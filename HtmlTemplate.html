@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Verificación de Seguridad</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8; padding:30px 0;">
+<tr>
+<td align="center">
+
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+
+<!-- HEADER -->
+<tr>
+<td style="background:#EC0000; padding:22px 30px; color:white; font-size:22px; font-weight:bold;">
+Santander
+</td>
+</tr>
+
+<!-- BODY -->
+<tr>
+<td style="padding:40px 35px; color:#333333;">
+
+<h2 style="margin-top:0; font-size:22px;">
+Verificación de identidad
+</h2>
+
+<p style="font-size:15px; line-height:1.6;">
+Hola <strong>{{USER_NAME}}</strong>,
+</p>
+
+<p style="font-size:15px; line-height:1.6;">
+Para continuar con la validación de tu usuario, ingresa el siguiente código de verificación:
+</p>
+
+<!-- OTP BOX -->
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding:30px 0;">
+
+<div style="
+display:inline-block;
+background:#fff5f5;
+border:2px solid #EC0000;
+border-radius:6px;
+padding:18px 35px;
+font-size:34px;
+letter-spacing:8px;
+font-weight:bold;
+color:#EC0000;">
+{{OTP_CODE}}
+</div>
+
+</td>
+</tr>
+</table>
+
+<p style="font-size:14px; line-height:1.6;">
+Este código es válido por <strong>{{EXPIRATION_MINUTES}} minutos</strong>.
+</p>
+
+<p style="font-size:14px; line-height:1.6;">
+Por tu seguridad, no compartas este código con nadie. Nuestro equipo nunca te pedirá esta información.
+</p>
+
+<hr style="border:none; border-top:1px solid #eeeeee; margin:30px 0;">
+
+<p style="font-size:13px; color:#666666;">
+Si no solicitaste este código, puedes ignorar este correo. Tu cuenta permanecerá segura.
+</p>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="background:#f7f7f7; padding:25px; text-align:center; font-size:12px; color:#777777; line-height:1.6;">
+
+<strong>Santander</strong><br>
+Este es un mensaje automático, por favor no respondas a este correo.
+
+<br><br>
+
+© 2026 Santander. Todos los derechos reservados.
+
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
