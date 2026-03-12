@@ -1,0 +1,21 @@
+<![CDATA[
+<div style="background:#1c1c1c;padding:20px;text-align:center;">
+  
+  <div style="font-size:22px;color:#ec0000;font-weight:bold;">
+    Santander Consumer
+  </div>
+
+  <div style="color:#ffffff;margin-top:10px;">
+    Tu código OTP
+  </div>
+
+  <div style="font-size:36px;color:#ec0000;font-weight:bold;">
+    4579312
+  </div>
+
+  <div style="color:#cccccc;margin-top:5px;">
+    Expira en 10 minutos
+  </div>
+
+</div>
+]]>
