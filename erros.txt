@@ -1,87 +1,26 @@
-2026-03-16T04:57:34.784-05:00  INFO 22884 --- [demo] [           main] com.example.demo.DemoApplication         : Starting DemoApplication using Java 17.0.18 with PID 22884 (C:\workspace\correo\demo\target\classes started by tecdesa2537 in C:\workspace\correo\demo)
-2026-03-16T04:57:34.790-05:00  INFO 22884 --- [demo] [           main] com.example.demo.DemoApplication         : No active profile set, falling back to 1 default profile: "default"
-2026-03-16T04:57:39.828-05:00  INFO 22884 --- [demo] [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8092
-2026-03-16T04:57:39.889-05:00  INFO 22884 --- [demo] [           main] com.example.demo.DemoApplication         : Started DemoApplication in 5.95 seconds (process running for 6.734)
-2026-03-16T04:59:35.074-05:00 DEBUG 22884 --- [demo] [ctor-http-nio-4] o.s.w.r.f.client.ExchangeFunctions       : [801f506] HTTP POST http://transact-campaign-us-2.goacoustic.com/XTMail
-2026-03-16T04:59:35.276-05:00 DEBUG 22884 --- [demo] [ctor-http-nio-4] r.netty.http.client.HttpClientConnect    : [f935ecc4-1, L:/192.168.31.194:62129 - R:transact-campaign-us-2.goacoustic.com/54.88.73.172:80] Handler is being applied: {uri=http://transact-campaign-us-2.goacoustic.com/XTMail, method=POST}
-2026-03-16T04:59:35.282-05:00 DEBUG 22884 --- [demo] [ctor-http-nio-4] r.n.http.client.HttpClientOperations     : [f935ecc4-1, L:/192.168.31.194:62129 - R:transact-campaign-us-2.goacoustic.com/54.88.73.172:80] Outbound error happened
+@Configuration
+public class XmlWebClientConfig {
 
-org.springframework.web.reactive.function.UnsupportedMediaTypeException: Content type 'application/xml' not supported for bodyType=com.example.demo.domain.model.otp.sendMailing.RequestOTP
-	at org.springframework.web.reactive.function.BodyInserters.unsupportedError(BodyInserters.java:440) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.BodyInserters.writeWithMessageWriters(BodyInserters.java:430) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.BodyInserters.lambda$fromValue$1(BodyInserters.java:103) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.client.DefaultClientRequestBuilder$BodyInserterRequest.writeTo(DefaultClientRequestBuilder.java:273) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$exchange$1(ExchangeFunctions.java:102) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.http.client.reactive.ReactorClientHttpConnector.lambda$connect$2(ReactorClientHttpConnector.java:147) ~[spring-web-6.1.6.jar:6.1.6]
-	at reactor.netty.http.client.HttpClientConnect$HttpClientHandler.requestWithBody(HttpClientConnect.java:604) ~[reactor-netty-http-1.1.18.jar:1.1.18]
-	at reactor.netty.http.client.HttpClientConnect$HttpIOHandlerObserver.lambda$onStateChange$0(HttpClientConnect.java:444) ~[reactor-netty-http-1.1.18.jar:1.1.18]
-	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:45) ~[reactor-core-3.6.5.jar:3.6.5]
-	at reactor.netty.http.client.HttpClientConnect$HttpIOHandlerObserver.onStateChange(HttpClientConnect.java:445) ~[reactor-netty-http-1.1.18.jar:1.1.18]
-	at reactor.netty.ReactorNetty$CompositeConnectionObserver.onStateChange(ReactorNetty.java:710) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onStateChange(DefaultPooledConnectionProvider.java:205) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnection.onStateChange(DefaultPooledConnectionProvider.java:466) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at reactor.netty.channel.ChannelOperationsHandler.channelActive(ChannelOperationsHandler.java:62) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:260) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:238) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:231) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelActive(CombinedChannelDuplexHandler.java:412) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.ChannelInboundHandlerAdapter.channelActive(ChannelInboundHandlerAdapter.java:69) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.CombinedChannelDuplexHandler.channelActive(CombinedChannelDuplexHandler.java:211) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:260) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:238) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:231) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelActive(DefaultChannelPipeline.java:1398) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:258) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:238) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.DefaultChannelPipeline.fireChannelActive(DefaultChannelPipeline.java:895) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:310) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:340) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) ~[netty-common-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.109.Final.jar:4.1.109.Final]
-	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+    @Bean
+    public WebClient xmlWebClient(TokenService tokenService) {
 
-2026-03-16T04:59:35.308-05:00  WARN 22884 --- [demo] [ctor-http-nio-4] r.netty.http.client.HttpClientConnect    : [f935ecc4-1, L:/192.168.31.194:62129 - R:transact-campaign-us-2.goacoustic.com/54.88.73.172:80] The connection observed an error
+        XmlMapper xmlMapper = new XmlMapper();
 
-org.springframework.web.reactive.function.UnsupportedMediaTypeException: Content type 'application/xml' not supported for bodyType=com.example.demo.domain.model.otp.sendMailing.RequestOTP
-	at org.springframework.web.reactive.function.BodyInserters.unsupportedError(BodyInserters.java:440) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.BodyInserters.writeWithMessageWriters(BodyInserters.java:430) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.BodyInserters.lambda$fromValue$1(BodyInserters.java:103) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.client.DefaultClientRequestBuilder$BodyInserterRequest.writeTo(DefaultClientRequestBuilder.java:273) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$exchange$1(ExchangeFunctions.java:102) ~[spring-webflux-6.1.6.jar:6.1.6]
-	at org.springframework.http.client.reactive.ReactorClientHttpConnector.lambda$connect$2(ReactorClientHttpConnector.java:147) ~[spring-web-6.1.6.jar:6.1.6]
-	at reactor.netty.http.client.HttpClientConnect$HttpClientHandler.requestWithBody(HttpClientConnect.java:604) ~[reactor-netty-http-1.1.18.jar:1.1.18]
-	at reactor.netty.http.client.HttpClientConnect$HttpIOHandlerObserver.lambda$onStateChange$0(HttpClientConnect.java:444) ~[reactor-netty-http-1.1.18.jar:1.1.18]
-	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:45) ~[reactor-core-3.6.5.jar:3.6.5]
-	at reactor.netty.http.client.HttpClientConnect$HttpIOHandlerObserver.onStateChange(HttpClientConnect.java:445) ~[reactor-netty-http-1.1.18.jar:1.1.18]
-	at reactor.netty.ReactorNetty$CompositeConnectionObserver.onStateChange(ReactorNetty.java:710) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onStateChange(DefaultPooledConnectionProvider.java:205) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnection.onStateChange(DefaultPooledConnectionProvider.java:466) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at reactor.netty.channel.ChannelOperationsHandler.channelActive(ChannelOperationsHandler.java:62) ~[reactor-netty-core-1.1.18.jar:1.1.18]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:260) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:238) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:231) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelActive(CombinedChannelDuplexHandler.java:412) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.ChannelInboundHandlerAdapter.channelActive(ChannelInboundHandlerAdapter.java:69) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.CombinedChannelDuplexHandler.channelActive(CombinedChannelDuplexHandler.java:211) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:260) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:238) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.fireChannelActive(AbstractChannelHandlerContext.java:231) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelActive(DefaultChannelPipeline.java:1398) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:258) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelActive(AbstractChannelHandlerContext.java:238) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.DefaultChannelPipeline.fireChannelActive(DefaultChannelPipeline.java:895) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:310) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:340) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562) ~[netty-transport-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) ~[netty-common-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.109.Final.jar:4.1.109.Final]
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.109.Final.jar:4.1.109.Final]
-	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> {
+                    configurer.defaultCodecs()
+                            .jackson2XmlEncoder(new Jackson2XmlEncoder(xmlMapper));
+                    configurer.defaultCodecs()
+                            .jackson2XmlDecoder(new Jackson2XmlDecoder(xmlMapper));
+                })
+                .build();
+
+        return WebClient.builder()
+                .baseUrl("http://transact-campaign-us-2.goacoustic.com")
+                .exchangeStrategies(strategies)
+                .filter(addTokenFilter(tokenService))
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                .build();
+    }
+}
