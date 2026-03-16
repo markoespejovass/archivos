@@ -1,0 +1,46 @@
+import java.util.concurrent.ThreadLocalRandom;
+
+public final class UtilsOtp {
+
+    private UtilsOtp() {
+        // Evita instanciación
+    }
+
+    /**
+     * Genera un número par aleatorio de 8 dígitos válido (empieza de 1-9)
+     */
+    public static String generarNumeroPar8Digitos() {
+        int numero = ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
+
+        // asegurar que sea par
+        if (numero % 2 != 0) {
+            numero++;
+        }
+
+        // en el caso extremadamente raro de pasar a 100000000
+        if (numero > 99_999_999) {
+            numero -= 2;
+        }
+
+        return String.valueOf(numero);
+    }
+
+    /**
+     * Valida si un número es par y tiene 8 dígitos válidos (1-9 al inicio)
+     */
+    public static boolean esNumeroPar8DigitosValido(String numero) {
+
+        if (numero == null) {
+            return false;
+        }
+
+        // Debe tener exactamente 8 dígitos y empezar 1-9
+        if (!numero.matches("^[1-9]\\d{7}$")) {
+            return false;
+        }
+
+        int valor = Integer.parseInt(numero);
+
+        return valor % 2 == 0;
+    }
+}
