@@ -1,26 +1,14 @@
-<dependencies>
-    <!-- WebFlux -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-webflux</artifactId>
-    </dependency>
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
 
-    <!-- R2DBC (reactivo) -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-r2dbc</artifactId>
-    </dependency>
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
-    <!-- H2 reactivo -->
-    <dependency>
-        <groupId>io.r2dbc</groupId>
-        <artifactId>r2dbc-h2</artifactId>
-    </dependency>
-
-    <!-- H2 consola (opcional) -->
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>runtime</scope>
-    </dependency>
-</dependencies>
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
