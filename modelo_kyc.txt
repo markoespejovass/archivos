@@ -1,0 +1,215 @@
+{
+   "party":{
+      "partyId":"7537136201",
+      "person":{
+         "documents":[
+            {
+               "documentNumber":"75371362",
+               "documentTypeCode":"DNI"
+            }
+         ],
+         "personName":{
+            "fullName":"Marko Raul Espejo Moran",
+            "givenName":"Marko",
+            "lastName":"Espejo",
+            "middleName":"Raul",
+            "secondLastName":"Moran"
+         },
+         "placeOfBirth":{
+            "countryCode":"PE",
+            "countryName":"Peru"
+         },
+         "birthDate":"1986-01-01",
+         "civilStatusDescription":"SOLTERO",
+         "politicalExposure":{
+            "isSelfDeclaredPEP":false,
+            "declarationComments":"Nunca ocupe un cargo politico"
+         },
+         "genderDescription":"Hombre",
+         "employmentInformation":{
+            "occupationCode":"1211",
+            "occupationDescription":"Chief Financial Officer",
+            "statusCode":"A",
+            "statusDescription":"Employed",
+            "position":{
+               "code":"C001",
+               "description":"National government"
+            },
+            "economicActivity":{
+               "categoryDescription":"Financial and insurance activities",
+               "subCategoryCode":"6491",
+               "subCategoryDescription":"Leasing"
+            },
+            "employer":{
+               "name":"British Airways",
+               "typeDescription":"Private sector",
+               "address":{
+                  "fullAddress":"7 Regent St. London W1B 4DY United Kingdom"
+               }
+            }
+         },
+         "additionalEmployments":[
+            {
+               "occupationCode":"1211",
+               "occupationDescription":"Chief Financial Officer",
+               "statusCode":"A",
+               "statusDescription":"Employed",
+               "position":{
+                  "code":"C001",
+                  "description":"National government"
+               },
+               "economicActivity":{
+                  "categoryDescription":"Financial and insurance activities",
+                  "subCategoryCode":"6491",
+                  "subCategoryDescription":"Leasing"
+               },
+               "employer":{
+                  "name":"British Airways",
+                  "typeDescription":"Private sector",
+                  "address":{
+                     "fullAddress":"7 Regent St. London W1B 4DY United Kingdom"
+                  }
+               }
+            }
+         ]
+      },
+      "statusInfo":{
+         "statusCode":"C001",
+         "statusDescription":"New"
+      },
+      "structuralSegmentCode":"PS",
+      "structuralSegmentDescription":"Personal",
+      "structuralSubsegmentCode":"01",
+      "structuralSubsegmentDescription":"Liberal professions",
+      "contactPoints":[
+         {
+            "electronicAddress":{
+               "emailAddress":"john.doe@santander.us"
+            },
+            "phoneAddress":{
+               "phoneNumber":"+36 612 123 123"
+            }
+         }
+      ]
+   },
+   "products":[
+      {
+         "family":{
+            "productFamily":{
+               "productFamilyId":"005003001",
+               "name":"Mortgage loans"
+            }
+         },
+         "productCode":"0049300130",
+         "productDescription":"Santander Checking Account"
+      }
+   ],
+   "preferenceChannel":{
+      "code":"01",
+      "description":"Web"
+   },
+   "knowYourCustomerQuestionnaires":[
+      {
+         "questionnaireId":"0233222",
+         "audit":{
+            "lastUpdateDate":"2025-02-18",
+            "lastUpdateProcess":"Onboarding",
+            "expirationDate":"2028-07-21",
+            "completionDate":"2025-11-15",
+            "submissionDate":"2025-11-17"
+         },
+         "questions":[
+            {
+               "typeDescription":"Simple answer",
+               "translationCode":"05_1G03",
+               "answer":"Self-employed",
+               "answerTranslationCode":"05_1G03",
+               "answers":[
+                  {
+                     "translationCode":"05_1G03",
+                     "values":[
+                        "PE"
+                     ]
+                  }
+               ],
+               "description":"What is your activity?",
+               "questionId":"Q8282838"
+            }
+         ],
+         "version":"1"
+      }
+   ],
+   "purposeOfRelationshipAndSourceOfFunds":{
+      "purposeOfRelationship":"Saving",
+      "typeOfOperations":"Deposits",
+      "mainCustomer":"Barefoot SL",
+      "mainSupplier":"Law and order",
+      "sourceOfWealth":[
+         {
+            "code":"C001",
+            "description":"Salary"
+         }
+      ],
+      "sourceOfFunds":[
+         {
+            "code":"C001",
+            "description":"Salary"
+         }
+      ],
+      "annualIncome":{
+         "amount":99.99,
+         "currency":"EUR"
+      },
+      "patrimony":{
+         "amount":99.99,
+         "currency":"EUR"
+      },
+      "purposeOfRelationshipList":[
+         {
+            "code":"001",
+            "description":"Occupation – Business ownership"
+         }
+      ]
+   },
+   "audit":{
+      "creationDate":"2025-01-21",
+      "creationChannel":{
+         "code":"01",
+         "description":"Web"
+      }
+   },
+   "antiMoneyLaundering":{
+      "statusInfo":{
+         "statusCode":"OK"
+      },
+      "amlId":"921",
+      "riskCategories":[
+         {
+            "riskCategoryCode":"SIP",
+            "riskCategoryDescription":"Special Interest Person"
+         }
+      ],
+      "riskSources":[
+         {
+            "riskSourceCode":"US-OFAC"
+         }
+      ]
+   },
+   "analysisResult":{
+      "analyst":{
+         "kycAnalystId":"d82h2",
+         "person":{
+            "personName":{
+               "fullName":"Mary Elizabeth Clark Butler"
+            }
+         },
+         "contactPoint":{
+            "electronicAddress":{
+               "emailAddress":"john.doe@santander.us"
+            }
+         }
+      },
+      "isVerified":true
+   },
+   "publicOfficeIndicator":true
+}
