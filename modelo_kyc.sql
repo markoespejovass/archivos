@@ -151,22 +151,6 @@ CREATE TABLE question (
 );
 
 
-CREATE TABLE question (
-    id BIGSERIAL PRIMARY KEY,
-    questionnaire_id BIGINT,
-
-    question_id VARCHAR(50),
-    description TEXT,
-
-    type_description VARCHAR(100),
-    translation_code VARCHAR(50),
-
-    answer TEXT,
-    answer_translation_code VARCHAR(50),
-
-    FOREIGN KEY (questionnaire_id) REFERENCES questionnaire(id)
-);
-
 
 CREATE TABLE question_answer_value (
     id BIGSERIAL PRIMARY KEY,
