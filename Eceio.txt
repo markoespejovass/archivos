@@ -1,143 +1,180 @@
-package com.example.demo.infrastructure.adapter.out.external.client;
+@Slf4j
+@Service
+public class TokenService {
 
-import com.example.demo.domain.model.otp.sendMailing.RequestOTP;
-import com.example.demo.domain.model.otp.sendMailing.ResponseOTP;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+  private final WebClient webClient;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+  public TokenService( WebClient.Builder webClient) {
+    this.webClient = webClient.baseUrl(Constant.baseURL).build();
+  }
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+    /**
+     * Genera un token
+     *
+     *
+     * @return un token generado
+     */
+  public Mono<String> getToken() {
+      return webClient
+              .post()
+              .uri(Constant.URI_API_TOKEN)
+              .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+              .body(BodyInserters
+                      .fromFormData(Constant.grantType,Constant.grantTypeValue)
+                      .with(Constant.clientId,Constant.clientIdValue)
+                      .with(Constant.clientSecret,Constant.clientSecretValue)
+                      .with(Constant.refreshToken,Constant.refreshTokenValue))
+              .retrieve()
+              .onStatus(
+                      httpStatus -> httpStatus.is4xxClientError() || httpStatus.is5xxServerError(),
+                      clientResponse ->
+                              clientResponse
+                                      .bodyToMono(String.class)
+                                      .flatMap(
+                                              errorBody -> {
+                                                  log.error("Error getting token: {}", errorBody);
+                                                  return Mono.error(
+                                                          new RuntimeException("Failed to get token: " + errorBody));
+                                              }))
+              .bodyToMono(TokenResponse.class)
+              .map(TokenResponse::getAccessToken)
+              .doOnSuccess(token -> log.info("Token obtained successfully"))
+              .doOnError(error -> log.error("Error obtaining token: ", error));
 
+  }
+
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
+import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
-import reactor.core.publisher.Mono;
+import javax.net.ssl.SSLException;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+/**
+ * The class representative Xml config
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration public class XmlWebClientConfig {
+@Bean
+public WebClient xmlWebClient(TokenService tokenService) {
 
-@ExtendWith(MockitoExtension.class)
-class OTPServiceAdapterTest {
+    ExchangeStrategies strategies = ExchangeStrategies.builder()
+            .codecs(configurer -> {
+                configurer.defaultCodecs()
+                        .jaxb2Encoder(new Jaxb2XmlEncoder());
+                configurer.defaultCodecs()
+                        .jaxb2Decoder(new Jaxb2XmlDecoder());
+            })
+            .build();
+    HttpClient httpClient = HttpClient.create()
+            .secure(t -> {
+                try {
+                    t.sslContext(SslContextBuilder.forClient().trustManager(
+                            InsecureTrustManagerFactory.INSTANCE
+                    ).build());
+                } catch (SSLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-    @Mock
-    private WebClient webClient;
-
-    @Mock
-    private XmlMapper xmlMapper;
-
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private WebClient.RequestBodySpec requestBodySpec;
-
-    @Mock
-    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpec;
-
-    @InjectMocks
-    private OTPServiceAdapter adapter;
-
-    // =========================
-    // ✅ SUCCESS CASE
-    // =========================
-    @Test
-    void shouldSendMailingSuccessfully() throws Exception {
-
-        RequestOTP request = new RequestOTP();
-        String xmlRequest = "<xml>request</xml>";
-        String xmlResponse = "<xml>response</xml>";
-
-        ResponseOTP expectedResponse = new ResponseOTP();
-
-        // Mock XML serialization
-        when(xmlMapper.writeValueAsString(request)).thenReturn(xmlRequest);
-
-        // Mock WebClient chain
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/XTMail")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.TEXT_XML)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(xmlRequest)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(xmlResponse));
-
-        // Mock XML deserialization
-        when(xmlMapper.readValue(xmlResponse, ResponseOTP.class))
-                .thenReturn(expectedResponse);
-
-        // Act
-        ResponseOTP result = adapter.sendMailing(request);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(expectedResponse, result);
-
-        verify(xmlMapper).writeValueAsString(request);
-        verify(xmlMapper).readValue(xmlResponse, ResponseOTP.class);
-
-        verify(webClient).post();
-        verify(requestBodyUriSpec).uri("/XTMail");
-        verify(requestBodySpec).contentType(MediaType.TEXT_XML);
-        verify(requestBodySpec).bodyValue(xmlRequest);
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).bodyToMono(String.class);
+    return WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .baseUrl("http://transact-campaign-us-2.goacoustic.com")
+            .exchangeStrategies(strategies)
+            .filter(addTokenFilter(tokenService))
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+            .build();
     }
 
-    // =========================
-    // ❌ ERROR PARSING XML
-    // =========================
-    @Test
-    void shouldReturnEmptyResponseWhenXmlParsingFails() throws Exception {
+    private ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
+        return (request, next) ->
+                tokenService
+                        .getToken()
+                        .flatMap(
+                                token -> {
+                                    ClientRequest authorizedRequest =
+                                            ClientRequest.from(request)
+                                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                                                    .build();
+                                    return next.exchange(authorizedRequest);
+                                });
+    }
+}
 
-        RequestOTP request = new RequestOTP();
-        String xmlRequest = "<xml>request</xml>";
-        String invalidXml = "INVALID_XML";
 
-        when(xmlMapper.writeValueAsString(request)).thenReturn(xmlRequest);
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.util;
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(invalidXml));
+import java.util.concurrent.ThreadLocalRandom;
 
-        when(xmlMapper.readValue(invalidXml, ResponseOTP.class))
-                .thenThrow(new JsonProcessingException("error") {});
+import static com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants.Constant.temp_2;
 
-        // Act
-        ResponseOTP result = adapter.sendMailing(request);
-
-        // Assert
-        assertNotNull(result); // retorna objeto vacío según tu lógica
+/**
+ * The class representative Utils otp
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+public class UtilsOtp {
+    private UtilsOtp() {
+        // Evita instanciación
     }
 
-    // =========================
-    // ❌ ERROR EN WEBCLIENT
-    // =========================
-    @Test
-    void shouldThrowExceptionWhenWebClientFails() throws Exception {
+    /**
+     * Genera un número par aleatorio de 8 dígitos válido (empieza de 1-9)
+     *
+     * @return el valor del numero generado
+     */
+    public static String generarNumeroPar8Digitos() {
+        var numero = ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
 
-        RequestOTP request = new RequestOTP();
+        // asegurar que sea par
+        if (numero % 2 != 0) {
+            numero++;
+        }
 
-        when(xmlMapper.writeValueAsString(request)).thenReturn("<xml/>");
+        // en el caso extremadamente raro de pasar a 100000000
+        if (numero > 99_999_999) {
+            numero -= 2;
+        }
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        return String.valueOf(numero);
+    }
 
-        when(responseSpec.bodyToMono(String.class))
-                .thenReturn(Mono.error(new RuntimeException("API error")));
+    /**
+     * Valida si un número es par y tiene 8 dígitos válidos (1-9 al inicio)
+     *
+     * @return validar el numero generado
+     */
+    public static boolean esNumeroPar8DigitosValido(String numero) {
 
-        assertThrows(RuntimeException.class,
-                () -> adapter.sendMailing(request));
+        if (numero == null) {
+            return false;
+        }
+
+        // Debe tener exactamente 8 dígitos y empezar 1-9
+        if (!numero.matches("^[1-9]\\d{7}$")) {
+            return false;
+        }
+
+        var valor = Integer.parseInt(numero);
+
+        return valor % temp_2 == 0;
     }
 }
