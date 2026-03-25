@@ -1,14 +1,119 @@
-spring:
-  r2dbc:
-    url: r2dbc:h2:mem:///testdb;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
+package com.example.demo.application.usecase;
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+import com.example.demo.application.port.out.OTPServiceRepositoryPort;
+import com.example.demo.domain.model.otp.getAggregateTrackingForMailing.*;
+import com.example.demo.domain.model.otp.getAggregateTrackingForUser.*;
+import com.example.demo.domain.model.otp.getReportIdByDate.*;
+import com.example.demo.domain.model.otp.saveMailing.*;
+import com.example.demo.domain.model.otp.sendMailing.*;
 
-logging:
-  level:
-    org.springframework.r2dbc: DEBUG
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
+class OTPServiceUseCaseImplTest {
+
+    @Mock
+    private OTPServiceRepositoryPort repositoryPort;
+
+    @InjectMocks
+    private OTPServiceUseCaseImpl useCase;
+
+    private RequestOTP requestOTP;
+    private ResponseOTP responseOTP;
+
+    private GetReportRequest reportRequest;
+    private GetReportResponse reportResponse;
+
+    private GetTrackingForUserRequest trackingUserRequest;
+    private GetTrackingForUserResponse trackingUserResponse;
+
+    private GetTrackingForMailRequest trackingMailRequest;
+    private GetTrackingForMailResponse trackingMailResponse;
+
+    private SaveMailRequest saveMailRequest;
+    private SaveMailResponse saveMailResponse;
+
+    @BeforeEach
+    void setUp() {
+        requestOTP = new RequestOTP();
+        responseOTP = new ResponseOTP();
+
+        reportRequest = new GetReportRequest();
+        reportResponse = new GetReportResponse();
+
+        trackingUserRequest = new GetTrackingForUserRequest();
+        trackingUserResponse = new GetTrackingForUserResponse();
+
+        trackingMailRequest = new GetTrackingForMailRequest();
+        trackingMailResponse = new GetTrackingForMailResponse();
+
+        saveMailRequest = new SaveMailRequest();
+        saveMailResponse = new SaveMailResponse();
+    }
+
+    @Test
+    void shouldSendMailing() {
+        when(repositoryPort.sendMailing(requestOTP)).thenReturn(responseOTP);
+
+        ResponseOTP result = useCase.sendMailing(requestOTP);
+
+        assertNotNull(result);
+        assertEquals(responseOTP, result);
+        verify(repositoryPort).sendMailing(requestOTP);
+    }
+
+    @Test
+    void shouldGetReportIdByDate() {
+        when(repositoryPort.getReportIdByDate(reportRequest)).thenReturn(reportResponse);
+
+        GetReportResponse result = useCase.getReportIdByDate(reportRequest);
+
+        assertNotNull(result);
+        assertEquals(reportResponse, result);
+        verify(repositoryPort).getReportIdByDate(reportRequest);
+    }
+
+    @Test
+    void shouldGetAggregateTrackingForUser() {
+        when(repositoryPort.getAggregateTrackingForUser(trackingUserRequest))
+                .thenReturn(trackingUserResponse);
+
+        GetTrackingForUserResponse result = useCase.getAggregateTrackingForUser(trackingUserRequest);
+
+        assertNotNull(result);
+        assertEquals(trackingUserResponse, result);
+        verify(repositoryPort).getAggregateTrackingForUser(trackingUserRequest);
+    }
+
+    @Test
+    void shouldGetAggregateTrackingForMailing() {
+        when(repositoryPort.getAggregateTrackingForMailing(trackingMailRequest))
+                .thenReturn(trackingMailResponse);
+
+        GetTrackingForMailResponse result = useCase.getAggregateTrackingForMailing(trackingMailRequest);
+
+        assertNotNull(result);
+        assertEquals(trackingMailResponse, result);
+        verify(repositoryPort).getAggregateTrackingForMailing(trackingMailRequest);
+    }
+
+    @Test
+    void shouldSaveMailing() {
+        when(repositoryPort.saveMailing(saveMailRequest)).thenReturn(saveMailResponse);
+
+        SaveMailResponse result = useCase.saveMailing(saveMailRequest);
+
+        assertNotNull(result);
+        assertEquals(saveMailResponse, result);
+        verify(repositoryPort).saveMailing(saveMailRequest);
+    }
+}
