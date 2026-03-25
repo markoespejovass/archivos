@@ -1,18 +1,20 @@
-
 package com.example.demo.infrastructure.adapter.out.external.client;
 
 import com.example.demo.domain.model.otp.sendMailing.RequestOTP;
 import com.example.demo.domain.model.otp.sendMailing.ResponseOTP;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
 import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.*;
@@ -25,7 +27,13 @@ class OTPServiceAdapterTest {
     private WebClient webClient;
 
     @Mock
-    private WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec;
+    private XmlMapper xmlMapper;
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    @Mock
+    private WebClient.RequestBodySpec requestBodySpec;
 
     @Mock
     private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
@@ -36,60 +44,100 @@ class OTPServiceAdapterTest {
     @InjectMocks
     private OTPServiceAdapter adapter;
 
-    private ResponseOTP response;
-
-    @BeforeEach
-    void setUp() {
-        response = new ResponseOTP();
-    }
-
+    // =========================
+    // ✅ SUCCESS CASE
+    // =========================
     @Test
-    void shouldSendMailingSuccessfully() {
+    void shouldSendMailingSuccessfully() throws Exception {
 
         RequestOTP request = new RequestOTP();
+        String xmlRequest = "<xml>request</xml>";
+        String xmlResponse = "<xml>response</xml>";
 
-        // Mock chain
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri("http://localhost:8092/api/demo-app/v1/api/xml/otp"))
-                .thenReturn(requestHeadersSpec);
+        ResponseOTP expectedResponse = new ResponseOTP();
+
+        // Mock XML serialization
+        when(xmlMapper.writeValueAsString(request)).thenReturn(xmlRequest);
+
+        // Mock WebClient chain
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri("/XTMail")).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.TEXT_XML)).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(xmlRequest)).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ResponseOTP.class)).thenReturn(Mono.just(response));
+        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(xmlResponse));
+
+        // Mock XML deserialization
+        when(xmlMapper.readValue(xmlResponse, ResponseOTP.class))
+                .thenReturn(expectedResponse);
 
         // Act
         ResponseOTP result = adapter.sendMailing(request);
 
         // Assert
         assertNotNull(result);
-        assertEquals(response, result);
+        assertEquals(expectedResponse, result);
 
-        verify(webClient).get();
-        verify(requestHeadersUriSpec).uri("http://localhost:8092/api/demo-app/v1/api/xml/otp");
+        verify(xmlMapper).writeValueAsString(request);
+        verify(xmlMapper).readValue(xmlResponse, ResponseOTP.class);
+
+        verify(webClient).post();
+        verify(requestBodyUriSpec).uri("/XTMail");
+        verify(requestBodySpec).contentType(MediaType.TEXT_XML);
+        verify(requestBodySpec).bodyValue(xmlRequest);
         verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).bodyToMono(ResponseOTP.class);
+        verify(responseSpec).bodyToMono(String.class);
     }
 
+    // =========================
+    // ❌ ERROR PARSING XML
+    // =========================
+    @Test
+    void shouldReturnEmptyResponseWhenXmlParsingFails() throws Exception {
 
+        RequestOTP request = new RequestOTP();
+        String xmlRequest = "<xml>request</xml>";
+        String invalidXml = "INVALID_XML";
 
+        when(xmlMapper.writeValueAsString(request)).thenReturn(xmlRequest);
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(invalidXml));
+
+        when(xmlMapper.readValue(invalidXml, ResponseOTP.class))
+                .thenThrow(new JsonProcessingException("error") {});
+
+        // Act
+        ResponseOTP result = adapter.sendMailing(request);
+
+        // Assert
+        assertNotNull(result); // retorna objeto vacío según tu lógica
+    }
+
+    // =========================
+    // ❌ ERROR EN WEBCLIENT
+    // =========================
+    @Test
+    void shouldThrowExceptionWhenWebClientFails() throws Exception {
+
+        RequestOTP request = new RequestOTP();
+
+        when(xmlMapper.writeValueAsString(request)).thenReturn("<xml/>");
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(String.class))
+                .thenReturn(Mono.error(new RuntimeException("API error")));
+
+        assertThrows(RuntimeException.class,
+                () -> adapter.sendMailing(request));
+    }
 }
-
-
-@Test
-void shouldThrowExceptionWhenWebClientFails() {
-
-    RequestOTP request = new RequestOTP();
-
-    when(webClient.get()).thenReturn(requestHeadersUriSpec);
-    when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-    when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-    when(responseSpec.bodyToMono(ResponseOTP.class))
-            .thenReturn(Mono.error(new RuntimeException("Error externo")));
-
-    assertThrows(RuntimeException.class, () -> adapter.sendMailing(request));
-}
-
-
-
-
-
-
-
