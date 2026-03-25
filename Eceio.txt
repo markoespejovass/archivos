@@ -1,91 +1,72 @@
-package com.example.demo.infrastructure.adapter.in.rest;
+package com.example.demo.security;
 
-import com.example.demo.application.port.in.OTPServiceUseCase;
-import com.example.demo.domain.model.otp.sendMailing.RequestOTP;
-import com.example.demo.domain.model.otp.sendMailing.ResponseOTP;
-import com.example.demo.infrastructure.adapter.in.dto.otp.sendMailing.RequestOTPDTO;
-import com.example.demo.infrastructure.adapter.in.dto.otp.sendMailing.ResponseOTPDTO;
-import com.example.demo.infrastructure.adapter.in.mapper.OTPServiceMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+public class JwtUtil {
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+    private static final String SECRET = "123456";
 
-@ExtendWith(MockitoExtension.class)
-class OTPServiceControllerTest {
+    private static SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    }
 
-    @Mock
-    private OTPServiceUseCase useCase;
+    public static String generateToken(String username) {
 
-    @Mock
-    private OTPServiceMapper mapper;
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", "USER"); // opcional
 
-    @InjectMocks
-    private OTPServiceController controller;
+        long now = System.currentTimeMillis();
+        long expiration = now + 1000 * 60 * 60; // 1 hora
 
-    @Test
-    void shouldSendMailingSuccessfully() {
-        // Arrange
-        RequestOTPDTO requestDTO = new RequestOTPDTO();
-        RequestOTP request = new RequestOTP();
-
-        ResponseOTP response = new ResponseOTP();
-        ResponseOTPDTO responseDTO = new ResponseOTPDTO();
-
-        when(mapper.RequestOTPDtoToRequestOTP(requestDTO)).thenReturn(request);
-        when(useCase.sendMailing(request)).thenReturn(response);
-        when(mapper.ResponseOTPToResponseOTPDTO(response)).thenReturn(responseDTO);
-
-        // Act
-        ResponseOTPDTO result = controller.sendMailing(requestDTO);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(responseDTO, result);
-
-        verify(mapper).RequestOTPDtoToRequestOTP(requestDTO);
-        verify(useCase).sendMailing(request);
-        verify(mapper).ResponseOTPToResponseOTPDTO(response);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 }
 
 
-@Test
-void shouldCallDependenciesInCorrectOrder() {
-    RequestOTPDTO requestDTO = new RequestOTPDTO();
-    RequestOTP request = new RequestOTP();
-    ResponseOTP response = new ResponseOTP();
-    ResponseOTPDTO responseDTO = new ResponseOTPDTO();
+<dependencies>
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>0.11.5</version>
+    </dependency>
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>0.11.5</version>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>0.11.5</version>
+        <scope>runtime</scope>
+    </dependency>
+</dependencies>
 
-    when(mapper.RequestOTPDtoToRequestOTP(requestDTO)).thenReturn(request);
-    when(useCase.sendMailing(request)).thenReturn(response);
-    when(mapper.ResponseOTPToResponseOTPDTO(response)).thenReturn(responseDTO);
 
-    controller.sendMailing(requestDTO);
+long now = System.currentTimeMillis();
 
-    InOrder inOrder = inOrder(mapper, useCase);
+Date issuedAt = new Date(now);
+Date expiration = new Date(now + 1000 * 60 * 60); // +1 hora
 
-    inOrder.verify(mapper).RequestOTPDtoToRequestOTP(requestDTO);
-    inOrder.verify(useCase).sendMailing(request);
-    inOrder.verify(mapper).ResponseOTPToResponseOTPDTO(response);
-}
-
-
-@Test
-void shouldThrowExceptionWhenMapperFails() {
-    RequestOTPDTO requestDTO = new RequestOTPDTO();
-
-    when(mapper.RequestOTPDtoToRequestOTP(requestDTO))
-            .thenThrow(new RuntimeException("Mapping error"));
-
-    assertThrows(RuntimeException.class, () -> controller.sendMailing(requestDTO));
-
-    verify(useCase, never()).sendMailing(any());
-}
+String token = Jwts.builder()
+        .setSubject("usuario123")
+        .setIssuedAt(issuedAt)      // 👈 iat
+        .setExpiration(expiration)  // 👈 exp
+        .signWith(key, SignatureAlgorithm.HS256)
+        .compact();
 
