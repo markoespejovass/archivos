@@ -1,79 +1,166 @@
-2026-03-25T17:10:16.799-05:00  INFO 23696 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "local"
-2026-03-25T17:10:28.105-05:00  WARN 23696 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\OTPServiceAdapter.class]: Failed to instantiate [com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter]: No default constructor found
-2026-03-25T17:10:28.250-05:00 ERROR 23696 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.SpringApplication                  : Application run failed
+@ExtendWith(MockitoExtension.class)
+class TokenServiceTest {
 
-org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\OTPServiceAdapter.class]: Failed to instantiate [com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter]: No default constructor found
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:990) ~[spring-context-6.2.12.jar:6.2.12]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.12.jar:6.2.12]
-	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.5.7.jar:3.5.7]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) [spring-boot-3.5.7.jar:3.5.7]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) [spring-boot-3.5.7.jar:3.5.7]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) [spring-boot-3.5.7.jar:3.5.7]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) [spring-boot-3.5.7.jar:3.5.7]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) [spring-boot-3.5.7.jar:3.5.7]
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.OpenApiGeneratorApplication.main(OpenApiGeneratorApplication.java:17) [classes/:?]
-Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\OTPServiceAdapter.class]: Failed to instantiate [com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter]: No default constructor found
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateBean(AbstractAutowireCapableBeanFactory.java:1357) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1242) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1770) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.12.jar:6.2.12]
-	... 21 more
-Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter]: No default constructor found
-	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:119) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateBean(AbstractAutowireCapableBeanFactory.java:1351) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1242) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1770) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.12.jar:6.2.12]
-	... 21 more
-Caused by: java.lang.NoSuchMethodException: com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.<init>()
-	at java.base/java.lang.Class.getConstructor0(Class.java:3587) ~[?:?]
-	at java.base/java.lang.Class.getDeclaredConstructor(Class.java:2756) ~[?:?]
-	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:115) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateBean(AbstractAutowireCapableBeanFactory.java:1351) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1242) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1770) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.12.jar:6.2.12]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.12.jar:6.2.12]
-	... 21 more
+    @Mock
+    private WebClient.Builder webClientBuilder;
+
+    @Mock
+    private WebClient webClient;
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
+    private TokenService tokenService;
+
+    @BeforeEach
+    void setUp() {
+        when(webClientBuilder.baseUrl(anyString())).thenReturn(webClientBuilder);
+        when(webClientBuilder.build()).thenReturn(webClient);
+
+        tokenService = new TokenService(webClientBuilder);
+    }
+
+    @Test
+    void shouldGetTokenSuccessfully() {
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken("token-ok");
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.contentType(any())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.body(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(TokenResponse.class))
+                .thenReturn(Mono.just(tokenResponse));
+
+        StepVerifier.create(tokenService.getToken())
+                .expectNext("token-ok")
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldHandleErrorFromApi() {
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.contentType(any())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.body(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(TokenResponse.class))
+                .thenReturn(Mono.error(new RuntimeException("fail")));
+
+        StepVerifier.create(tokenService.getToken())
+                .expectError(RuntimeException.class)
+                .verify();
+    }
+}
 
 
-Process finished with exit code 1
+
+########
+
+
+@Test
+void shouldTriggerOnStatusErrorHandler() {
+
+    when(webClient.post()).thenReturn(requestBodyUriSpec);
+    when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+    when(requestBodyUriSpec.contentType(any())).thenReturn(requestBodyUriSpec);
+    when(requestBodyUriSpec.body(any())).thenReturn(requestHeadersSpec);
+    when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+    when(responseSpec.onStatus(any(), any())).thenAnswer(invocation -> {
+        var function = invocation.getArgument(1);
+
+        // simulamos error response
+        var clientResponse = mock(org.springframework.web.reactive.function.client.ClientResponse.class);
+        when(clientResponse.bodyToMono(String.class))
+                .thenReturn(Mono.just("error-body"));
+
+        return ((Mono<?>) function.apply(clientResponse)).thenReturn(responseSpec);
+    });
+
+    when(responseSpec.bodyToMono(TokenResponse.class))
+            .thenReturn(Mono.empty());
+
+    StepVerifier.create(tokenService.getToken())
+            .verifyComplete();
+}
+
+
+
+
+#########
+
+
+class XmlWebClientConfigTest {
+
+    @Test
+    void shouldCreateWebClient() {
+
+        TokenService tokenService = mock(TokenService.class);
+        when(tokenService.getToken()).thenReturn(Mono.just("token"));
+
+        XmlWebClientConfig config = new XmlWebClientConfig();
+
+        WebClient client = config.xmlWebClient(tokenService);
+
+        assertNotNull(client);
+    }
+}
+
+#######
+
+
+
+@Test
+void shouldAddAuthorizationHeaderInFilter() {
+
+    TokenService tokenService = mock(TokenService.class);
+    when(tokenService.getToken()).thenReturn(Mono.just("fake-token"));
+
+    XmlWebClientConfig config = new XmlWebClientConfig();
+
+    WebClient client = config.xmlWebClient(tokenService);
+
+    // Creamos request mock
+    var request = org.springframework.web.reactive.function.client.ClientRequest
+            .create(org.springframework.http.HttpMethod.GET, java.net.URI.create("http://test"))
+            .build();
+
+    var exchangeFunction = mock(org.springframework.web.reactive.function.client.ExchangeFunction.class);
+
+    when(exchangeFunction.exchange(any()))
+            .thenReturn(Mono.just(mock(org.springframework.web.reactive.function.client.ClientResponse.class)));
+
+    // Ejecutamos filtro manualmente
+    var filter = config.getClass()
+            .getDeclaredMethods()[1]; // hack simple (addTokenFilter)
+
+    filter.setAccessible(true);
+
+    try {
+        var exchangeFilterFunction = (org.springframework.web.reactive.function.client.ExchangeFilterFunction)
+                filter.invoke(config, tokenService);
+
+        StepVerifier.create(exchangeFilterFunction.filter(request, exchangeFunction))
+                .expectNextCount(1)
+                .verifyComplete();
+
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+}
