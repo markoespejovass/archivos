@@ -1,180 +1,202 @@
-@Slf4j
-@Service
-public class TokenService {
+package com.example.demo.infrastructure.util;
 
-  private final WebClient webClient;
+import org.junit.jupiter.api.Test;
 
-  public TokenService( WebClient.Builder webClient) {
-    this.webClient = webClient.baseUrl(Constant.baseURL).build();
-  }
+import static org.junit.jupiter.api.Assertions.*;
 
-    /**
-     * Genera un token
-     *
-     *
-     * @return un token generado
-     */
-  public Mono<String> getToken() {
-      return webClient
-              .post()
-              .uri(Constant.URI_API_TOKEN)
-              .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-              .body(BodyInserters
-                      .fromFormData(Constant.grantType,Constant.grantTypeValue)
-                      .with(Constant.clientId,Constant.clientIdValue)
-                      .with(Constant.clientSecret,Constant.clientSecretValue)
-                      .with(Constant.refreshToken,Constant.refreshTokenValue))
-              .retrieve()
-              .onStatus(
-                      httpStatus -> httpStatus.is4xxClientError() || httpStatus.is5xxServerError(),
-                      clientResponse ->
-                              clientResponse
-                                      .bodyToMono(String.class)
-                                      .flatMap(
-                                              errorBody -> {
-                                                  log.error("Error getting token: {}", errorBody);
-                                                  return Mono.error(
-                                                          new RuntimeException("Failed to get token: " + errorBody));
-                                              }))
-              .bodyToMono(TokenResponse.class)
-              .map(TokenResponse::getAccessToken)
-              .doOnSuccess(token -> log.info("Token obtained successfully"))
-              .doOnError(error -> log.error("Error obtaining token: ", error));
+class UtilsOtpTest {
 
-  }
+    @Test
+    void shouldGenerateValidEvenNumber() {
 
+        String numero = UtilsOtp.generarNumeroPar8Digitos();
+
+        assertNotNull(numero);
+        assertEquals(8, numero.length());
+
+        int valor = Integer.parseInt(numero);
+
+        assertTrue(valor % 2 == 0);
+        assertTrue(numero.matches("^[1-9]\\d{7}$"));
+    }
+
+    @Test
+    void shouldValidateCorrectNumber() {
+
+        String numero = "12345678"; // par y válido
+
+        boolean result = UtilsOtp.esNumeroPar8DigitosValido(numero);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalseForOddNumber() {
+
+        String numero = "12345679"; // impar
+
+        boolean result = UtilsOtp.esNumeroPar8DigitosValido(numero);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalseForInvalidFormat() {
+
+        assertFalse(UtilsOtp.esNumeroPar8DigitosValido("02345678")); // empieza en 0
+        assertFalse(UtilsOtp.esNumeroPar8DigitosValido("1234567"));  // 7 dígitos
+        assertFalse(UtilsOtp.esNumeroPar8DigitosValido("abcdefgh")); // letras
+    }
+
+    @Test
+    void shouldReturnFalseForNull() {
+        assertFalse(UtilsOtp.esNumeroPar8DigitosValido(null));
+    }
 }
 
+package com.example.demo.infrastructure.config;
 
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
-import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
 
-import javax.net.ssl.SSLException;
+import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * The class representative Xml config
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Configuration public class XmlWebClientConfig {
-@Bean
-public WebClient xmlWebClient(TokenService tokenService) {
+class XmlWebClientConfigTest {
 
-    ExchangeStrategies strategies = ExchangeStrategies.builder()
-            .codecs(configurer -> {
-                configurer.defaultCodecs()
-                        .jaxb2Encoder(new Jaxb2XmlEncoder());
-                configurer.defaultCodecs()
-                        .jaxb2Decoder(new Jaxb2XmlDecoder());
-            })
-            .build();
-    HttpClient httpClient = HttpClient.create()
-            .secure(t -> {
-                try {
-                    t.sslContext(SslContextBuilder.forClient().trustManager(
-                            InsecureTrustManagerFactory.INSTANCE
-                    ).build());
-                } catch (SSLException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+    @Test
+    void shouldCreateWebClientBean() {
 
-    return WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .baseUrl("http://transact-campaign-us-2.goacoustic.com")
-            .exchangeStrategies(strategies)
-            .filter(addTokenFilter(tokenService))
-            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
-            .build();
+        TokenService tokenService = Mockito.mock(TokenService.class);
+
+        XmlWebClientConfig config = new XmlWebClientConfig();
+
+        WebClient client = config.xmlWebClient(tokenService);
+
+        assertNotNull(client);
     }
 
-    private ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
-        return (request, next) ->
-                tokenService
-                        .getToken()
-                        .flatMap(
-                                token -> {
-                                    ClientRequest authorizedRequest =
-                                            ClientRequest.from(request)
-                                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                                                    .build();
-                                    return next.exchange(authorizedRequest);
-                                });
+}
+
+
+
+package com.example.demo.infrastructure.config;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class XmlWebClientConfigTest {
+
+    @Test
+    void shouldCreateWebClientBean() {
+
+        TokenService tokenService = Mockito.mock(TokenService.class);
+
+        XmlWebClientConfig config = new XmlWebClientConfig();
+
+        WebClient client = config.xmlWebClient(tokenService);
+
+        assertNotNull(client);
     }
 }
 
 
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.util;
 
-import java.util.concurrent.ThreadLocalRandom;
+package com.example.demo.infrastructure.adapters.output;
 
-import static com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants.Constant.temp_2;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-/**
- * The class representative Utils otp
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-public class UtilsOtp {
-    private UtilsOtp() {
-        // Evita instanciación
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class TokenServiceTest {
+
+    @Mock
+    private WebClient.Builder webClientBuilder;
+
+    @Mock
+    private WebClient webClient;
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
+    private TokenService tokenService;
+
+    @BeforeEach
+    void setUp() {
+        when(webClientBuilder.baseUrl(anyString())).thenReturn(webClientBuilder);
+        when(webClientBuilder.build()).thenReturn(webClient);
+
+        tokenService = new TokenService(webClientBuilder);
     }
 
-    /**
-     * Genera un número par aleatorio de 8 dígitos válido (empieza de 1-9)
-     *
-     * @return el valor del numero generado
-     */
-    public static String generarNumeroPar8Digitos() {
-        var numero = ThreadLocalRandom.current().nextInt(10_000_000, 100_000_000);
+    @Test
+    void shouldReturnTokenSuccessfully() {
 
-        // asegurar que sea par
-        if (numero % 2 != 0) {
-            numero++;
-        }
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken("fake-token");
 
-        // en el caso extremadamente raro de pasar a 100000000
-        if (numero > 99_999_999) {
-            numero -= 2;
-        }
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .thenReturn(requestBodyUriSpec);
 
-        return String.valueOf(numero);
+        when(requestBodyUriSpec.body(any(BodyInserters.FormInserter.class)))
+                .thenReturn(requestHeadersSpec);
+
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(TokenResponse.class))
+                .thenReturn(Mono.just(tokenResponse));
+
+        Mono<String> result = tokenService.getToken();
+
+        StepVerifier.create(result)
+                .expectNext("fake-token")
+                .verifyComplete();
     }
 
-    /**
-     * Valida si un número es par y tiene 8 dígitos válidos (1-9 al inicio)
-     *
-     * @return validar el numero generado
-     */
-    public static boolean esNumeroPar8DigitosValido(String numero) {
+    @Test
+    void shouldReturnErrorWhenApiFails() {
 
-        if (numero == null) {
-            return false;
-        }
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.contentType(any())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.body(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
-        // Debe tener exactamente 8 dígitos y empezar 1-9
-        if (!numero.matches("^[1-9]\\d{7}$")) {
-            return false;
-        }
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
 
-        var valor = Integer.parseInt(numero);
+        when(responseSpec.bodyToMono(TokenResponse.class))
+                .thenReturn(Mono.error(new RuntimeException("error")));
 
-        return valor % temp_2 == 0;
+        Mono<String> result = tokenService.getToken();
+
+        StepVerifier.create(result)
+                .expectError(RuntimeException.class)
+                .verify();
     }
 }
