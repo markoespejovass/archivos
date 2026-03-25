@@ -1,13 +1,12 @@
-package com.example.demo.application.usecase;
+package com.example.demo.infrastructure.adapter.in.rest;
 
-import com.example.demo.application.port.out.OTPServiceRepositoryPort;
-import com.example.demo.domain.model.otp.getAggregateTrackingForMailing.*;
-import com.example.demo.domain.model.otp.getAggregateTrackingForUser.*;
-import com.example.demo.domain.model.otp.getReportIdByDate.*;
-import com.example.demo.domain.model.otp.saveMailing.*;
-import com.example.demo.domain.model.otp.sendMailing.*;
+import com.example.demo.application.port.in.OTPServiceUseCase;
+import com.example.demo.domain.model.otp.sendMailing.RequestOTP;
+import com.example.demo.domain.model.otp.sendMailing.ResponseOTP;
+import com.example.demo.infrastructure.adapter.in.dto.otp.sendMailing.RequestOTPDTO;
+import com.example.demo.infrastructure.adapter.in.dto.otp.sendMailing.ResponseOTPDTO;
+import com.example.demo.infrastructure.adapter.in.mapper.OTPServiceMapper;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -19,101 +18,74 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class OTPServiceUseCaseImplTest {
+class OTPServiceControllerTest {
 
     @Mock
-    private OTPServiceRepositoryPort repositoryPort;
+    private OTPServiceUseCase useCase;
+
+    @Mock
+    private OTPServiceMapper mapper;
 
     @InjectMocks
-    private OTPServiceUseCaseImpl useCase;
-
-    private RequestOTP requestOTP;
-    private ResponseOTP responseOTP;
-
-    private GetReportRequest reportRequest;
-    private GetReportResponse reportResponse;
-
-    private GetTrackingForUserRequest trackingUserRequest;
-    private GetTrackingForUserResponse trackingUserResponse;
-
-    private GetTrackingForMailRequest trackingMailRequest;
-    private GetTrackingForMailResponse trackingMailResponse;
-
-    private SaveMailRequest saveMailRequest;
-    private SaveMailResponse saveMailResponse;
-
-    @BeforeEach
-    void setUp() {
-        requestOTP = new RequestOTP();
-        responseOTP = new ResponseOTP();
-
-        reportRequest = new GetReportRequest();
-        reportResponse = new GetReportResponse();
-
-        trackingUserRequest = new GetTrackingForUserRequest();
-        trackingUserResponse = new GetTrackingForUserResponse();
-
-        trackingMailRequest = new GetTrackingForMailRequest();
-        trackingMailResponse = new GetTrackingForMailResponse();
-
-        saveMailRequest = new SaveMailRequest();
-        saveMailResponse = new SaveMailResponse();
-    }
+    private OTPServiceController controller;
 
     @Test
-    void shouldSendMailing() {
-        when(repositoryPort.sendMailing(requestOTP)).thenReturn(responseOTP);
+    void shouldSendMailingSuccessfully() {
+        // Arrange
+        RequestOTPDTO requestDTO = new RequestOTPDTO();
+        RequestOTP request = new RequestOTP();
 
-        ResponseOTP result = useCase.sendMailing(requestOTP);
+        ResponseOTP response = new ResponseOTP();
+        ResponseOTPDTO responseDTO = new ResponseOTPDTO();
 
+        when(mapper.RequestOTPDtoToRequestOTP(requestDTO)).thenReturn(request);
+        when(useCase.sendMailing(request)).thenReturn(response);
+        when(mapper.ResponseOTPToResponseOTPDTO(response)).thenReturn(responseDTO);
+
+        // Act
+        ResponseOTPDTO result = controller.sendMailing(requestDTO);
+
+        // Assert
         assertNotNull(result);
-        assertEquals(responseOTP, result);
-        verify(repositoryPort).sendMailing(requestOTP);
-    }
+        assertEquals(responseDTO, result);
 
-    @Test
-    void shouldGetReportIdByDate() {
-        when(repositoryPort.getReportIdByDate(reportRequest)).thenReturn(reportResponse);
-
-        GetReportResponse result = useCase.getReportIdByDate(reportRequest);
-
-        assertNotNull(result);
-        assertEquals(reportResponse, result);
-        verify(repositoryPort).getReportIdByDate(reportRequest);
-    }
-
-    @Test
-    void shouldGetAggregateTrackingForUser() {
-        when(repositoryPort.getAggregateTrackingForUser(trackingUserRequest))
-                .thenReturn(trackingUserResponse);
-
-        GetTrackingForUserResponse result = useCase.getAggregateTrackingForUser(trackingUserRequest);
-
-        assertNotNull(result);
-        assertEquals(trackingUserResponse, result);
-        verify(repositoryPort).getAggregateTrackingForUser(trackingUserRequest);
-    }
-
-    @Test
-    void shouldGetAggregateTrackingForMailing() {
-        when(repositoryPort.getAggregateTrackingForMailing(trackingMailRequest))
-                .thenReturn(trackingMailResponse);
-
-        GetTrackingForMailResponse result = useCase.getAggregateTrackingForMailing(trackingMailRequest);
-
-        assertNotNull(result);
-        assertEquals(trackingMailResponse, result);
-        verify(repositoryPort).getAggregateTrackingForMailing(trackingMailRequest);
-    }
-
-    @Test
-    void shouldSaveMailing() {
-        when(repositoryPort.saveMailing(saveMailRequest)).thenReturn(saveMailResponse);
-
-        SaveMailResponse result = useCase.saveMailing(saveMailRequest);
-
-        assertNotNull(result);
-        assertEquals(saveMailResponse, result);
-        verify(repositoryPort).saveMailing(saveMailRequest);
+        verify(mapper).RequestOTPDtoToRequestOTP(requestDTO);
+        verify(useCase).sendMailing(request);
+        verify(mapper).ResponseOTPToResponseOTPDTO(response);
     }
 }
+
+
+@Test
+void shouldCallDependenciesInCorrectOrder() {
+    RequestOTPDTO requestDTO = new RequestOTPDTO();
+    RequestOTP request = new RequestOTP();
+    ResponseOTP response = new ResponseOTP();
+    ResponseOTPDTO responseDTO = new ResponseOTPDTO();
+
+    when(mapper.RequestOTPDtoToRequestOTP(requestDTO)).thenReturn(request);
+    when(useCase.sendMailing(request)).thenReturn(response);
+    when(mapper.ResponseOTPToResponseOTPDTO(response)).thenReturn(responseDTO);
+
+    controller.sendMailing(requestDTO);
+
+    InOrder inOrder = inOrder(mapper, useCase);
+
+    inOrder.verify(mapper).RequestOTPDtoToRequestOTP(requestDTO);
+    inOrder.verify(useCase).sendMailing(request);
+    inOrder.verify(mapper).ResponseOTPToResponseOTPDTO(response);
+}
+
+
+@Test
+void shouldThrowExceptionWhenMapperFails() {
+    RequestOTPDTO requestDTO = new RequestOTPDTO();
+
+    when(mapper.RequestOTPDtoToRequestOTP(requestDTO))
+            .thenThrow(new RuntimeException("Mapping error"));
+
+    assertThrows(RuntimeException.class, () -> controller.sendMailing(requestDTO));
+
+    verify(useCase, never()).sendMailing(any());
+}
+
