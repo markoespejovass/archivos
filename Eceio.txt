@@ -1,15 +1,141 @@
-when(responseSpec.onStatus(any(), any())).thenAnswer(invocation -> {
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
 
-    var function = invocation.getArgument(1);
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
-    var clientResponse = mock(ClientResponse.class);
+/**
+ * The class representative Security Config
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
 
-    when(clientResponse.bodyToMono(String.class))
-            .thenReturn(Mono.just("error-body"));
+    /**
+     * config sec
+     *
+     * @param http config
+     * @throws Exception for some error
+     * @return SecurityFilterChain sec config
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        http.authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
 
-    Mono<?> result = (Mono<?>) function.apply(clientResponse);
+}
 
-    StepVerifier.create(result).verifyError();
 
-    return responseSpec;
-});
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.mapper;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Savecolumns;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Personalization;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.ResponseOTP;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Recipient;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.WrapperRequestSendEmail;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.WrapperSendEmail;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.util.UtilsOtp;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+
+import java.util.List;
+
+/**
+ * The class representative Mapper
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Mapper(componentModel = "spring")
+public interface OTPServiceMapper {
+
+    /**
+     * Metodo para mapear de un objeto request de entrada a un obejto de dominio
+     *
+     * @param requestDto objeto de entrada
+     * @return objecto de dominio
+     */
+    @Mapping(target = "recipient", expression = "java(toRecipient(requestDto))" )
+    @Mapping(target = "campaignid", constant = "25514100")
+    @Mapping(target = "transactionid", constant = "opcional")
+    @Mapping(target = "showallsenddetail", constant = "true")
+    @Mapping(target = "sendasbatch", constant = "false")
+    @Mapping(target = "noretryonfailure", constant = "false")
+    @Mapping(target = "savecolumns", expression = "java(toSaveCollumns())")
+    RequestOTP wrapperRequestSendEmailToRequest(
+            WrapperRequestSendEmail requestDto);
+
+    /**
+     * Metodo para mapear de un objeto request de entrada a un objeto de dominio interno Recepient
+     *
+     * @param requestDto objeto de entrada
+     * @return objecto de dominio
+     */
+    @Mapping(target = "bodyType", constant = "HTML")
+    @Mapping(target = "personalization", expression = "java(toPersonalitation())")
+    @Mapping(target = "email", expression = "java(mapForEmail(requestDto))")
+    Recipient toRecipient(
+            WrapperRequestSendEmail requestDto);
+
+
+    /**
+     * Metodo para mapear de un objeto de dominio a un obejto de entrada response
+     *
+     * @param responseOTP objeto de dominio
+     * @return objecto de entrada de tipo response
+     */
+    @Mapping(target = "emailId", expression = "java(mappingForStatus(responseOTP))")
+    WrapperSendEmail responseOTPToWrapperSendEmail(
+            ResponseOTP responseOTP);
+
+
+    default String mapForEmail(WrapperRequestSendEmail requestDto){
+        if (requestDto.getEmail() != null && requestDto.getEmail().getRecipients() != null) {
+            return requestDto.getEmail().getRecipients().getTo().get(0).getEmailAddress();
+        }
+        return "";
+    }
+
+    /**
+     * Metodo para emapear a status
+     *
+     * @param responseOTP valor del objecto response
+     * @return objecto de string de estatus
+     */
+    default String mappingForStatus(ResponseOTP responseOTP){
+        return responseOTP.getSTATUS()==0?"Se envio el correo":"Ocurrio un problema";
+    }
+
+    /**
+     * Metodo para setar el valor de variable 1
+     *
+     * @return  objecto de response
+     */
+    default Savecolumns toSaveCollumns(){
+        return new Savecolumns(List.of("VARIABLE_1"));
+    }
+
+    /**
+     * Metodo para setear el valor de variable 1
+     *
+     * @return  objecto de response
+     */
+    default List<Personalization> toPersonalitation(){
+        return List.of(new Personalization("VARIABLE_1", "OTP: "+ UtilsOtp.generarNumeroPar8Digitos()));
+    }
+
+ 
+}
+
+
