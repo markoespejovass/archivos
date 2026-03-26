@@ -1,171 +1,27 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+2026-03-26T14:45:58.202-05:00  WARN 14504 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter': Unsatisfied dependency expressed through method 'setWebClient' parameter 0: Error creating bean with name 'xmlWebClient' defined in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/infrastructure/config/XmlWebClientConfig.class]: Unsatisfied dependency expressed through method 'xmlWebClient' parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\TokenService.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'xmlWebClient': Requested bean is currently in creation: Is there an unresolvable circular reference or an asynchronous initialization dependency?
+2026-03-26T14:45:58.297-05:00 ERROR 14504 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.d.LoggingFailureAnalysisReporter   : 
 
-import org.junit.jupiter.api.Test;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+***************************
+APPLICATION FAILED TO START
+***************************
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+Description:
 
-class SecurityConfigTest {
+The dependencies of some of the beans in the application context form a cycle:
 
-    @Test
-    void shouldCreateSecurityFilterChain() throws Exception {
-        // Arrange
-        SecurityConfig config = new SecurityConfig();
-        HttpSecurity httpSecurity = mock(HttpSecurity.class, RETURNS_DEEP_STUBS);
-
-        when(httpSecurity.authorizeHttpRequests(any())).thenReturn(httpSecurity);
-        when(httpSecurity.csrf(any())).thenReturn(httpSecurity);
-        when(httpSecurity.formLogin(any())).thenReturn(httpSecurity);
-        when(httpSecurity.httpBasic(any())).thenReturn(httpSecurity);
-
-        SecurityFilterChain mockChain = mock(SecurityFilterChain.class);
-        when(httpSecurity.build()).thenReturn(mockChain);
-
-        // Act
-        SecurityFilterChain result = config.securityFilterChain(httpSecurity);
-
-        // Assert
-        assertNotNull(result);
-        verify(httpSecurity).authorizeHttpRequests(any());
-        verify(httpSecurity).csrf(any());
-        verify(httpSecurity).formLogin(any());
-        verify(httpSecurity).httpBasic(any());
-        verify(httpSecurity).build();
-    }
-}
+   com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]
+      ↓
+   com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter
+┌─────┐
+|  xmlWebClient defined in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/infrastructure/config/XmlWebClientConfig.class]
+↑     ↓
+|  com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\TokenService.class]
+└─────┘
 
 
-#######
+Action:
+
+Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
 
 
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.mapper;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.*;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class OTPServiceMapperTest {
-
-    private OTPServiceMapper mapper;
-
-    @BeforeEach
-    void setUp() {
-        mapper = Mappers.getMapper(OTPServiceMapper.class);
-    }
-
-    @Test
-    void shouldMapWrapperRequestToRequestOTP() {
-        // Arrange
-        WrapperRequestSendEmail request = buildRequest();
-
-        // Act
-        RequestOTP result = mapper.wrapperRequestSendEmailToRequest(request);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("25514100", result.getCampaignid());
-        assertEquals("opcional", result.getTransactionid());
-        assertTrue(result.getShowallsenddetail());
-        assertFalse(result.getSendasbatch());
-        assertFalse(result.getNoretryonfailure());
-
-        assertNotNull(result.getRecipient());
-        assertNotNull(result.getSavecolumns());
-        assertEquals(1, result.getSavecolumns().getColumns().size());
-    }
-
-    @Test
-    void shouldMapRecipientCorrectly() {
-        WrapperRequestSendEmail request = buildRequest();
-
-        Recipient recipient = mapper.toRecipient(request);
-
-        assertNotNull(recipient);
-        assertEquals("HTML", recipient.getBodyType());
-        assertNotNull(recipient.getPersonalization());
-        assertEquals("test@mail.com", recipient.getEmail());
-    }
-
-    @Test
-    void shouldReturnEmptyEmailWhenNull() {
-        WrapperRequestSendEmail request = new WrapperRequestSendEmail();
-
-        String email = mapper.mapForEmail(request);
-
-        assertEquals("", email);
-    }
-
-    @Test
-    void shouldMapStatusSuccess() {
-        ResponseOTP response = new ResponseOTP();
-        response.setSTATUS(0);
-
-        String result = mapper.mappingForStatus(response);
-
-        assertEquals("Se envio el correo", result);
-    }
-
-    @Test
-    void shouldMapStatusError() {
-        ResponseOTP response = new ResponseOTP();
-        response.setSTATUS(1);
-
-        String result = mapper.mappingForStatus(response);
-
-        assertEquals("Ocurrio un problema", result);
-    }
-
-    @Test
-    void shouldCreateSaveColumns() {
-        Savecolumns savecolumns = mapper.toSaveCollumns();
-
-        assertNotNull(savecolumns);
-        assertEquals(1, savecolumns.getColumns().size());
-        assertEquals("VARIABLE_1", savecolumns.getColumns().get(0));
-    }
-
-    @Test
-    void shouldCreatePersonalization() {
-        var list = mapper.toPersonalitation();
-
-        assertNotNull(list);
-        assertEquals(1, list.size());
-        assertTrue(list.get(0).getValue().contains("OTP: "));
-    }
-
-    @Test
-    void shouldMapResponseToWrapper() {
-        ResponseOTP response = new ResponseOTP();
-        response.setSTATUS(0);
-
-        WrapperSendEmail result = mapper.responseOTPToWrapperSendEmail(response);
-
-        assertNotNull(result);
-        assertEquals("Se envio el correo", result.getEmailId());
-    }
-
-    // 🔧 Helper
-    private WrapperRequestSendEmail buildRequest() {
-        WrapperRequestSendEmail request = new WrapperRequestSendEmail();
-
-        Email email = new Email();
-        Recipients recipients = new Recipients();
-        To to = new To();
-        to.setEmailAddress("test@mail.com");
-
-        recipients.setTo(List.of(to));
-        email.setRecipients(recipients);
-        request.setEmail(email);
-
-        return request;
-    }
-}
+Process finished with exit code 1
