@@ -1,27 +1,119 @@
-2026-03-26T14:45:58.202-05:00  WARN 14504 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter': Unsatisfied dependency expressed through method 'setWebClient' parameter 0: Error creating bean with name 'xmlWebClient' defined in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/infrastructure/config/XmlWebClientConfig.class]: Unsatisfied dependency expressed through method 'xmlWebClient' parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\TokenService.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'xmlWebClient': Requested bean is currently in creation: Is there an unresolvable circular reference or an asynchronous initialization dependency?
-2026-03-26T14:45:58.297-05:00 ERROR 14504 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.d.LoggingFailureAnalysisReporter   : 
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
 
-***************************
-APPLICATION FAILED TO START
-***************************
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
+import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.netty.http.client.HttpClient;
 
-Description:
+import javax.net.ssl.SSLException;
 
-The dependencies of some of the beans in the application context form a cycle:
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
-   com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]
-      ↓
-   com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter
-┌─────┐
-|  xmlWebClient defined in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/infrastructure/config/XmlWebClientConfig.class]
-↑     ↓
-|  com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\TokenService.class]
-└─────┘
+import static com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants.Constant.TIMEOUT;
+import static com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants.Constant.URI_API_TOKEN;
 
+/**
+ * The class representative Xml config
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+@RequiredArgsConstructor
+public class XmlWebClientConfig {
 
-Action:
+/**
+ * Metodo de config para webclient xml
+ *
+ * @param tokenService valor del servicio de token
+ * @return  objecto de webclient
+ */
+@Bean
+public WebClient xmlWebClient(TokenService tokenService) throws SSLException {
 
-Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
+    var sslContext = SslContextBuilder.forClient()
+            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+            .build();
 
+    ExchangeStrategies strategies = ExchangeStrategies.builder()
+            .codecs(configurer -> {
+                configurer.defaultCodecs()
+                        .jaxb2Encoder(new Jaxb2XmlEncoder());
+                configurer.defaultCodecs()
+                        .jaxb2Decoder(new Jaxb2XmlDecoder());
+            })
+            .build();
+    var httpClient = HttpClient.create()
+            .secure(t ->
+            t.sslContext(sslContext)
+                    .handlerConfigurator((SslHandler sslHandler) -> {}))
+            .wiretap(true)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT)
+            .responseTimeout(Duration.ofMillis(TIMEOUT))
+            .doOnConnected(
+                    conn ->
+                            conn.addHandlerLast(
+                                            new ReadTimeoutHandler(
+                                                    TIMEOUT, TimeUnit.MILLISECONDS))
+                                    .addHandlerLast(
+                                            new WriteTimeoutHandler(
+                                                    TIMEOUT, TimeUnit.MILLISECONDS)));
 
-Process finished with exit code 1
+    return WebClient.builder()
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .baseUrl("http://transact-campaign-us-2.goacoustic.com")
+            .exchangeStrategies(strategies)
+            .filter(addTokenFilter(tokenService))
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+            .build();
+    }
+
+    /**
+     * The Token Web Client.
+     *
+     * @return A{@link WebClient}
+     * @throws SSLException if there is an error during the SSL context creation.
+     */
+    @Bean
+    public WebClient tokenWebClient() throws SSLException {
+        var sslContext = SslContextBuilder.forClient()
+                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                .build();
+
+        var httpClient = HttpClient.create()
+                .secure(ssl-> ssl.sslContext(sslContext));
+
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(URI_API_TOKEN)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+    }
+
+    private static ExchangeFilterFunction addTokenFilter(TokenService tokenService){
+        return ExchangeFilterFunction.ofRequestProcessor(request ->
+                Mono.fromCallable(tokenService::getToken)
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .map(token -> ClientRequest.from(request)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer "+ token)
+                                .build()));
+    }
+}
