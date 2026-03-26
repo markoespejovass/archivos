@@ -1,111 +1,13 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+ExchangeFunction exchangeFunction = requestArg -> {
+    // aquí puedes inspeccionar el request modificado
+    String authHeader = requestArg.headers().getFirst(HttpHeaders.AUTHORIZATION);
+    assertEquals("Bearer my-token", authHeader);
 
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.TokenService;
-import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
+    return Mono.just(mock(ClientResponse.class));
+};
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+Mono<ClientResponse> result = filter.filter(request, exchangeFunction);
 
-class XmlWebClientConfigTest {
-
-    private final XmlWebClientConfig config = new XmlWebClientConfig();
-
-    @Test
-    void shouldCreateXmlWebClient() throws Exception {
-        TokenService tokenService = mock(TokenService.class);
-        when(tokenService.getToken()).thenReturn("fake-token");
-
-        WebClient client = config.xmlWebClient(tokenService);
-
-        assertNotNull(client);
-    }
-}
-
-######
-@Test
-void shouldCreateTokenWebClient() throws Exception {
-    WebClient client = config.tokenWebClient();
-
-    assertNotNull(client);
-}
-
-
-#####
-
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.reactive.function.client.*;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
-import java.lang.reflect.Method;
-import java.net.URI;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-class XmlWebClientConfigFilterTest {
-
-    @Test
-    void shouldAddAuthorizationHeader() throws Exception {
-
-        // Mock TokenService
-        TokenService tokenService = mock(TokenService.class);
-        when(tokenService.getToken()).thenReturn("my-token");
-
-        // Obtener método privado con reflection
-        Method method = XmlWebClientConfig.class
-                .getDeclaredMethod("addTokenFilter", TokenService.class);
-
-        method.setAccessible(true);
-
-        ExchangeFilterFunction filter =
-                (ExchangeFilterFunction) method.invoke(null, tokenService);
-
-        // Request base
-        ClientRequest request = ClientRequest
-                .create(org.springframework.http.HttpMethod.GET, URI.create("http://test"))
-                .build();
-
-        // Aplicar filtro
-        Mono<ClientRequest> result =
-                filter.filter(request, exchange -> Mono.empty());
-
-        StepVerifier.create(result)
-                .assertNext(req -> {
-                    String authHeader = req.headers().getFirst(HttpHeaders.AUTHORIZATION);
-                    assertEquals("Bearer my-token", authHeader);
-                })
-                .verifyComplete();
-    }
-}
-
-
-#####
-
-
-@Test
-void shouldExecuteTokenCallable() throws Exception {
-
-    TokenService tokenService = mock(TokenService.class);
-    when(tokenService.getToken()).thenReturn("token-123");
-
-    Method method = XmlWebClientConfig.class
-            .getDeclaredMethod("addTokenFilter", TokenService.class);
-
-    method.setAccessible(true);
-
-    ExchangeFilterFunction filter =
-            (ExchangeFilterFunction) method.invoke(null, tokenService);
-
-    ClientRequest request = ClientRequest
-            .create(org.springframework.http.HttpMethod.GET, URI.create("http://test"))
-            .build();
-
-    StepVerifier.create(filter.filter(request, exchange -> Mono.empty()))
-            .expectNextCount(1)
-            .verifyComplete();
-
-    verify(tokenService).getToken();
-}
+StepVerifier.create(result)
+        .expectNextCount(1)
+        .verifyComplete();
