@@ -1,141 +1,171 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
-/**
- * The class representative Security Config
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-    /**
-     * config sec
-     *
-     * @param http config
-     * @throws Exception for some error
-     * @return SecurityFilterChain sec config
-     */
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http.authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
+class SecurityConfigTest {
+
+    @Test
+    void shouldCreateSecurityFilterChain() throws Exception {
+        // Arrange
+        SecurityConfig config = new SecurityConfig();
+        HttpSecurity httpSecurity = mock(HttpSecurity.class, RETURNS_DEEP_STUBS);
+
+        when(httpSecurity.authorizeHttpRequests(any())).thenReturn(httpSecurity);
+        when(httpSecurity.csrf(any())).thenReturn(httpSecurity);
+        when(httpSecurity.formLogin(any())).thenReturn(httpSecurity);
+        when(httpSecurity.httpBasic(any())).thenReturn(httpSecurity);
+
+        SecurityFilterChain mockChain = mock(SecurityFilterChain.class);
+        when(httpSecurity.build()).thenReturn(mockChain);
+
+        // Act
+        SecurityFilterChain result = config.securityFilterChain(httpSecurity);
+
+        // Assert
+        assertNotNull(result);
+        verify(httpSecurity).authorizeHttpRequests(any());
+        verify(httpSecurity).csrf(any());
+        verify(httpSecurity).formLogin(any());
+        verify(httpSecurity).httpBasic(any());
+        verify(httpSecurity).build();
     }
-
 }
+
+
+#######
+
 
 
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.mapper;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Savecolumns;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Personalization;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.ResponseOTP;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Recipient;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.WrapperRequestSendEmail;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.WrapperSendEmail;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.util.UtilsOtp;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-/**
- * The class representative Mapper
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Mapper(componentModel = "spring")
-public interface OTPServiceMapper {
+import static org.junit.jupiter.api.Assertions.*;
 
-    /**
-     * Metodo para mapear de un objeto request de entrada a un obejto de dominio
-     *
-     * @param requestDto objeto de entrada
-     * @return objecto de dominio
-     */
-    @Mapping(target = "recipient", expression = "java(toRecipient(requestDto))" )
-    @Mapping(target = "campaignid", constant = "25514100")
-    @Mapping(target = "transactionid", constant = "opcional")
-    @Mapping(target = "showallsenddetail", constant = "true")
-    @Mapping(target = "sendasbatch", constant = "false")
-    @Mapping(target = "noretryonfailure", constant = "false")
-    @Mapping(target = "savecolumns", expression = "java(toSaveCollumns())")
-    RequestOTP wrapperRequestSendEmailToRequest(
-            WrapperRequestSendEmail requestDto);
+class OTPServiceMapperTest {
 
-    /**
-     * Metodo para mapear de un objeto request de entrada a un objeto de dominio interno Recepient
-     *
-     * @param requestDto objeto de entrada
-     * @return objecto de dominio
-     */
-    @Mapping(target = "bodyType", constant = "HTML")
-    @Mapping(target = "personalization", expression = "java(toPersonalitation())")
-    @Mapping(target = "email", expression = "java(mapForEmail(requestDto))")
-    Recipient toRecipient(
-            WrapperRequestSendEmail requestDto);
+    private OTPServiceMapper mapper;
 
-
-    /**
-     * Metodo para mapear de un objeto de dominio a un obejto de entrada response
-     *
-     * @param responseOTP objeto de dominio
-     * @return objecto de entrada de tipo response
-     */
-    @Mapping(target = "emailId", expression = "java(mappingForStatus(responseOTP))")
-    WrapperSendEmail responseOTPToWrapperSendEmail(
-            ResponseOTP responseOTP);
-
-
-    default String mapForEmail(WrapperRequestSendEmail requestDto){
-        if (requestDto.getEmail() != null && requestDto.getEmail().getRecipients() != null) {
-            return requestDto.getEmail().getRecipients().getTo().get(0).getEmailAddress();
-        }
-        return "";
+    @BeforeEach
+    void setUp() {
+        mapper = Mappers.getMapper(OTPServiceMapper.class);
     }
 
-    /**
-     * Metodo para emapear a status
-     *
-     * @param responseOTP valor del objecto response
-     * @return objecto de string de estatus
-     */
-    default String mappingForStatus(ResponseOTP responseOTP){
-        return responseOTP.getSTATUS()==0?"Se envio el correo":"Ocurrio un problema";
+    @Test
+    void shouldMapWrapperRequestToRequestOTP() {
+        // Arrange
+        WrapperRequestSendEmail request = buildRequest();
+
+        // Act
+        RequestOTP result = mapper.wrapperRequestSendEmailToRequest(request);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("25514100", result.getCampaignid());
+        assertEquals("opcional", result.getTransactionid());
+        assertTrue(result.getShowallsenddetail());
+        assertFalse(result.getSendasbatch());
+        assertFalse(result.getNoretryonfailure());
+
+        assertNotNull(result.getRecipient());
+        assertNotNull(result.getSavecolumns());
+        assertEquals(1, result.getSavecolumns().getColumns().size());
     }
 
-    /**
-     * Metodo para setar el valor de variable 1
-     *
-     * @return  objecto de response
-     */
-    default Savecolumns toSaveCollumns(){
-        return new Savecolumns(List.of("VARIABLE_1"));
+    @Test
+    void shouldMapRecipientCorrectly() {
+        WrapperRequestSendEmail request = buildRequest();
+
+        Recipient recipient = mapper.toRecipient(request);
+
+        assertNotNull(recipient);
+        assertEquals("HTML", recipient.getBodyType());
+        assertNotNull(recipient.getPersonalization());
+        assertEquals("test@mail.com", recipient.getEmail());
     }
 
-    /**
-     * Metodo para setear el valor de variable 1
-     *
-     * @return  objecto de response
-     */
-    default List<Personalization> toPersonalitation(){
-        return List.of(new Personalization("VARIABLE_1", "OTP: "+ UtilsOtp.generarNumeroPar8Digitos()));
+    @Test
+    void shouldReturnEmptyEmailWhenNull() {
+        WrapperRequestSendEmail request = new WrapperRequestSendEmail();
+
+        String email = mapper.mapForEmail(request);
+
+        assertEquals("", email);
     }
 
- 
+    @Test
+    void shouldMapStatusSuccess() {
+        ResponseOTP response = new ResponseOTP();
+        response.setSTATUS(0);
+
+        String result = mapper.mappingForStatus(response);
+
+        assertEquals("Se envio el correo", result);
+    }
+
+    @Test
+    void shouldMapStatusError() {
+        ResponseOTP response = new ResponseOTP();
+        response.setSTATUS(1);
+
+        String result = mapper.mappingForStatus(response);
+
+        assertEquals("Ocurrio un problema", result);
+    }
+
+    @Test
+    void shouldCreateSaveColumns() {
+        Savecolumns savecolumns = mapper.toSaveCollumns();
+
+        assertNotNull(savecolumns);
+        assertEquals(1, savecolumns.getColumns().size());
+        assertEquals("VARIABLE_1", savecolumns.getColumns().get(0));
+    }
+
+    @Test
+    void shouldCreatePersonalization() {
+        var list = mapper.toPersonalitation();
+
+        assertNotNull(list);
+        assertEquals(1, list.size());
+        assertTrue(list.get(0).getValue().contains("OTP: "));
+    }
+
+    @Test
+    void shouldMapResponseToWrapper() {
+        ResponseOTP response = new ResponseOTP();
+        response.setSTATUS(0);
+
+        WrapperSendEmail result = mapper.responseOTPToWrapperSendEmail(response);
+
+        assertNotNull(result);
+        assertEquals("Se envio el correo", result.getEmailId());
+    }
+
+    // 🔧 Helper
+    private WrapperRequestSendEmail buildRequest() {
+        WrapperRequestSendEmail request = new WrapperRequestSendEmail();
+
+        Email email = new Email();
+        Recipients recipients = new Recipients();
+        To to = new To();
+        to.setEmailAddress("test@mail.com");
+
+        recipients.setTo(List.of(to));
+        email.setRecipients(recipients);
+        request.setEmail(email);
+
+        return request;
+    }
 }
-
-
