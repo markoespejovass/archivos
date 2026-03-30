@@ -1,3 +1,6 @@
+org.springframework.web.reactive.function.client.WebClientResponseException$BadRequest: 400 Bad Request from POST https://api-campaign-us-2.goacoustic.com/oauth/token
+
+
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,9 +13,14 @@ import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.in
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.data.WrapperRequestClassifyEmails;
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.OtpRequest;
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.OtpResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.ValidateOtpRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.ValidateOtpResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa.OtpEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa.OtpRepository;
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.util.UtilsOtp;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,9 +38,12 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OTPServiceAdapter implements OTPServiceRepositoryPort {
 
+    @Qualifier("xmlWebClient")
     private WebClient xmlWebClient;
-    private XmlMapper xmlMapper;
+
+    @Qualifier("jsonWebClient")
     private WebClient jsonWebClient;
+    private OtpRepository repository;
 
     /**
      * Metodo de salida para validar otp
@@ -45,11 +56,31 @@ public class OTPServiceAdapter implements OTPServiceRepositoryPort {
     public WrapperClassifyEmail validCode(String otp, WrapperRequestClassifyEmails criteria) {
         boolean isValid = UtilsOtp.esNumeroPar8DigitosValido(otp);
 
-        if (isValid) {
+        String status = jsonWebClient
+                .post()
+                .uri("/v1/otp/validate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(generateValidateOtp(otp))
+                .retrieve()
+                .bodyToMono(ValidateOtpResponse.class)
+                .map(this::mapeoValidateOtp)
+                .block();
+
+        if (status != null) {
             return generateResponsseValidCode(StatusInfo.StatusCodeEnum.PROCESSED);
         } else {
             return generateResponsseValidCode(StatusInfo.StatusCodeEnum.ERROR);
         }
+    }
+
+    private String mapeoValidateOtp(ValidateOtpResponse validateOtpResponse){
+        return validateOtpResponse.getMessage();
+    }
+
+    private ValidateOtpRequest generateValidateOtp(String otp){
+        //TODO: recuperar de la bd en h2
+        String uuid = repository.findByOtp(otp).getId();
+        return new ValidateOtpRequest(uuid, otp);
     }
 
     /**
@@ -61,10 +92,10 @@ public class OTPServiceAdapter implements OTPServiceRepositoryPort {
     @Override
     public ResponseOTP sendMailing(RequestOTP criteria)  {
         log.info("request: "+ criteria.toString());
-
+        XmlMapper xmlMapper = new XmlMapper();
         String otp = jsonWebClient
                 .post()
-                .uri("v1/otp/generate")
+                .uri("/v1/otp/generate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(generateRequestOtp())
                 .retrieve()
@@ -72,6 +103,8 @@ public class OTPServiceAdapter implements OTPServiceRepositoryPort {
                 .map(this::mapeoOtp)
                 .block();
 
+        //TODO guardar en la bd h2 el otp y el uuid
+        repository.save(new OtpEntity(UUID.randomUUID().toString(),otp));
         String xml;
         try {
             criteria = setearOtp(criteria,otp);
@@ -95,6 +128,7 @@ public class OTPServiceAdapter implements OTPServiceRepositoryPort {
 
     private ResponseOTP mapeoResponse(String valueXml){
         log.info(valueXml);
+        XmlMapper xmlMapper = new XmlMapper();
         try {
             return xmlMapper.readValue(valueXml, ResponseOTP.class);
         } catch (JsonProcessingException e) {
@@ -127,8 +161,6 @@ public class OTPServiceAdapter implements OTPServiceRepositoryPort {
     }
 
 }
-
-
 
 
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
@@ -184,7 +216,7 @@ public class TokenServiceJson {
     }
 
       OTPTokenResponse response = otpTokenWebClient.post()
-            .uri("oauth/token")
+            .uri("/oauth/token")
             .headers(httpHeaders -> httpHeaders.setBasicAuth(Constant.CLIENT_VALUE, Constant.CLIENT_SECRET))
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(BodyInserters
@@ -206,9 +238,6 @@ public class TokenServiceJson {
 
 
 }
-
-
-
 
 
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
@@ -262,7 +291,7 @@ public class TokenServiceXml {
     }
 
     TokenResponse response = tokenWebClient.post()
-            .uri("oauth/token")
+            .uri("/oauth/token")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(BodyInserters
                     .fromFormData(Constant.GRANT_TYPE,Constant.GRANT_TYPE_VALUE)
@@ -285,8 +314,6 @@ public class TokenServiceXml {
 
 
 }
-
-
 
 
 
@@ -401,7 +428,6 @@ public WebClient jsonWebClient(TokenServiceJson tokenServiceJson) throws SSLExce
                                 .build()));
     }
 }
-
 
 
 
@@ -524,30 +550,5 @@ public WebClient xmlWebClient(TokenServiceXml tokenServiceXml) throws SSLExcepti
                                 .build()));
     }
 }
-
-
-
-2026-03-27T14:52:17.942-05:00  INFO 30232 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication using Java 17.0.18 with PID 30232 (C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes started by tecdesa2537 in C:\workspace\Q1\cpe-nxhbsc-beemailboxes)
-2026-03-27T14:52:17.989-05:00  INFO 30232 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "local"
-2026-03-27T14:52:30.403-05:00  WARN 30232 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\application\ports\input\EmailboxIdInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter' defined in file [C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbeemailboxes\infrastructure\adapters\output\OTPServiceAdapter.class]: Unsatisfied dependency expressed through constructor parameter 1: No qualifying bean of type 'com.fasterxml.jackson.dataformat.xml.XmlMapper' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-2026-03-27T14:52:30.516-05:00 ERROR 30232 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.d.LoggingFailureAnalysisReporter   : 
-
-***************************
-APPLICATION FAILED TO START
-***************************
-
-Description:
-
-Parameter 1 of constructor in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter required a bean of type 'com.fasterxml.jackson.dataformat.xml.XmlMapper' that could not be found.
-
-
-Action:
-
-Consider defining a bean of type 'com.fasterxml.jackson.dataformat.xml.XmlMapper' in your configuration.
-
-
-Process finished with exit code 1
-
-
 
 
