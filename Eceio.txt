@@ -1,54 +1,99 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+package com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa;
 
-import com.amazonaws.services.s3.AmazonS3;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.application.ports.output.ChannelServiceRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.input.rest.data.WrapperCustomerPositionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.mapper.ProductJPAMapper;
+import org.springframework.stereotype.Component;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.repository.ExampleUserRepository;
 
-class S3ConfigTest {
+/**
+ * User management output adapter that saves info using JPA repository
+ * 
+ * @author Created by Team DCOE Mx
+ */
+@Component
+public class UserManagementJPAAdapter implements ChannelServiceRepositoryPort {
 
-    private S3Config s3Config;
+    private final ExampleUserRepository userDataRepository;
 
-    @BeforeEach
-    void setUp() {
-        s3Config = new S3Config();
-
-        // Inyectamos valores mockeados en los @Value
-        ReflectionTestUtils.setField(s3Config, "awsAccessKeyId", "test-access-key");
-        ReflectionTestUtils.setField(s3Config, "awsSecretKey", "test-secret-key");
-        ReflectionTestUtils.setField(s3Config, "awsRegion", "us-east-1");
+    public UserManagementJPAAdapter(ExampleUserRepository userDataRepository) {
+        this.userDataRepository = userDataRepository;
     }
 
-    @Test
-    void shouldCreateAmazonS3BeanSuccessfully() {
-        AmazonS3 amazonS3 = s3Config.amazonS3();
 
-        assertNotNull(amazonS3);
+
+    @Override
+    public WrapperCustomerPositionResponse getListServices(String customerId) {
+        return ProductJPAMapper.toDTO(userDataRepository.findByNroDocumento(convertToDni(customerId)));
     }
 
-    @Test
-    void shouldUseCorrectConfigurationValues() {
-        AmazonS3 amazonS3 = s3Config.amazonS3();
-
-        assertNotNull(amazonS3);
-        // No podemos inspeccionar directamente credenciales internas,
-        // pero validamos que no falle la construcción con valores válidos
+    private String convertToDni(String customerId){
+        return customerId.substring(0,customerId.length()-2);
     }
 
-    @Test
-    void shouldNotThrowExceptionWhenCreatingBean() {
-        assertDoesNotThrow(() -> s3Config.amazonS3());
-    }
+}
 
-    @Test
-    void shouldCreateDifferentInstancesEachTime() {
-        AmazonS3 amazonS3_1 = s3Config.amazonS3();
-        AmazonS3 amazonS3_2 = s3Config.amazonS3();
 
-        assertNotNull(amazonS3_1);
-        assertNotNull(amazonS3_2);
-        assertNotSame(amazonS3_1, amazonS3_2);
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.mapper;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.data.Product;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+public class ProductJPAMapper {
+
+
+
+    public static WrapperCustomerPositionResponse toDTO(List<Product> entities){
+        WrapperCustomerPositionResponse response = new WrapperCustomerPositionResponse();
+        WrapperCardsInformation creditsCards = new WrapperCardsInformation();
+
+        List<WrapperCardWithLinks> cards = entities.stream().map(enty ->{
+            WrapperCardWithLinks wrapperCard = new WrapperCardWithLinks();
+            Card card = new Card();
+            // Datos de campaña
+            card.setCardId(enty.getCanal());
+            WrapperDebitCardCardIdentification wrapperDebitCardCardIdentification = new WrapperDebitCardCardIdentification();
+            wrapperDebitCardCardIdentification.setDisplayNumber(enty.getPeriodo().toString());
+            card.setCardIdentification(wrapperDebitCardCardIdentification);
+            com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.input.rest.data.Product product = new com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.input.rest.data.Product();
+            product.setProductCode(enty.getOfertaTasa().toString());
+            product.setProductDescription(enty.getPorcDispEfectivo().toString());
+            card.setProduct(product);
+
+            // Datos de la tarjeta
+            card.setType(enty.getOfertaTipoTc());
+            CardCreditLimitLevel cardCreditLimitLevel = new CardCreditLimitLevel();
+            cardCreditLimitLevel.setLevelDescription(enty.getOfertaLineaTc().toString());
+            card.setCreditLimitLevel(cardCreditLimitLevel);
+
+            //Caracteristicas
+            WrapperDebitCardCardholder caracteristicas = new WrapperDebitCardCardholder();
+            caracteristicas.setCardholderId(enty.getCaracteristica1());
+            caracteristicas.setTypeCode(enty.getCaracteristica2());
+            caracteristicas.setTypeDescription(enty.getCaracteristica3());
+            //WrapperDebitCardBalancesInner matrices = new WrapperDebitCardBalancesInner();
+
+            WrapperDebitCardStatusInfo segmentos = new WrapperDebitCardStatusInfo();
+            segmentos.setStatusCode(enty.getSegmento1());
+            segmentos.setStatusDescription(enty.getSegmento2());
+            segmentos.setStatusReasonCode(enty.getSegmento3());
+            segmentos.setStatusReasonDescription(enty.getSegmento4());
+
+            card.setStatusInfo(segmentos);
+            card.setCardholder(caracteristicas);
+            wrapperCard.setCard(card);
+            return wrapperCard;
+        }).collect(Collectors.toList());
+
+        creditsCards.setList(cards);
+        response.setCards(creditsCards);
+        return response;
     }
 }
+
