@@ -1,169 +1,77 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa;
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.data.Product;
-import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.repository.ExampleUserRepository;
-import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.input.rest.data.WrapperCustomerPositionResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import java.util.Collections;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.output.KnowYourCustomerRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Questionnairy;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+@Component
+@RequiredArgsConstructor
+public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
 
-class UserManagementJPAAdapterTest {
+  private final KnokYourCustomerRepository repository;
+  private final KYCEntityMapper mapper;
 
-    private ExampleUserRepository repository;
-    private UserManagementJPAAdapter adapter;
+  @Override
+  public WrapperPostKycResolutionResponse createProcesstKyc(
+      WrapperPostKycResolutionRequest criteria) {
+    List<Questionnairy> questionnairies = repository.saveAll(
+            mapper.WrapperPostKycResolutionRequestToCustomerEntitys(
+                    criteria.getKnowYourCustomerQuestionnaires()));
+    String id = questionnairies.get(0).getDni();
+    return mapper.toDto(
+            questionnairies, id
+            );
 
-    @BeforeEach
-    void setUp() {
-        repository = mock(ExampleUserRepository.class);
-        adapter = new UserManagementJPAAdapter(repository);
-    }
 
-    @Test
-    void shouldReturnMappedResponse() {
-        Product product = buildProduct();
-
-        when(repository.findByNroDocumento("12345678"))
-                .thenReturn(List.of(product));
-
-        WrapperCustomerPositionResponse response =
-                adapter.getListServices("1234567890");
-
-        assertNotNull(response);
-        assertNotNull(response.getCards());
-        assertFalse(response.getCards().getList().isEmpty());
-
-        verify(repository).findByNroDocumento("12345678");
-    }
-
-    @Test
-    void shouldHandleEmptyList() {
-        when(repository.findByNroDocumento(anyString()))
-                .thenReturn(Collections.emptyList());
-
-        WrapperCustomerPositionResponse response =
-                adapter.getListServices("1234567890");
-
-        assertNotNull(response);
-        assertNotNull(response.getCards());
-        assertTrue(response.getCards().getList().isEmpty());
-    }
-
-    @Test
-    void shouldConvertCustomerIdToDniCorrectly() {
-        when(repository.findByNroDocumento("12345678"))
-                .thenReturn(Collections.emptyList());
-
-        adapter.getListServices("1234567899");
-
-        verify(repository).findByNroDocumento("12345678");
-    }
-
-    private Product buildProduct() {
-        Product p = new Product();
-        p.setCanal("CANAL1");
-        p.setPeriodo(12);
-        p.setOfertaTasa(10.5);
-        p.setPorcDispEfectivo(50.0);
-        p.setOfertaTipoTc("VISA");
-        p.setOfertaLineaTc(10000);
-        p.setCaracteristica1("C1");
-        p.setCaracteristica2("C2");
-        p.setCaracteristica3("C3");
-        p.setSegmento1("S1");
-        p.setSegmento2("S2");
-        p.setSegmento3("S3");
-        p.setSegmento4("S4");
-        return p;
-    }
+  }
 }
 
 
 
-package com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.mapper;
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.output.jpa.data.Product;
-import com.santander.cpe.nxhbsc.cpenxhbscbeproducoffering.infrastructure.adapters.input.rest.data.WrapperCustomerPositionResponse;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Questionnairy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+@Mapper(componentModel = "spring")
+public interface KYCEntityMapper {
 
-class ProductJPAMapperTest {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dni", source = "questionnaireId")
+    @Mapping(target = "audit", expression = "java(toStringJson(request.getAudit())")
+    @Mapping(target = "questions", expression = "java(toStringJson(request.getQuestions())")
+    @Mapping(target = "version", defaultValue = "1")
+    Questionnairy WrapperPostKycResolutionRequestToCustomerEntity(WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner request);
 
-    @Test
-    void shouldMapProductCorrectly() {
-        Product product = buildProduct();
+    List<Questionnairy> WrapperPostKycResolutionRequestToCustomerEntitys(List<WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner> request);
 
-        WrapperCustomerPositionResponse response =
-                ProductJPAMapper.toDTO(List.of(product));
+    @Mapping(target = "kycResolutionId", source = "id")
+    WrapperPostKycResolutionResponse toDto(List<Questionnairy> questionnairies, String id);
 
-        assertNotNull(response);
-        assertNotNull(response.getCards());
-        assertEquals(1, response.getCards().getList().size());
-
-        var card = response.getCards().getList().get(0).getCard();
-
-        assertEquals("CANAL1", card.getCardId());
-        assertEquals("12", card.getCardIdentification().getDisplayNumber());
-        assertEquals("10.5", card.getProduct().getProductCode());
-        assertEquals("50.0", card.getProduct().getProductDescription());
-        assertEquals("VISA", card.getType());
-        assertEquals("10000", card.getCreditLimitLevel().getLevelDescription());
-
-        assertEquals("C1", card.getCardholder().getCardholderId());
-        assertEquals("C2", card.getCardholder().getTypeCode());
-        assertEquals("C3", card.getCardholder().getTypeDescription());
-
-        assertEquals("S1", card.getStatusInfo().getStatusCode());
-        assertEquals("S2", card.getStatusInfo().getStatusDescription());
-        assertEquals("S3", card.getStatusInfo().getStatusReasonCode());
-        assertEquals("S4", card.getStatusInfo().getStatusReasonDescription());
-    }
-
-    @Test
-    void shouldHandleEmptyList() {
-        WrapperCustomerPositionResponse response =
-                ProductJPAMapper.toDTO(Collections.emptyList());
-
-        assertNotNull(response);
-        assertNotNull(response.getCards());
-        assertTrue(response.getCards().getList().isEmpty());
-    }
-
-    @Test
-    void shouldMapMultipleProducts() {
-        Product p1 = buildProduct();
-        Product p2 = buildProduct();
-
-        WrapperCustomerPositionResponse response =
-                ProductJPAMapper.toDTO(List.of(p1, p2));
-
-        assertEquals(2, response.getCards().getList().size());
-    }
-
-    private Product buildProduct() {
-        Product p = new Product();
-        p.setCanal("CANAL1");
-        p.setPeriodo(12);
-        p.setOfertaTasa(10.5);
-        p.setPorcDispEfectivo(50.0);
-        p.setOfertaTipoTc("VISA");
-        p.setOfertaLineaTc(10000);
-        p.setCaracteristica1("C1");
-        p.setCaracteristica2("C2");
-        p.setCaracteristica3("C3");
-        p.setSegmento1("S1");
-        p.setSegmento2("S2");
-        p.setSegmento3("S3");
-        p.setSegmento4("S4");
-        return p;
+    default String toStringJson(Object o){
+        JsonMapper jsonMapper = new JsonMapper();
+        try {
+            return jsonMapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return "Error al parsear objeto";
+        }
     }
 }
+
+
