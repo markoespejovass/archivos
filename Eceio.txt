@@ -1,191 +1,234 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Base64;
 
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.constants.Constant.PREFIJO_KEY;
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.constants.Constant.TYPE_PDF;
+import static org.junit.jupiter.api.Assertions.*;
 
-public final class UtilsFile {
-    private UtilsFile() {
-        // Evita instanciación
+class UtilsFileTest {
+
+    @Test
+    void shouldGenerateFileName() {
+        String result = UtilsFile.generateFileName("123");
+        assertTrue(result.contains("123"));
     }
 
-    public static String generateFileName(String name){
-        return name+TYPE_PDF;
+    @Test
+    void shouldGenerateKey() {
+        String result = UtilsFile.generateKey("abc");
+        assertTrue(result.contains("abc"));
     }
 
-    public static String generateKey(String id){
-        return PREFIJO_KEY+generateFileName(id);
+    @Test
+    void shouldGetFileName() {
+        String key = UtilsFile.generateKey("123");
+        String fileName = UtilsFile.getFileName(key);
+
+        assertFalse(fileName.contains("PREFIJO")); // depende de tu constante
     }
 
-    public static String getDocumentId(String key){
-        return getFileName(key).replace(TYPE_PDF,"");
+    @Test
+    void shouldGetDocumentId() {
+        String key = UtilsFile.generateKey("999");
+        String id = UtilsFile.getDocumentId(key);
+
+        assertEquals("999", id);
     }
 
-    public static String getFileName(String key){
-        return key.replace(PREFIJO_KEY,"");
+    @Test
+    void shouldReturnNullWhenBase64IsNull() throws Exception {
+        File result = UtilsFile.base64ToFile(null, "test.pdf");
+        assertNull(result);
     }
 
-    public static File base64ToFile(String base64, String name) throws IOException {
-        if (base64 == null){
-            return null;
-        }
-        byte[] decodedBytes = Base64.getDecoder().decode(base64);
-        Path destinationFile = Paths.get("./"+name);
-        return Files.write(destinationFile, decodedBytes).toFile();
+    @Test
+    void shouldConvertBase64ToFile() throws Exception {
+        String content = "hola";
+        String base64 = Base64.getEncoder().encodeToString(content.getBytes());
+
+        File file = UtilsFile.base64ToFile(base64, "testFile.txt");
+
+        assertNotNull(file);
+        assertTrue(file.exists());
+
+        String fileContent = Files.readString(file.toPath());
+        assertEquals("hola", fileContent);
+
+        file.delete(); // cleanup
     }
 }
 
 
 
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
 
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@Component
-@Slf4j
-public class DocumentMapper {
+class DocumentMapperTest {
 
-    public WrapperGetDocumentsResponse donwloadMapper(String url){
-        WrapperGetDocumentsResponse response = new WrapperGetDocumentsResponse();
-        LinkReference linkReference = new LinkReference();
-        linkReference.setHref(url);
-        response.setAccessInformation(linkReference);
-        return response;
+    private final DocumentMapper mapper = new DocumentMapper();
+
+    @Test
+    void shouldMapDownload() {
+        var response = mapper.donwloadMapper("http://url");
+
+        assertNotNull(response);
+        assertEquals("http://url", response.getAccessInformation().getHref());
     }
 
-    public WrapperPostSearchDocumentsResponse searchMapper(ObjectListing objectListing){
-        WrapperPostSearchDocumentsResponse response = new WrapperPostSearchDocumentsResponse();
-        List<WrapperMySearchDocumentResponse> documents = objectListing.getObjectSummaries().stream().map(objectSumary ->{
-            WrapperMySearchDocumentResponse wrapper = new WrapperMySearchDocumentResponse();
-            wrapper.setDocumentId(getDocumentId(objectSumary.getKey()));
-            wrapper.setName(getFileName(objectSumary.getKey()));
-            return wrapper;
-        }).collect(Collectors.toList());
-        response.setDocuments(documents);
-        return response;
+    @Test
+    void shouldMapSearch() {
+        ObjectListing listing = new ObjectListing();
+
+        S3ObjectSummary summary = new S3ObjectSummary();
+        summary.setKey(UtilsFile.generateKey("123"));
+
+        listing.getObjectSummaries().add(summary);
+
+        var response = mapper.searchMapper(listing);
+
+        assertEquals(1, response.getDocuments().size());
+        assertEquals("123", response.getDocuments().get(0).getDocumentId());
     }
 
-    public WrapperPostDocumentsResponse uploadMapper(String documentId){
-        WrapperMyDocumentResponse documentResponse = new WrapperMyDocumentResponse();
-        documentResponse.documentId(documentId);
-        WrapperPostDocumentsResponse response = new WrapperPostDocumentsResponse();
-        response.setDocument(documentResponse);
-        return response;
+    @Test
+    void shouldMapUpload() {
+        var response = mapper.uploadMapper("abc");
+
+        assertNotNull(response);
+        assertEquals("abc", response.getDocument().getDocumentId());
     }
 
-    public WrapperMySearchDocumentResponse getMapper(String documentId, ObjectMetadata objectMetadata){
-        WrapperMySearchDocumentResponse response = new WrapperMySearchDocumentResponse();
-        response.setName(generateFileName(documentId));
-        response.setDocumentId(documentId);
-        response.setStatus((new WrapperMySearchDocumentResponseStatus()).statusCode(objectMetadata.getArchiveStatus()));
-        response.setMimeType(objectMetadata.getContentType());
-        return response;
-    }
+    @Test
+    void shouldMapGet() {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType("application/pdf");
+        metadata.setHeader("x-amz-archive-status", "AVAILABLE");
 
+        var response = mapper.getMapper("123", metadata);
+
+        assertEquals("123", response.getDocumentId());
+        assertTrue(response.getName().contains("123"));
+        assertEquals("application/pdf", response.getMimeType());
+    }
 }
 
 
 
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
 
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.constants.Constant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import java.net.URL;
 
-import java.io.File;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
+class DocumentManagementAdapterTest {
 
+    @Mock
+    private AmazonS3 amazonS3;
 
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
+    @Mock
+    private DocumentMapper mapper;
 
-  private final AmazonS3 amazonS3;
+    @InjectMocks
+    private DocumentManagementAdapter adapter;
 
-  private final DocumentMapper mapper;
-
-  @Value("${aws.bucket}")
-  private String bucketName;
-
-  @Override
-  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
-    String fileName = generateKey(criteria.getDocument().getDocumentId());
-    String url =  amazonS3.getUrl(bucketName,fileName).getRef();
-    return mapper.donwloadMapper(url);
-  }
-
-  @Override
-  public WrapperPostSearchDocumentsResponse searchDocuments(
-      WrapperPostSearchDocumentsRequest criteria) {
-    ObjectListing objectListing = amazonS3.listObjects(bucketName);
-    return mapper.searchMapper(objectListing);
-  }
-
-  @Override
-  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
-    String documentId = UUID.randomUUID().toString();
-    try {
-        assert criteria.getDocument() != null;
-        File file = base64ToFile(criteria.getDocument().getFolderReference(),generateFileName(documentId));
-      amazonS3.putObject(bucketName,generateKey(documentId),file);
-      return mapper.uploadMapper(documentId);
-    } catch (Exception ex){
-      log.error("error : "+ex);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        adapter = new DocumentManagementAdapter(amazonS3, mapper);
+        adapter.bucketName = "bucket-test";
     }
-    return new WrapperPostDocumentsResponse();
-  }
 
-  @Override
-  public WrapperMySearchDocumentResponse getDocument(String documentId) {
-    ObjectMetadata objectMetadata =amazonS3.getObjectMetadata(bucketName,generateKey(documentId));
-    return mapper.getMapper(documentId,objectMetadata);
-  }
+    @Test
+    void shouldDownloadDocument() throws Exception {
+        var request = new WrapperGetDocumentsRequest();
+        var doc = new WrapperMyDocumentResponse();
+        doc.setDocumentId("123");
+        request.setDocument(doc);
 
-  @Override
-  public Void deleteDocument(String documentId) {
-    String filename = generateKey(documentId);
-    amazonS3.deleteObject(bucketName,filename);
-    return null;
-  }
+        when(amazonS3.getUrl(anyString(), anyString()))
+                .thenReturn(new URL("http://test-url"));
 
+        when(mapper.donwloadMapper(anyString()))
+                .thenReturn(new WrapperGetDocumentsResponse());
 
+        var response = adapter.downloadDocument(request);
+
+        assertNotNull(response);
+        verify(amazonS3).getUrl(anyString(), anyString());
+    }
+
+    @Test
+    void shouldSearchDocuments() {
+        ObjectListing listing = new ObjectListing();
+
+        when(amazonS3.listObjects(anyString())).thenReturn(listing);
+        when(mapper.searchMapper(listing))
+                .thenReturn(new WrapperPostSearchDocumentsResponse());
+
+        var response = adapter.searchDocuments(new WrapperPostSearchDocumentsRequest());
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldUploadDocumentSuccessfully() {
+        var request = new WrapperPostDocumentsRequest();
+        var doc = new WrapperMyDocumentResponse();
+        doc.setFolderReference("aG9sYQ=="); // "hola" base64
+        request.setDocument(doc);
+
+        when(mapper.uploadMapper(anyString()))
+                .thenReturn(new WrapperPostDocumentsResponse());
+
+        var response = adapter.uploadDocument(request);
+
+        assertNotNull(response);
+        verify(amazonS3).putObject(anyString(), anyString(), any(File.class));
+    }
+
+    @Test
+    void shouldHandleUploadException() {
+        var request = new WrapperPostDocumentsRequest();
+
+        var response = adapter.uploadDocument(request);
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldGetDocument() {
+        ObjectMetadata metadata = new ObjectMetadata();
+
+        when(amazonS3.getObjectMetadata(anyString(), anyString()))
+                .thenReturn(metadata);
+
+        when(mapper.getMapper(anyString(), any()))
+                .thenReturn(new WrapperMySearchDocumentResponse());
+
+        var response = adapter.getDocument("123");
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldDeleteDocument() {
+        adapter.deleteDocument("123");
+
+        verify(amazonS3).deleteObject(anyString(), anyString());
+    }
 }
-
-
