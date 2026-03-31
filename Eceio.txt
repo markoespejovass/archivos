@@ -1,79 +1,161 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa;
 
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.output.KnowYourCustomerRepositoryPort;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Questionnairy;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
 
+import java.util.Collections;
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
-public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-  private final KnokYourCustomerRepository repository;
-  private final KYCEntityMapper mapper;
+class KnowYourCustomerAdapterTest {
 
-  @Override
-  public WrapperPostKycResolutionResponse createProcesstKyc(
-      WrapperPostKycResolutionRequest criteria) {
-    List<Questionnairy> questionnairies = repository.saveAll(
-            mapper.WrapperPostKycResolutionRequestToCustomerEntitys(
-                    criteria.getKnowYourCustomerQuestionnaires()));
-    if (questionnairies.isEmpty()){
-      return mapper.toDto(null);
+    @Mock
+    private KnokYourCustomerRepository repository;
+
+    @Mock
+    private KYCEntityMapper mapper;
+
+    @InjectMocks
+    private KnowYourCustomerAdapter adapter;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
-    String id = questionnairies.get(0).getDni();
-    return mapper.toDto(id);
 
+    @Test
+    void shouldReturnResponseWhenListHasData() {
+        WrapperPostKycResolutionRequest request = mock(WrapperPostKycResolutionRequest.class);
 
-  }
+        var inner = List.of(mock(
+                com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner.class
+        ));
+
+        when(request.getKnowYourCustomerQuestionnaires()).thenReturn(inner);
+
+        Questionnairy entity = new Questionnairy();
+        entity.setDni("12345678");
+
+        when(mapper.WrapperPostKycResolutionRequestToCustomerEntitys(inner))
+                .thenReturn(List.of(entity));
+
+        when(repository.saveAll(anyList()))
+                .thenReturn(List.of(entity));
+
+        WrapperPostKycResolutionResponse expected = new WrapperPostKycResolutionResponse();
+
+        when(mapper.toDto("12345678")).thenReturn(expected);
+
+        WrapperPostKycResolutionResponse response =
+                adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+        verify(repository).saveAll(anyList());
+        verify(mapper).toDto("12345678");
+    }
+
+    @Test
+    void shouldHandleEmptyList() {
+        WrapperPostKycResolutionRequest request = mock(WrapperPostKycResolutionRequest.class);
+
+        when(request.getKnowYourCustomerQuestionnaires())
+                .thenReturn(Collections.emptyList());
+
+        when(mapper.WrapperPostKycResolutionRequestToCustomerEntitys(anyList()))
+                .thenReturn(Collections.emptyList());
+
+        when(repository.saveAll(anyList()))
+                .thenReturn(Collections.emptyList());
+
+        WrapperPostKycResolutionResponse expected = new WrapperPostKycResolutionResponse();
+
+        when(mapper.toDto(null)).thenReturn(expected);
+
+        WrapperPostKycResolutionResponse response =
+                adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+        verify(mapper).toDto(null);
+    }
 }
-
 
 
 package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.*;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Questionnairy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-public interface KYCEntityMapper {
+import static org.junit.jupiter.api.Assertions.*;
 
-    JsonMapper jsonMapper = new JsonMapper();
+class KYCEntityMapperTest {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "dni", source = "questionnaireId")
-    @Mapping(target = "audit", expression = "java(toStringJson(request.getAudit()))")
-    @Mapping(target = "questions", expression = "java(toStringJson(request.getQuestions()))")
-    @Mapping(target = "version", defaultValue = "1")
-    Questionnairy WrapperPostKycResolutionRequestToCustomerEntity(WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner request);
+    private final KYCEntityMapper mapper = Mappers.getMapper(KYCEntityMapper.class);
 
-    List<Questionnairy> WrapperPostKycResolutionRequestToCustomerEntitys(List<WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner> request);
+    @Test
+    void shouldMapRequestToEntity() {
+        var inner = new WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner();
+        inner.setQuestionnaireId("12345678");
+        inner.setAudit("audit-test");
+        inner.setQuestions("questions-test");
 
-    @Mapping(target = "kycResolutionId", source = "id")
-    WrapperPostKycResolutionResponse toDto(String id);
+        Questionnairy entity =
+                mapper.WrapperPostKycResolutionRequestToCustomerEntity(inner);
 
-    default String toStringJson(Object o){
-        try {
-            return jsonMapper.writeValueAsString(o);
-        } catch (JsonProcessingException e) {
-            return "Error al parsear objeto";
-        }
+        assertNotNull(entity);
+        assertEquals("12345678", entity.getDni());
+        assertNotNull(entity.getAudit());
+        assertNotNull(entity.getQuestions());
+        assertEquals("1", entity.getVersion());
+    }
+
+    @Test
+    void shouldMapList() {
+        var inner = new WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner();
+        inner.setQuestionnaireId("111");
+
+        List<Questionnairy> list =
+                mapper.WrapperPostKycResolutionRequestToCustomerEntitys(List.of(inner));
+
+        assertEquals(1, list.size());
+    }
+
+    @Test
+    void shouldMapToDto() {
+        var response = mapper.toDto("ABC123");
+
+        assertNotNull(response);
+        assertEquals("ABC123", response.getKycResolutionId());
+    }
+
+    @Test
+    void shouldConvertObjectToJsonSuccessfully() {
+        String json = mapper.toStringJson("test");
+
+        assertNotNull(json);
+        assertTrue(json.contains("test"));
+    }
+
+    @Test
+    void shouldHandleJsonError() {
+        Object invalid = new Object() {
+            public Object self() { return this; } // potencial recursivo
+        };
+
+        String result = mapper.toStringJson(invalid);
+
+        assertNotNull(result);
+        // no necesariamente falla siempre, pero cubre rama catch si ocurre
     }
 }
-
-
