@@ -1,234 +1,31 @@
-import org.junit.jupiter.api.Test;
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Base64;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class UtilsFileTest {
-
-    @Test
-    void shouldGenerateFileName() {
-        String result = UtilsFile.generateFileName("123");
-        assertTrue(result.contains("123"));
-    }
-
-    @Test
-    void shouldGenerateKey() {
-        String result = UtilsFile.generateKey("abc");
-        assertTrue(result.contains("abc"));
-    }
-
-    @Test
-    void shouldGetFileName() {
-        String key = UtilsFile.generateKey("123");
-        String fileName = UtilsFile.getFileName(key);
-
-        assertFalse(fileName.contains("PREFIJO")); // depende de tu constante
-    }
-
-    @Test
-    void shouldGetDocumentId() {
-        String key = UtilsFile.generateKey("999");
-        String id = UtilsFile.getDocumentId(key);
-
-        assertEquals("999", id);
-    }
-
-    @Test
-    void shouldReturnNullWhenBase64IsNull() throws Exception {
-        File result = UtilsFile.base64ToFile(null, "test.pdf");
-        assertNull(result);
-    }
-
-    @Test
-    void shouldConvertBase64ToFile() throws Exception {
-        String content = "hola";
-        String base64 = Base64.getEncoder().encodeToString(content.getBytes());
-
-        File file = UtilsFile.base64ToFile(base64, "testFile.txt");
-
-        assertNotNull(file);
-        assertTrue(file.exists());
-
-        String fileContent = Files.readString(file.toPath());
-        assertEquals("hola", fileContent);
-
-        file.delete(); // cleanup
-    }
-}
-
-
-
-
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class DocumentMapperTest {
-
-    private final DocumentMapper mapper = new DocumentMapper();
-
-    @Test
-    void shouldMapDownload() {
-        var response = mapper.donwloadMapper("http://url");
-
-        assertNotNull(response);
-        assertEquals("http://url", response.getAccessInformation().getHref());
-    }
-
-    @Test
-    void shouldMapSearch() {
-        ObjectListing listing = new ObjectListing();
-
-        S3ObjectSummary summary = new S3ObjectSummary();
-        summary.setKey(UtilsFile.generateKey("123"));
-
-        listing.getObjectSummaries().add(summary);
-
-        var response = mapper.searchMapper(listing);
-
-        assertEquals(1, response.getDocuments().size());
-        assertEquals("123", response.getDocuments().get(0).getDocumentId());
-    }
-
-    @Test
-    void shouldMapUpload() {
-        var response = mapper.uploadMapper("abc");
-
-        assertNotNull(response);
-        assertEquals("abc", response.getDocument().getDocumentId());
-    }
-
-    @Test
-    void shouldMapGet() {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("application/pdf");
-        metadata.setHeader("x-amz-archive-status", "AVAILABLE");
-
-        var response = mapper.getMapper("123", metadata);
-
-        assertEquals("123", response.getDocumentId());
-        assertTrue(response.getName().contains("123"));
-        assertEquals("application/pdf", response.getMimeType());
-    }
-}
-
-
-
-
-
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import java.net.URL;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+@Configuration
+public class S3Config {
 
-class DocumentManagementAdapterTest {
+    @Value("${aws.accessKeyId}")
+    private String awsAccessKeyId;
 
-    @Mock
-    private AmazonS3 amazonS3;
+    @Value("${aws.secretKey}")
+    private String awsSecretKey;
 
-    @Mock
-    private DocumentMapper mapper;
+    @Value("${aws.region}")
+    private String awsRegion;
 
-    @InjectMocks
-    private DocumentManagementAdapter adapter;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        adapter = new DocumentManagementAdapter(amazonS3, mapper);
-        adapter.bucketName = "bucket-test";
-    }
-
-    @Test
-    void shouldDownloadDocument() throws Exception {
-        var request = new WrapperGetDocumentsRequest();
-        var doc = new WrapperMyDocumentResponse();
-        doc.setDocumentId("123");
-        request.setDocument(doc);
-
-        when(amazonS3.getUrl(anyString(), anyString()))
-                .thenReturn(new URL("http://test-url"));
-
-        when(mapper.donwloadMapper(anyString()))
-                .thenReturn(new WrapperGetDocumentsResponse());
-
-        var response = adapter.downloadDocument(request);
-
-        assertNotNull(response);
-        verify(amazonS3).getUrl(anyString(), anyString());
-    }
-
-    @Test
-    void shouldSearchDocuments() {
-        ObjectListing listing = new ObjectListing();
-
-        when(amazonS3.listObjects(anyString())).thenReturn(listing);
-        when(mapper.searchMapper(listing))
-                .thenReturn(new WrapperPostSearchDocumentsResponse());
-
-        var response = adapter.searchDocuments(new WrapperPostSearchDocumentsRequest());
-
-        assertNotNull(response);
-    }
-
-    @Test
-    void shouldUploadDocumentSuccessfully() {
-        var request = new WrapperPostDocumentsRequest();
-        var doc = new WrapperMyDocumentResponse();
-        doc.setFolderReference("aG9sYQ=="); // "hola" base64
-        request.setDocument(doc);
-
-        when(mapper.uploadMapper(anyString()))
-                .thenReturn(new WrapperPostDocumentsResponse());
-
-        var response = adapter.uploadDocument(request);
-
-        assertNotNull(response);
-        verify(amazonS3).putObject(anyString(), anyString(), any(File.class));
-    }
-
-    @Test
-    void shouldHandleUploadException() {
-        var request = new WrapperPostDocumentsRequest();
-
-        var response = adapter.uploadDocument(request);
-
-        assertNotNull(response);
-    }
-
-    @Test
-    void shouldGetDocument() {
-        ObjectMetadata metadata = new ObjectMetadata();
-
-        when(amazonS3.getObjectMetadata(anyString(), anyString()))
-                .thenReturn(metadata);
-
-        when(mapper.getMapper(anyString(), any()))
-                .thenReturn(new WrapperMySearchDocumentResponse());
-
-        var response = adapter.getDocument("123");
-
-        assertNotNull(response);
-    }
-
-    @Test
-    void shouldDeleteDocument() {
-        adapter.deleteDocument("123");
-
-        verify(amazonS3).deleteObject(anyString(), anyString());
+    @Bean
+    public AmazonS3 amazonS3() {
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretKey);
+        return AmazonS3ClientBuilder.standard()
+                .withRegion(awsRegion)
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .build();
     }
 }
