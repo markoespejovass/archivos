@@ -25,10 +25,11 @@ public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
     List<Questionnairy> questionnairies = repository.saveAll(
             mapper.WrapperPostKycResolutionRequestToCustomerEntitys(
                     criteria.getKnowYourCustomerQuestionnaires()));
+    if (questionnairies.isEmpty()){
+      return mapper.toDto(null);
+    }
     String id = questionnairies.get(0).getDni();
-    return mapper.toDto(
-            questionnairies, id
-            );
+    return mapper.toDto(id);
 
 
   }
@@ -52,20 +53,21 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface KYCEntityMapper {
 
+    JsonMapper jsonMapper = new JsonMapper();
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dni", source = "questionnaireId")
-    @Mapping(target = "audit", expression = "java(toStringJson(request.getAudit())")
-    @Mapping(target = "questions", expression = "java(toStringJson(request.getQuestions())")
+    @Mapping(target = "audit", expression = "java(toStringJson(request.getAudit()))")
+    @Mapping(target = "questions", expression = "java(toStringJson(request.getQuestions()))")
     @Mapping(target = "version", defaultValue = "1")
     Questionnairy WrapperPostKycResolutionRequestToCustomerEntity(WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner request);
 
     List<Questionnairy> WrapperPostKycResolutionRequestToCustomerEntitys(List<WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner> request);
 
     @Mapping(target = "kycResolutionId", source = "id")
-    WrapperPostKycResolutionResponse toDto(List<Questionnairy> questionnairies, String id);
+    WrapperPostKycResolutionResponse toDto(String id);
 
     default String toStringJson(Object o){
-        JsonMapper jsonMapper = new JsonMapper();
         try {
             return jsonMapper.writeValueAsString(o);
         } catch (JsonProcessingException e) {
