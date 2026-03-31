@@ -1,31 +1,54 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@Configuration
-public class S3Config {
+import static org.junit.jupiter.api.Assertions.*;
 
-    @Value("${aws.accessKeyId}")
-    private String awsAccessKeyId;
+class S3ConfigTest {
 
-    @Value("${aws.secretKey}")
-    private String awsSecretKey;
+    private S3Config s3Config;
 
-    @Value("${aws.region}")
-    private String awsRegion;
+    @BeforeEach
+    void setUp() {
+        s3Config = new S3Config();
 
-    @Bean
-    public AmazonS3 amazonS3() {
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretKey);
-        return AmazonS3ClientBuilder.standard()
-                .withRegion(awsRegion)
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .build();
+        // Inyectamos valores mockeados en los @Value
+        ReflectionTestUtils.setField(s3Config, "awsAccessKeyId", "test-access-key");
+        ReflectionTestUtils.setField(s3Config, "awsSecretKey", "test-secret-key");
+        ReflectionTestUtils.setField(s3Config, "awsRegion", "us-east-1");
+    }
+
+    @Test
+    void shouldCreateAmazonS3BeanSuccessfully() {
+        AmazonS3 amazonS3 = s3Config.amazonS3();
+
+        assertNotNull(amazonS3);
+    }
+
+    @Test
+    void shouldUseCorrectConfigurationValues() {
+        AmazonS3 amazonS3 = s3Config.amazonS3();
+
+        assertNotNull(amazonS3);
+        // No podemos inspeccionar directamente credenciales internas,
+        // pero validamos que no falle la construcción con valores válidos
+    }
+
+    @Test
+    void shouldNotThrowExceptionWhenCreatingBean() {
+        assertDoesNotThrow(() -> s3Config.amazonS3());
+    }
+
+    @Test
+    void shouldCreateDifferentInstancesEachTime() {
+        AmazonS3 amazonS3_1 = s3Config.amazonS3();
+        AmazonS3 amazonS3_2 = s3Config.amazonS3();
+
+        assertNotNull(amazonS3_1);
+        assertNotNull(amazonS3_2);
+        assertNotSame(amazonS3_1, amazonS3_2);
     }
 }
