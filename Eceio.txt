@@ -1,337 +1,247 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa;
+@ExtendWith(MockitoExtension.class)
+class DataConsentManagementAdapterTest {
 
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.application.ports.output.DataConsentManagementRepositoryPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.input.rest.data.WrapperConsentId;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.input.rest.data.WrapperGetConsentsOutput;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.input.rest.data.WrapperPatchConsentRequestBody;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.input.rest.data.WrapperPostConsentRequestBody;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.mapper.ConsentEntityMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository.ConsentRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+    @Mock
+    private ConsentRepository repository;
 
-import java.util.List;
-import java.util.Optional;
+    @Mock
+    private ConsentEntityMapper mapper;
 
-@Component
-@RequiredArgsConstructor
-public class DataConsentManagementAdapter implements DataConsentManagementRepositoryPort {
+    @InjectMocks
+    private DataConsentManagementAdapter adapter;
 
+    @Test
+    void shouldReturnEmptyWhenNoConsent() {
+        when(repository.findByPartyId("123")).thenReturn(Optional.empty());
 
-  private final ConsentRepository consentRepository;
+        WrapperGetConsentsOutput result = adapter.getConsent("123");
 
-  private final ConsentEntityMapper mapper;
+        assertNotNull(result);
+        verify(repository).findByPartyId("123");
+        verifyNoInteractions(mapper);
+    }
 
-  @Override
-  public WrapperGetConsentsOutput getConsent(String partyId) {
-    var optionalConsent = consentRepository.findByPartyId(partyId);
-    if (optionalConsent.isEmpty()){return new WrapperGetConsentsOutput();}
-    return mapper.toDTOGet(optionalConsent.get());
-  }
+    @Test
+    void shouldReturnConsentWhenExists() {
+        ConsentEntity entity = new ConsentEntity();
+        WrapperGetConsentsOutput response = new WrapperGetConsentsOutput();
 
-  @Override
-  public List<WrapperConsentId> postConsent(
-          WrapperPostConsentRequestBody criteria, String partyId) {
-    ConsentEntity response = consentRepository.save(mapper.toEntityPost(criteria,partyId));
+        when(repository.findByPartyId("123")).thenReturn(Optional.of(entity));
+        when(mapper.toDTOGet(entity)).thenReturn(response);
 
-    return List.of(mapper.toDTOPost(response));
-  }
+        WrapperGetConsentsOutput result = adapter.getConsent("123");
 
-  @Override
-  public Void patchConsent(WrapperPatchConsentRequestBody criteria, String partyId, String consentId){
-    consentRepository.save(mapper.toEntityUpdate(criteria,partyId,consentId));
-    return null;
-  }
+        assertNotNull(result);
+        assertEquals(response, result);
+    }
 
+    @Test
+    void shouldSaveConsent() {
+        WrapperPostConsentRequestBody request = new WrapperPostConsentRequestBody();
+        ConsentEntity entity = new ConsentEntity();
+        WrapperConsentId dto = new WrapperConsentId();
+
+        when(mapper.toEntityPost(request, "123")).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTOPost(entity)).thenReturn(dto);
+
+        List<WrapperConsentId> result = adapter.postConsent(request, "123");
+
+        assertEquals(1, result.size());
+        assertEquals(dto, result.get(0));
+    }
+
+    @Test
+    void shouldPatchConsent() {
+        WrapperPatchConsentRequestBody request = new WrapperPatchConsentRequestBody();
+        ConsentEntity entity = new ConsentEntity();
+
+        when(mapper.toEntityUpdate(request, "123", "abc")).thenReturn(entity);
+
+        adapter.patchConsent(request, "123", "abc");
+
+        verify(repository).save(entity);
+    }
 }
 
 
 
+class JwtUtilTest {
 
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
+    @Test
+    void shouldGenerateValidToken() {
+        String token = JwtUtil.generateToken();
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-
-/**
- * The class representative Jwt ultis class
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-public class JwtUtil {
-
-    private static final String SECRET = "9b7c2d4e1a6f8c3d5e7a9b0c1d2e3f4a5c6b7d8e9f0a1b2c3d4e5f6a7b8c9d01";
-
-    private static SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+        assertNotNull(token);
+        assertFalse(token.isEmpty());
+        assertTrue(token.split("\\.").length == 3); // estructura JWT
     }
-
-    public static String generateToken() {
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("partnerId", "BSPE"); // opcional
-
-
-
-        long now = System.currentTimeMillis();
-        long expiration = now + 1000 * 60 * 60; // 1 hora
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date(now))
-                .setExpiration(new Date(expiration))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-
-}
-
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
-
-/**
- * The class representative Aes ultis class
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-public class AesEncryptionService {
-
-    private static final String ALGORITHM = "AES";
-    private static final String SECRET_KEY = "9b7c2d4e1a6f8c3d5e7a9b0c1d2e3f4a5c6b7d8e9f0a1b2c3d4e5f6a7b8c9d01";
-
-    public static String encrypt(String value){
-        byte[] keyBytes = hexStringToByteArray(SECRET_KEY);
-        try {
-            // generar IV aleatorio
-            byte[] iv = new byte[16];
-            SecureRandom secureRandom = new SecureRandom();
-            secureRandom.nextBytes(iv);
-
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, ALGORITHM);
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-
-            byte[] encrypted = cipher.doFinal(value.getBytes("UTF-8"));
-
-            // IV + ciphertext
-            byte[] result = new byte[iv.length + encrypted.length];
-
-            System.arraycopy(iv, 0, result, 0, iv.length);
-            System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);
-
-            return bytesToHex(result);
-        } catch (Exception ex){
-            throw new RuntimeException("Error encrypting");
-        }
-    }
-
-
-    private static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-
-        byte[] data = new byte[len / 2];
-
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] =
-                    (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                            + Character.digit(s.charAt(i + 1), 16));
-        }
-
-        return data;
-    }
-
-    private static String bytesToHex(byte[] bytes) {
-
-        StringBuilder hex = new StringBuilder(bytes.length * 2);
-
-        for (byte b : bytes) {
-            hex.append(String.format("%02x", b));
-        }
-
-        return hex.toString();
-    }
-
 }
 
 
 
+class AesEncryptionServiceTest {
 
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external;
+    @Test
+    void shouldEncryptSuccessfully() {
+        String input = "hola mundo";
 
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.application.ports.output.SKYServiceRepositoryPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+        String encrypted = AesEncryptionService.encrypt(input);
+
+        assertNotNull(encrypted);
+        assertNotEquals(input, encrypted);
+    }
+
+    @Test
+    void shouldGenerateDifferentOutputsForSameInput() {
+        String input = "test";
+
+        String encrypted1 = AesEncryptionService.encrypt(input);
+        String encrypted2 = AesEncryptionService.encrypt(input);
+
+        assertNotEquals(encrypted1, encrypted2); // por IV aleatorio
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionOnError() {
+        assertThrows(RuntimeException.class, () -> {
+            AesEncryptionService.encrypt(null);
+        });
+    }
+}
 
 
-/**
- * The class representative Sky service adapter
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Slf4j
-@Component
-@AllArgsConstructor
-public class SKYServiceAdapter implements SKYServiceRepositoryPort {
 
-    private final WebClient webClient;
+@ExtendWith(MockitoExtension.class)
+class SKYServiceAdapterTest {
 
-    @Override
-    public CreateUserResponse createUser(CreateUserRequest criteria) {
-        return webClient
-                .post()
-                .uri(Constant.URI_API_SKY)
-                .header("Authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0bmVySWQiOiJCU1BFIiwiaWF0IjoxNzA5NjU0MDQ2LCJleHAiOjIwMDk2NTc2NDZ9.XSUWCBkgxKirAnA9GCsfzprdHvRSfhmCOOJFeiUcaFU")
-                .header("Ocp-Apim-Subscription-Key", "5cfc7d2fea014ede83c5bd0086d81d2c")
-                .header("Content-Type", "application/json")
-                .bodyValue(criteria)
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::is4xxClientError,
-                        response -> response.bodyToMono(String.class).map(body ->{
-                            log.error("error: {}", body);
-                            throw new RuntimeException("error: "+ body);
-                        })
-                )
-                .bodyToMono(CreateUserResponse.class)
-                .block();
+    @Mock
+    private WebClient webClient;
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
+    @InjectMocks
+    private SKYServiceAdapter adapter;
+
+    @Test
+    void shouldCreateUserSuccessfully() {
+        CreateUserRequest request = new CreateUserRequest();
+        CreateUserResponse response = new CreateUserResponse();
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.header(anyString(), anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(CreateUserResponse.class)).thenReturn(Mono.just(response));
+
+        CreateUserResponse result = adapter.createUser(request);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void shouldThrowExceptionOn4xx() {
+        CreateUserRequest request = new CreateUserRequest();
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.header(anyString(), anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any())).thenAnswer(invocation -> {
+            throw new RuntimeException("error");
+        });
+
+        assertThrows(RuntimeException.class, () -> adapter.createUser(request));
+    }
+}
+
+
+
+@ExtendWith(MockitoExtension.class)
+class HelloApiDelegateImplTest {
+
+    @Mock
+    private SkyServicelnputPort service;
+
+    @Mock
+    private SkyServiceMapper mapper;
+
+    @InjectMocks
+    private HelloApiDelegateImpl delegate;
+
+    @Test
+    void shouldRegisterCustomerSuccessfully() {
+        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
+        CreateUserRequest domainRequest = new CreateUserRequest();
+        CreateUserResponse domainResponse = new CreateUserResponse();
+        WrapperRegisterCustomer response = new WrapperRegisterCustomer();
+
+        when(mapper.CreateUserRequestDtoToCreateUserRequest(request)).thenReturn(domainRequest);
+        when(service.createUser(domainRequest)).thenReturn(domainResponse);
+        when(mapper.CreateUserResponseToCreateUserResponseDTO(domainResponse)).thenReturn(response);
+
+        ResponseEntity<WrapperRegisterCustomer> result = delegate.registerCustomer(request);
+
+        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(response, result.getBody());
     }
 }
 
 
 
 
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest;
+@SpringBootTest
+class SkyServiceMapperTest {
 
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.application.ports.input.SkyServicelnputPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper.SkyServiceMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
+    @Autowired
+    private SkyServiceMapper mapper;
 
-/**
- * The class representative Api delegate<
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class HelloApiDelegateImpl implements RegisterCustomerApiDelegate {
+    @Test
+    void shouldMapRequestAndEncrypt() {
+        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
 
-    private final SkyServicelnputPort servicelnputPort;
-    private final SkyServiceMapper mapper;
+        BenefitProgramActivationRequestActivationPropertiesInner prop1 =
+                new BenefitProgramActivationRequestActivationPropertiesInner();
+        prop1.setKey("email");
+        prop1.setValue("test@mail.com");
 
+        BenefitProgramActivationRequestActivationPropertiesInner prop2 =
+                new BenefitProgramActivationRequestActivationPropertiesInner();
+        prop2.setKey("country");
+        prop2.setValue("PE");
 
-    @Override
-    public ResponseEntity<WrapperRegisterCustomer> registerCustomer(BenefitProgramActivationRequest request) {
-        log.info("Log from Servlet controller");
-        return ResponseEntity.ok(mapper.CreateUserResponseToCreateUserResponseDTO(servicelnputPort.createUser(
-                mapper.CreateUserRequestDtoToCreateUserRequest(request))));
+        request.setActivationProperties(List.of(prop1, prop2));
+
+        CreateUserRequest result = mapper.CreateUserRequestDtoToCreateUserRequest(request);
+
+        assertNotNull(result);
+        assertNotNull(result.getData()); // encrypted
+    }
+
+    @Test
+    void shouldMapResponse() {
+        CreateUserResponse response = new CreateUserResponse();
+
+        // ⚠️ debes mockear estructura interna real aquí
+        // o usar builder si tienes
+
+        WrapperRegisterCustomer result =
+                mapper.CreateUserResponseToCreateUserResponseDTO(response);
+
+        assertNotNull(result);
     }
 }
 
 
 
-
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper;
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.Profile;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.CreateUserRequestDTO;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.DocumentSKY;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.UserInfo;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequestActivationPropertiesInner;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-/**
- * The class representative Sky service mapper<
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Mapper(componentModel = "spring")
-public interface SkyServiceMapper {
-
-  ObjectMapper objectMapper = new ObjectMapper();
-
-  CreateUserRequest CreateUserRequestDtoToCreateUserRequest(
-          BenefitProgramActivationRequest dto);
-
-  @Mapping(target = "requestId", expression = "java(getUserId(createUserResponse))")
-  @Mapping(target = "status.statusCode", source = "success")
-  @Mapping(target = "status.statusDescription", source = "message")
-  WrapperRegisterCustomer CreateUserResponseToCreateUserResponseDTO(
-          CreateUserResponse createUserResponse);
-
-  @AfterMapping
-  default void mapPropertiesRequest(BenefitProgramActivationRequest dto, @MappingTarget CreateUserRequest request){
-
-    Map<String,String> mapProperties = dto.getActivationProperties()
-                                          .stream()
-                                          .collect(Collectors.toMap(
-                                                  BenefitProgramActivationRequestActivationPropertiesInner::getKey,
-                                                  BenefitProgramActivationRequestActivationPropertiesInner::getValue));
-    request.setPartnerId(Constant.REQUEST_BSPE);
-    CreateUserRequestDTO requestDTO = new CreateUserRequestDTO();
-    requestDTO.setProfile(new Profile(mapProperties.get(Constant.REQUEST_EMAIL), mapProperties.get(Constant.REQUEST_COUNTRY)));
-    requestDTO.setDocument(new DocumentSKY(mapProperties.get(Constant.REQUEST_TYPE), mapProperties.get(Constant.REQUEST_NUMBER), mapProperties.get(Constant.REQUEST_COUNTRY) ));
-    requestDTO.setUserInfo(new UserInfo(mapProperties.get(Constant.REQUEST_NAME), mapProperties.get(Constant.REQUEST_LASTNAME), List.of(mapProperties.get(Constant.REQUEST_EMAIL)), mapProperties.get(Constant.REQUEST_BIRTHDATE)));
-
-    request.setData(encryptRequest(requestDTO));
-
-  }
-
-  default String encryptRequest(CreateUserRequestDTO dto){
-    try {
-      String json = objectMapper.writeValueAsString(dto);
-      return AesEncryptionService.encrypt(json);
-    } catch (Exception ex){
-        throw new RuntimeException("Error mapping or encrypting request");
-    }
-  }
-
-  default String getUserId(CreateUserResponse createUserResponse){
-    return createUserResponse.getContent().getLoginBffResponse().getContent().getResponse().getUid();
-  }
-}
