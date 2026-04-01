@@ -7,12 +7,29 @@
     "discriminator": "",
     "searchProperties": [
       {
-        "keyOperator": "",
-        "keyId": "",
-        "keyValue": "",
-        "keyType": "",
-        "keyValueFrom": "",
-        "keyValueTo": ""
+        "keyOperator": "Contains",// Solo se permite(Contains,Equal)
+        "keyId": "NAME",// Solo se permite(NAME,MIME_TYPE,STATUS,VERSION,ID)
+        "keyValue": "Terminos y condiciones",
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "MIME_TYPE",
+        "keyValue": "aplication/pdf",
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "STATUS",
+        "keyValue": "UPLOADED",//Solo se permite(UPLOADED,UPDATED)
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "VERSION",
+        "keyValue": "1",
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "ID",
+        "keyValue": "1321325",
       }
     ],
     "sortOrder": "",
@@ -22,4 +39,3 @@
     "_limit": "",
     "_offset": ""
   }
-}
