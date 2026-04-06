@@ -1,126 +1,122 @@
-{
-  "party": {
-    "partyId": "F123456789",
-    "person": {
-      "documents": [
-        {
-          "documentNumber": "50456713W",
-          "documentTypeCode": "SSN",
-          "documentTypeDescription": "Social Security Number",
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ],
-      "personName": {
-        "fullName": "Mary Elizabeth Clark Butler",
-        "givenName": "Mary",
-        "lastName": "Clark",
-        "middleName": "Elizabeth",
-        "secondLastName": "Butler"
-      },
-      "placeOfBirth": { 
-        "country": {
-          "code": "US",
-          "name": "United States of America"
-        }
-      },
-      "firstNationality": {
-        "code": "US",
-        "name": "United States of America"},
-      "civilStatusDescription": "Divorced",
-      "politicalExposure": {
-        "isSelfDeclaredPEP": true,
-        "declarationComments": "I am the mayor of Fuentejuela de Arriba."
-      },
-      "birthDate": "1986-01-01",
-      "countryOfResidence": {
-        "code": "US",
-        "name": "United States of America"
-      },
-      "genderDescription": "Male",
-      "employmentInformation": {
-        "occupationCode": "1211",
-        "occupationDescription": "Chief Financial Officer",
-        "economicActivity": {
-          "categoryDescription": "Financial and insurance activities",
-          "subCategoryCode": "6491",
-          "subCategoryDescription": "Leasing"
-        }
-        }
-      }
-    },
-  "products": [
-    {
-      "productFamilyId": "005003001",
-      "name": "Mortgage loans",
-      "productCode": "0049300130",
-      "productDescription": "Santander Checking Account"
-    }
-  ],
-  "preferenceChannel": {
-    "code": "01",
-    "description": "Web"
-  },
-  "knowYourCustomerQuestionnaires": [
-    {
-      "questionnaireId": "0233222",
-      "audit": {
-        "lastUpdateDate": "2025-02-18",
-        "lastUpdateProcess": "Onboarding",
-        "expirationDate": "2028-07-21",
-        "completionDate": "2025-11-15",
-        "submissionDate": "2025-11-17"
-      },
-      "questions": [
-        {
-          "typeDescription": "Simple answer",
-          "translationCode": "05_1G03",
-          "answer": "Self-employed",
-          "answerTranslationCode": "05_1G03",
-          "answers": [
-            {
-              "translationCode": "05_1G03",
-              "values": [
-                "PE"
-              ]
-            }
-          ],
-          "description": "What is your activity?",
-          "questionId": "Q8282838"
-        }
-      ],
-      "version": "1"
-    }
-  ]
-}
-}
+CREATE TABLE kyc (
+    id SERIAL PRIMARY KEY,
+    party_id VARCHAR(50),
+
+    -- Documento
+    document_number VARCHAR(50),
+    document_type_code VARCHAR(10),
+    document_country_code VARCHAR(5),
+
+    -- Datos personales
+    full_name VARCHAR(200),
+    given_name VARCHAR(100),
+    last_name VARCHAR(100),
+    birth_date DATE,
+    gender VARCHAR(20),
+
+    -- Nacionalidad y residencia
+    nationality_code VARCHAR(5),
+    country_of_residence VARCHAR(5),
+    country_of_birth VARCHAR(5),
+
+    -- Estado civil
+    civil_status VARCHAR(50),
+
+    -- PEP
+    is_pep BOOLEAN,
+    pep_comments TEXT,
+
+    -- Trabajo
+    occupation_code VARCHAR(20),
+    occupation_description VARCHAR(200),
+    economic_activity_category VARCHAR(200),
+    economic_activity_subcategory VARCHAR(20),
+
+    -- Producto
+    product_family_id VARCHAR(50),
+    product_name VARCHAR(100),
+    product_code VARCHAR(50),
+    product_description VARCHAR(200),
+
+    -- Canal
+    channel_code VARCHAR(10),
+    channel_description VARCHAR(100),
+
+    -- Auditoría
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 
-factor cliente
-[@[Valor TC]]+ tipo de cliente + person.documentNumber
-[@[Valor CL]]+ categoria laboral + economicActivity
-[@Valor]+ tipo de pj o pn + person.documentNumber
-[@[Valor P]]+ profesion + occupationCode
-[@[Valor SO]]+ valor sujeto obligado + depende del occupationCode, 
-[@[Valor RDD]]+ regimen de debida dilgencia+ depende si es pep o si es alb entonces regimen reforzado en caso contario regimen general
-[@[Valor ALB]]+ antecedente de lista bloqueante + siempre no
-[@[Valor PEP]]+ pep + politicalExposure
-[@[Valor RE]]+ valor rango de edad + birthDate
-[@[Valor EP]] + estructura de propieda + siemple = 2 otra cosa 5, siempre simple hasta que lo definan
+CREATE TABLE kyc_questionnaire (
+    id SERIAL PRIMARY KEY,
+    kyc_id INTEGER REFERENCES kyc(id),
+
+    questionnaire_id VARCHAR(50),
+    version VARCHAR(10),
+
+    last_update_date DATE,
+    expiration_date DATE,
+    completion_date DATE,
+    submission_date DATE
+);
 
 
-factor canal
-[@[Valor TP 2]]+ tipo de producto + productDescription
-[@[Valor CD]]+ canal de distribucion + preferenceChannel
-[@[Valor T]]+ transaccionalidad + trans regular su valor es 2
-[@[Valor M]]+ moneda + productFamily.name
 
 
-factor zg
-[@[Valor L]]+ localidad de residencia + countryOfResidence
-[@[Valor P2]]+ pais de nacimiento + placeOfBirth
-[@[Valor R]]+ pais de residencia + countryOfResidence
-[@[Valor PG]]+ presencia del grupo + constante nacional si la persona reside en peru entonces queda si vive en el extranjero no es nacional
-[@[Valor EXP]]+  exp pais rais + exposicion del pais residencinte
+CREATE TABLE kyc_question (
+    id SERIAL PRIMARY KEY,
+    questionnaire_id INTEGER REFERENCES kyc_questionnaire(id),
+
+    question_id VARCHAR(50),
+    description TEXT,
+    type_description VARCHAR(50)
+);
+
+
+
+CREATE TABLE kyc_answer (
+    id SERIAL PRIMARY KEY,
+    question_id INTEGER REFERENCES kyc_question(id),
+
+    answer TEXT,
+    answer_translation_code VARCHAR(50)
+);
+
+
+
+
+CREATE TABLE kyc_answer_values (
+    id SERIAL PRIMARY KEY,
+    answer_id INTEGER REFERENCES kyc_answer(id),
+
+    translation_code VARCHAR(50),
+    value VARCHAR(50)
+);
+
+
+
+
+CREATE TABLE input_definition (
+    input_code VARCHAR(10) PRIMARY KEY, -- TC, CL, P, etc
+    kyc_field VARCHAR(100),             -- nombre del campo en KYC
+    description VARCHAR(200)
+);
+
+
+
+
+CREATE TABLE value_mapping (
+    id SERIAL PRIMARY KEY,
+    input_code VARCHAR(10),
+    value_text VARCHAR(100),
+    value_numeric DECIMAL
+);
+
+
+
+CREATE TABLE factor_rule (
+    id SERIAL PRIMARY KEY,
+    factor_code VARCHAR(20),   -- CLIENTE, CANAL, ZG, SCORE
+    input_code VARCHAR(20),    -- TC, CL, CLIENTE, etc
+    weight DECIMAL
+);
