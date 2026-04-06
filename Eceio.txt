@@ -1,41 +1,126 @@
 {
-  "caller_information": {
-    "appId": "",
-    "name": ""
-  },
-  "search_parameters": {
-    "discriminator": "",
-    "searchProperties": [
-      {
-        "keyOperator": "Contains",// Solo se permite(Contains,Equal)
-        "keyId": "NAME",// Solo se permite(NAME,MIME_TYPE,STATUS,VERSION,ID)
-        "keyValue": "Terminos y condiciones",
+  "party": {
+    "partyId": "F123456789",
+    "person": {
+      "documents": [
+        {
+          "documentNumber": "50456713W",
+          "documentTypeCode": "SSN",
+          "documentTypeDescription": "Social Security Number",
+          "country": {
+            "code": "US",
+            "name": "United States of America"
+          }
+        }
+      ],
+      "personName": {
+        "fullName": "Mary Elizabeth Clark Butler",
+        "givenName": "Mary",
+        "lastName": "Clark",
+        "middleName": "Elizabeth",
+        "secondLastName": "Butler"
       },
-      {
-        "keyOperator": "Equal",
-        "keyId": "MIME_TYPE",
-        "keyValue": "aplication/pdf",
+      "placeOfBirth": { 
+        "country": {
+          "code": "US",
+          "name": "United States of America"
+        }
       },
-      {
-        "keyOperator": "Equal",
-        "keyId": "STATUS",
-        "keyValue": "UPLOADED",//Solo se permite(UPLOADED,UPDATED)
+      "firstNationality": {
+        "code": "US",
+        "name": "United States of America"},
+      "civilStatusDescription": "Divorced",
+      "politicalExposure": {
+        "isSelfDeclaredPEP": true,
+        "declarationComments": "I am the mayor of Fuentejuela de Arriba."
       },
-      {
-        "keyOperator": "Equal",
-        "keyId": "VERSION",
-        "keyValue": "1",
+      "birthDate": "1986-01-01",
+      "countryOfResidence": {
+        "code": "US",
+        "name": "United States of America"
       },
-      {
-        "keyOperator": "Equal",
-        "keyId": "ID",
-        "keyValue": "1321325",
+      "genderDescription": "Male",
+      "employmentInformation": {
+        "occupationCode": "1211",
+        "occupationDescription": "Chief Financial Officer",
+        "economicActivity": {
+          "categoryDescription": "Financial and insurance activities",
+          "subCategoryCode": "6491",
+          "subCategoryDescription": "Leasing"
+        }
+        }
       }
-    ],
-    "sortOrder": "",
-    "sortBy": ""
+    },
+  "products": [
+    {
+      "productFamilyId": "005003001",
+      "name": "Mortgage loans",
+      "productCode": "0049300130",
+      "productDescription": "Santander Checking Account"
+    }
+  ],
+  "preferenceChannel": {
+    "code": "01",
+    "description": "Web"
   },
-  "navigation_parameters": {
-    "_limit": "",
-    "_offset": ""
-  }
+  "knowYourCustomerQuestionnaires": [
+    {
+      "questionnaireId": "0233222",
+      "audit": {
+        "lastUpdateDate": "2025-02-18",
+        "lastUpdateProcess": "Onboarding",
+        "expirationDate": "2028-07-21",
+        "completionDate": "2025-11-15",
+        "submissionDate": "2025-11-17"
+      },
+      "questions": [
+        {
+          "typeDescription": "Simple answer",
+          "translationCode": "05_1G03",
+          "answer": "Self-employed",
+          "answerTranslationCode": "05_1G03",
+          "answers": [
+            {
+              "translationCode": "05_1G03",
+              "values": [
+                "PE"
+              ]
+            }
+          ],
+          "description": "What is your activity?",
+          "questionId": "Q8282838"
+        }
+      ],
+      "version": "1"
+    }
+  ]
+}
+}
+
+
+factor cliente
+[@[Valor TC]]+ tipo de cliente + person.documentNumber
+[@[Valor CL]]+ categoria laboral + economicActivity
+[@Valor]+ tipo de pj o pn + person.documentNumber
+[@[Valor P]]+ profesion + occupationCode
+[@[Valor SO]]+ valor sujeto obligado + depende del occupationCode, 
+[@[Valor RDD]]+ regimen de debida dilgencia+ depende si es pep o si es alb entonces regimen reforzado en caso contario regimen general
+[@[Valor ALB]]+ antecedente de lista bloqueante + siempre no
+[@[Valor PEP]]+ pep + politicalExposure
+[@[Valor RE]]+ valor rango de edad + birthDate
+[@[Valor EP]] + estructura de propieda + siemple = 2 otra cosa 5, siempre simple hasta que lo definan
+
+
+factor canal
+[@[Valor TP 2]]+ tipo de producto + productDescription
+[@[Valor CD]]+ canal de distribucion + preferenceChannel
+[@[Valor T]]+ transaccionalidad + trans regular su valor es 2
+[@[Valor M]]+ moneda + productFamily.name
+
+
+factor zg
+[@[Valor L]]+ localidad de residencia + countryOfResidence
+[@[Valor P2]]+ pais de nacimiento + placeOfBirth
+[@[Valor R]]+ pais de residencia + countryOfResidence
+[@[Valor PG]]+ presencia del grupo + constante nacional si la persona reside en peru entonces queda si vive en el extranjero no es nacional
+[@[Valor EXP]]+  exp pais rais + exposicion del pais residencinte
