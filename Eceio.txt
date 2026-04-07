@@ -1,28 +1,68 @@
 @Override
-  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
-    var documentId = UUID.randomUUID().toString();
-    try {
-      // en FolderReference esta el string de base64 del archivo
-      var file = base64ToFile(Objects.requireNonNull(criteria.getDocument()).getFolderReference(),
-              criteria.getDocument().getName());
-      //cargar archivo a S3
-      amazonS3.putObject(bucketName,generateKey(documentId),file);
-      //obtner la url
-      var url =  amazonS3.getUrl(bucketName,criteria.getDocument().getName()).toString();
-      //guardar
-      FileEntity entity = repository.save(mapper.toEntity(criteria));
-      return mapper.toDTO(entity);
-    } catch (Exception ex){
-      log.error("error : "+ex);
-    }
-    return new WrapperPostDocumentsResponse();
-  }
+public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
 
-  public static File base64ToFile(String base64, String name) throws IOException {
-    if (base64 == null){
-      return null;
+    validateRequest(criteria);
+
+    String documentId = UUID.randomUUID().toString();
+    String key = generateKey(documentId);
+
+    try {
+        var document = criteria.getDocument();
+
+        byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(fileBytes.length);
+        metadata.setContentType(document.getMimeType()); // importante
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
+
+        // ✅ subir a S3
+        amazonS3.putObject(bucketName, key, inputStream, metadata);
+
+        // ✅ obtener URL correcta
+        String url = amazonS3.getUrl(bucketName, key).toString();
+
+        // ✅ mapear entity
+        FileEntity entity = mapper.toEntity(criteria);
+        entity.setId(documentId);
+        entity.setS3Key(key);
+        entity.setUrl(url);
+
+        // guardar
+        entity = repository.save(entity);
+
+        return mapper.toDTO(entity);
+
+    } catch (Exception ex) {
+        log.error("Error uploading document", ex);
+        throw new RuntimeException("Error uploading document to S3", ex);
     }
-    byte[] decodedBytes = Base64.getDecoder().decode(base64);
-    Path destinationFile = Paths.get("./"+name);
-    return Files.write(destinationFile, decodedBytes).toFile();
-  }
+}
+
+
+
+private void validateRequest(WrapperPostDocumentsRequest criteria) {
+
+    if (criteria == null || criteria.getDocument() == null) {
+        throw new IllegalArgumentException("Document is required");
+    }
+
+    var doc = criteria.getDocument();
+
+    if (doc.getFolderReference() == null || doc.getFolderReference().isEmpty()) {
+        throw new IllegalArgumentException("File (base64) is required");
+    }
+
+    if (doc.getName() == null || doc.getName().isEmpty()) {
+        throw new IllegalArgumentException("File name is required");
+    }
+}
+
+
+
+
+
+private String generateKey(String documentId) {
+    return "documents/" + documentId;
+}
