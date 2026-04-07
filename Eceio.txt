@@ -1,122 +1,45 @@
-CREATE TABLE kyc (
-    id SERIAL PRIMARY KEY,
-    party_id VARCHAR(50),
+import org.springframework.data.jpa.domain.Specification;
 
-    -- Documento
-    document_number VARCHAR(50),
-    document_type_code VARCHAR(10),
-    document_country_code VARCHAR(5),
+public class FileSpecificationBuilder {
 
-    -- Datos personales
-    full_name VARCHAR(200),
-    given_name VARCHAR(100),
-    last_name VARCHAR(100),
-    birth_date DATE,
-    gender VARCHAR(20),
+    public static Specification<FileEntity> build(
+            List<SearchProperty> filters,
+            String discriminator
+    ) {
 
-    -- Nacionalidad y residencia
-    nationality_code VARCHAR(5),
-    country_of_residence VARCHAR(5),
-    country_of_birth VARCHAR(5),
+        return (root, query, cb) -> {
 
-    -- Estado civil
-    civil_status VARCHAR(50),
+            List<Predicate> predicates = new ArrayList<>();
 
-    -- PEP
-    is_pep BOOLEAN,
-    pep_comments TEXT,
+            for (SearchProperty filter : filters) {
 
-    -- Trabajo
-    occupation_code VARCHAR(20),
-    occupation_description VARCHAR(200),
-    economic_activity_category VARCHAR(200),
-    economic_activity_subcategory VARCHAR(20),
+                String field = mapField(filter.getKeyId());
+                String value = filter.getKeyValue();
 
-    -- Producto
-    product_family_id VARCHAR(50),
-    product_name VARCHAR(100),
-    product_code VARCHAR(50),
-    product_description VARCHAR(200),
+                switch (filter.getKeyOperator()) {
 
-    -- Canal
-    channel_code VARCHAR(10),
-    channel_description VARCHAR(100),
+                    case CONTAINS:
+                        predicates.add(
+                            cb.like(
+                                cb.lower(root.get(field)),
+                                "%" + value.toLowerCase() + "%"
+                            )
+                        );
+                        break;
 
-    -- Auditoría
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+                    case EQUAL:
+                        predicates.add(
+                            cb.equal(root.get(field), castValue(field, value))
+                        );
+                        break;
+                }
+            }
 
+            // AND por defecto
+            if ("OR".equalsIgnoreCase(discriminator)) {
+                return cb.or(predicates.toArray(new Predicate[0]));
+            }
 
-CREATE TABLE kyc_questionnaire (
-    id SERIAL PRIMARY KEY,
-    kyc_id INTEGER REFERENCES kyc(id),
-
-    questionnaire_id VARCHAR(50),
-    version VARCHAR(10),
-
-    last_update_date DATE,
-    expiration_date DATE,
-    completion_date DATE,
-    submission_date DATE
-);
-
-
-
-
-CREATE TABLE kyc_question (
-    id SERIAL PRIMARY KEY,
-    questionnaire_id INTEGER REFERENCES kyc_questionnaire(id),
-
-    question_id VARCHAR(50),
-    description TEXT,
-    type_description VARCHAR(50)
-);
-
-
-
-CREATE TABLE kyc_answer (
-    id SERIAL PRIMARY KEY,
-    question_id INTEGER REFERENCES kyc_question(id),
-
-    answer TEXT,
-    answer_translation_code VARCHAR(50)
-);
-
-
-
-
-CREATE TABLE kyc_answer_values (
-    id SERIAL PRIMARY KEY,
-    answer_id INTEGER REFERENCES kyc_answer(id),
-
-    translation_code VARCHAR(50),
-    value VARCHAR(50)
-);
-
-
-
-
-CREATE TABLE input_definition (
-    input_code VARCHAR(10) PRIMARY KEY, -- TC, CL, P, etc
-    kyc_field VARCHAR(100),             -- nombre del campo en KYC
-    description VARCHAR(200)
-);
-
-
-
-
-CREATE TABLE value_mapping (
-    id SERIAL PRIMARY KEY,
-    input_code VARCHAR(10),
-    value_text VARCHAR(100),
-    value_numeric DECIMAL
-);
-
-
-
-CREATE TABLE factor_rule (
-    id SERIAL PRIMARY KEY,
-    factor_code VARCHAR(20),   -- CLIENTE, CANAL, ZG, SCORE
-    input_code VARCHAR(20),    -- TC, CL, CLIENTE, etc
-    weight DECIMAL
-);
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
