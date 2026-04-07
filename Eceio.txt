@@ -1,26 +1,28 @@
-private static String mapField(KeyId keyId) {
-    switch (keyId) {
-        case NAME: return "name";
-        case MIME_TYPE: return "mimeType";
-        case STATUS: return "status";
-        case VERSION: return "version";
-        case ID: return "id";
-        default: throw new IllegalArgumentException("Invalid field");
+@Override
+  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
+    var documentId = UUID.randomUUID().toString();
+    try {
+      // en FolderReference esta el string de base64 del archivo
+      var file = base64ToFile(Objects.requireNonNull(criteria.getDocument()).getFolderReference(),
+              criteria.getDocument().getName());
+      //cargar archivo a S3
+      amazonS3.putObject(bucketName,generateKey(documentId),file);
+      //obtner la url
+      var url =  amazonS3.getUrl(bucketName,criteria.getDocument().getName()).toString();
+      //guardar
+      FileEntity entity = repository.save(mapper.toEntity(criteria));
+      return mapper.toDTO(entity);
+    } catch (Exception ex){
+      log.error("error : "+ex);
     }
-}
+    return new WrapperPostDocumentsResponse();
+  }
 
-
-
-private static Object castValue(String field, String value) {
-
-    switch (field) {
-        case "version":
-            return Integer.parseInt(value);
-
-        case "id":
-            return Long.parseLong(value);
-
-        default:
-            return value;
+  public static File base64ToFile(String base64, String name) throws IOException {
+    if (base64 == null){
+      return null;
     }
-}
+    byte[] decodedBytes = Base64.getDecoder().decode(base64);
+    Path destinationFile = Paths.get("./"+name);
+    return Files.write(destinationFile, decodedBytes).toFile();
+  }
