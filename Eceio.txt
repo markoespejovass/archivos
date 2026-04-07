@@ -1,45 +1,26 @@
-import org.springframework.data.jpa.domain.Specification;
-
-public class FileSpecificationBuilder {
-
-    public static Specification<FileEntity> build(
-            List<SearchProperty> filters,
-            String discriminator
-    ) {
-
-        return (root, query, cb) -> {
-
-            List<Predicate> predicates = new ArrayList<>();
-
-            for (SearchProperty filter : filters) {
-
-                String field = mapField(filter.getKeyId());
-                String value = filter.getKeyValue();
-
-                switch (filter.getKeyOperator()) {
-
-                    case CONTAINS:
-                        predicates.add(
-                            cb.like(
-                                cb.lower(root.get(field)),
-                                "%" + value.toLowerCase() + "%"
-                            )
-                        );
-                        break;
-
-                    case EQUAL:
-                        predicates.add(
-                            cb.equal(root.get(field), castValue(field, value))
-                        );
-                        break;
-                }
-            }
-
-            // AND por defecto
-            if ("OR".equalsIgnoreCase(discriminator)) {
-                return cb.or(predicates.toArray(new Predicate[0]));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+private static String mapField(KeyId keyId) {
+    switch (keyId) {
+        case NAME: return "name";
+        case MIME_TYPE: return "mimeType";
+        case STATUS: return "status";
+        case VERSION: return "version";
+        case ID: return "id";
+        default: throw new IllegalArgumentException("Invalid field");
     }
+}
+
+
+
+private static Object castValue(String field, String value) {
+
+    switch (field) {
+        case "version":
+            return Integer.parseInt(value);
+
+        case "id":
+            return Long.parseLong(value);
+
+        default:
+            return value;
+    }
+}
