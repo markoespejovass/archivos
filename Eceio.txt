@@ -1,68 +1,41 @@
-@Override
-public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
-
-    validateRequest(criteria);
-
-    String documentId = UUID.randomUUID().toString();
-    String key = generateKey(documentId);
-
-    try {
-        var document = criteria.getDocument();
-
-        byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
-
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(fileBytes.length);
-        metadata.setContentType(document.getMimeType()); // importante
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
-
-        // ✅ subir a S3
-        amazonS3.putObject(bucketName, key, inputStream, metadata);
-
-        // ✅ obtener URL correcta
-        String url = amazonS3.getUrl(bucketName, key).toString();
-
-        // ✅ mapear entity
-        FileEntity entity = mapper.toEntity(criteria);
-        entity.setId(documentId);
-        entity.setS3Key(key);
-        entity.setUrl(url);
-
-        // guardar
-        entity = repository.save(entity);
-
-        return mapper.toDTO(entity);
-
-    } catch (Exception ex) {
-        log.error("Error uploading document", ex);
-        throw new RuntimeException("Error uploading document to S3", ex);
-    }
-}
-
-
-
-private void validateRequest(WrapperPostDocumentsRequest criteria) {
-
-    if (criteria == null || criteria.getDocument() == null) {
-        throw new IllegalArgumentException("Document is required");
-    }
-
-    var doc = criteria.getDocument();
-
-    if (doc.getFolderReference() == null || doc.getFolderReference().isEmpty()) {
-        throw new IllegalArgumentException("File (base64) is required");
-    }
-
-    if (doc.getName() == null || doc.getName().isEmpty()) {
-        throw new IllegalArgumentException("File name is required");
-    }
-}
-
-
-
-
-
-private String generateKey(String documentId) {
-    return "documents/" + documentId;
-}
+{
+  "caller_information": {
+    "appId": "",
+    "name": ""
+  },
+  "search_parameters": {
+    "discriminator": "",
+    "searchProperties": [
+      {
+        "keyOperator": "Contains",// Solo se permite(Contains,Equal)
+        "keyId": "NAME",// Solo se permite(NAME,MIME_TYPE,STATUS,VERSION,ID)
+        "keyValue": "Terminos y condiciones",
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "MIME_TYPE",
+        "keyValue": "aplication/pdf",
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "STATUS",
+        "keyValue": "UPLOADED",//Solo se permite(UPLOADED,UPDATED)
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "VERSION",
+        "keyValue": "1",
+      },
+      {
+        "keyOperator": "Equal",
+        "keyId": "ID",
+        "keyValue": "1321325",
+      }
+    ],
+    "sortOrder": "",
+    "sortBy": ""
+  },
+  "navigation_parameters": {
+    "_limit": "",
+    "_offset": ""
+  }
