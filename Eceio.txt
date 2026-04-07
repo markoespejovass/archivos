@@ -1,4 +1,4 @@
-objetoCompleto = {
+{
   "party": {
     "partyId": "F123456789",
     "person": {
@@ -31,26 +31,19 @@ objetoCompleto = {
         "name": "United States of America"
       },
       "secondNationality": {
-        "code": "US",
-        "name": "United States of America"
+        "code": "",
+        "name": ""
       },
       "thirdNationality": {
-        "code": "US",
-        "name": "United States of America"
+        "code": "",
+        "name": ""
       },
       "civilStatusDescription": "Divorced",
       "politicalExposure": {
         "isSelfDeclaredPEP": true,
         "declarationComments": "I am the mayor of Fuentejuela de Arriba."
       },
-      "foreignTaxes": [
-        {
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ],
+      "foreignTaxes": [],
       "birthDate": "1986-01-01",
       "countryOfResidence": {
         "code": "US",
@@ -60,11 +53,11 @@ objetoCompleto = {
       "employmentInformation": {
         "occupationCode": "1211",
         "occupationDescription": "Chief Financial Officer",
-        "statusCode": "A",
-        "statusDescription": "Employed",
+        "statusCode": "",
+        "statusDescription": "",
         "position": {
-          "code": "C001",
-          "description": "National government"
+          "code": "",
+          "description": ""
         },
         "economicActivity": {
           "categoryDescription": "Financial and insurance activities",
@@ -72,172 +65,71 @@ objetoCompleto = {
           "subCategoryDescription": "Leasing"
         },
         "employer": {
-          "name": "British Airways",
-          "typeDescription": "Private sector",
+          "name": "",
+          "typeDescription": "",
           "address": {
-            "fullAddress": "7 Regent St. London W1B 4DY United Kingdom"
+            "fullAddress": ""
           }
         }
       },
-      "additionalEmployments": [
-        {
-          "occupationCode": "1211",
-          "occupationDescription": "Chief Financial Officer",
-          "statusCode": "A",
-          "statusDescription": "Employed",
-          "position": {
-            "code": "C001",
-            "description": "National government"
-          },
-          "economicActivity": {
-            "categoryDescription": "Financial and insurance activities",
-            "subCategoryCode": "6491",
-            "subCategoryDescription": "Leasing"
-          },
-          "employer": {
-            "name": "British Airways",
-            "typeDescription": "Private sector",
-            "address": {
-              "fullAddress": "7 Regent St. London W1B 4DY United Kingdom"
-            }
-          }
-        }
-      ]
+      "additionalEmployments": []
     },
     "organization": {
-      "documents": [
-        {
-          "documentNumber": "50456713W",
-          "documentTypeCode": "SSN",
-          "documentTypeDescription": "Social Security Number",
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ],
-      "typeCode": "02",
-      "typeDescription": "Sole trader",
+      "documents": [],
+      "typeCode": "",
+      "typeDescription": "",
       "organizationName": {
-        "legalName": "Commercial Business & Sons Co.",
-        "tradingName": "Business Co."
+        "legalName": "",
+        "tradingName": ""
       },
-      "foreignTaxes": [
-        {
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ],
+      "foreignTaxes": [],
       "placeOfRegistration": {
         "country": {
-          "code": "US",
-          "name": "United States of America"
+          "code": "",
+          "name": ""
         }
       },
       "countryOfOperation": {
-        "code": "US",
-        "name": "United States of America"
+        "code": "",
+        "name": ""
       },
       "economicData": {
         "actualTurnover": {
-          "amount": 99.99,
-          "currency": "EUR"
+          "amount": null,
+          "currency": ""
         }
       },
-      "registrationDate": "2025-01-01",
-      "complexOwnershipStructureIndicator": true,
+      "registrationDate": "",
+      "complexOwnershipStructureIndicator": null,
       "economicActivity": {
-        "categoryDescription": "Financial and insurance activities",
-        "subCategoryCode": "6491",
-        "subCategoryDescription": "Leasing"
+        "categoryDescription": "",
+        "subCategoryCode": "",
+        "subCategoryDescription": ""
       },
-      "additionalEconomicActivities": [
-        {
-          "categoryDescription": "Financial and insurance activities",
-          "subCategoryCode": "6491",
-          "subCategoryDescription": "Leasing"
-        }
-      ],
-      "otherCountriesOfOperation": [
-        {
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ]
+      "additionalEconomicActivities": [],
+      "otherCountriesOfOperation": []
     },
     "statusInfo": {
-      "statusCode": "C001",
-      "statusDescription": "New"
+      "statusCode": "",
+      "statusDescription": ""
     },
     "audit": {
-      "creationDate": "2025-01-21"
+      "creationDate": ""
     },
     "bank": {
       "center": {
-        "centerId": "1001",
-        "name": "MGT Custodian - Private 1001"
+        "centerId": "",
+        "name": ""
       }
     },
-    "structuralSegmentCode": "PS",
-    "structuralSegmentDescription": "Personal",
-    "structuralSubsegmentCode": "01",
-    "structuralSubsegmentDescription": "Liberal professions",
-    "contactPoints": [
-      {
-        "electronicAddress": {
-          "emailAddress": "john.doe@santander.us"
-        },
-        "phoneAddress": {
-          "phoneNumber": "+36 612 123 123"
-        },
-        "useTypes": [
-          {
-            "code": "02",
-            "description": "Home"
-          }
-        ],
-        "postalAddress": {
-          "formatCode": "01",
-          "detailCode": "21",
-          "streetTypeCode": "AV",
-          "streetTypeDescription": "Avenue",
-          "streetName": "Market St.",
-          "streetBuildingIdentification": "5",
-          "postOfficeBox": "09879",
-          "unitType": "Flat",
-          "unitNumber": "315",
-          "ruralTypeCode": "RR",
-          "ruralNumber": "12",
-          "postCodeIdentification": "28024",
-          "city": {
-            "name": "Houston"
-          },
-          "state": {
-            "code": "US-MA",
-            "name": "Massachusetts"
-          },
-          "townName": "Madrid",
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          },
-          "zipCode": "02171",
-          "zip4Code": "1234",
-          "displayLine1": "Flat 4",
-          "displayLine2": "8 Abbey Road",
-          "regionIdentification": {
-            "name": "Flanders"
-          }
-        }
-      }
-    ]
+    "structuralSegmentCode": "",
+    "structuralSegmentDescription": "",
+    "structuralSubsegmentCode": "",
+    "structuralSubsegmentDescription": "",
+    "contactPoints": []
   },
   "customer": {
-    "confidentialityLevel": "01"
+    "confidentialityLevel": ""
   },
   "products": [
     {
@@ -252,16 +144,16 @@ objetoCompleto = {
     }
   ],
   "employee": {
-    "number": "n9999999BV",
+    "number": "",
     "person": {
       "personName": {
-        "fullName": "Mary Elizabeth Clark Butler"
+        "fullName": ""
       }
     }
   },
   "bank": {
-    "bankId": "AAOZ",
-    "bankName": "Bank of America"
+    "bankId": "",
+    "bankName": ""
   },
   "preferenceChannel": {
     "code": "01",
@@ -299,328 +191,81 @@ objetoCompleto = {
     }
   ],
   "knowYourCustomerNonResidents": {
-    "relationshipReason": "Employee",
-    "isInitialDeposit": true,
-    "initialTransactionTypeDescription": "Transfer",
+    "relationshipReason": "",
+    "isInitialDeposit": null,
+    "initialTransactionTypeDescription": "",
     "amount": {
-      "amount": 99.99,
-      "currency": "EUR"
+      "amount": null,
+      "currency": ""
     },
     "originBank": {
-      "bankId": "AAOZ",
-      "bankName": "Bank of America"
+      "bankId": "",
+      "bankName": ""
     },
     "location": {
-      "code": "US",
-      "name": "United States of America"
+      "code": "",
+      "name": ""
     },
-    "otherBankingRelationships": [
-      {
-        "bankName": "Bank of America"
-      }
-    ]
+    "otherBankingRelationships": []
   },
-  "countriesOfRevenue": [
-    {
-      "code": "US",
-      "name": "United States of America"
-    }
-  ],
-  "isInRestrictedCountries": false,
-  "hasPoliticallyExposedPerson": true,
-  "declarationComments": "I am the mayor of Fuentejuela de Arriba.",
-  "screeningConfirmedFlag": true,
-  "screeningNegativeInformationReference": "NQ-111.222.333-44",
-  "isPendingNationality": true,
-  "thirdPartyIndicator": true,
+  "countriesOfRevenue": [],
+  "isInRestrictedCountries": null,
+  "hasPoliticallyExposedPerson": null,
+  "declarationComments": "",
+  "screeningConfirmedFlag": null,
+  "screeningNegativeInformationReference": "",
+  "isPendingNationality": null,
+  "thirdPartyIndicator": null,
   "purposeOfRelationshipAndSourceOfFunds": {
-    "purposeOfRelationship": "Saving",
-    "typeOfOperations": "Deposits",
-    "mainCustomer": "Barefoot SL",
-    "mainSupplier": "Law and order",
-    "sourceOfWealth": [
-      {
-        "code": "C001",
-        "description": "Salary"
-      }
-    ],
-    "sourceOfFunds": [
-      {
-        "code": "C001",
-        "description": "Salary"
-      }
-    ],
+    "purposeOfRelationship": "",
+    "typeOfOperations": "",
+    "mainCustomer": "",
+    "mainSupplier": "",
+    "sourceOfWealth": [],
+    "sourceOfFunds": [],
     "annualIncome": {
-      "amount": 99.99,
-      "currency": "EUR"
+      "amount": null,
+      "currency": ""
     },
     "patrimony": {
-      "amount": 99.99,
-      "currency": "EUR"
+      "amount": null,
+      "currency": ""
     },
-    "purposeOfRelationshipList": [
-      {
-        "code": "001",
-        "description": "Occupation – Business ownership"
-      }
-    ]
+    "purposeOfRelationshipList": []
   },
-  "customerLinks": [
-    {
-      "customerLink": {
-        "linkedParty": {
-          "partyId": "F123456789",
-          "type": {
-            "code": "Individual"
-          },
-          "person": {
-            "documents": [
-              {
-                "documentNumber": "50456713W",
-                "documentTypeDescription": "Social Security Number",
-                "documentTypeCode": "SSN",
-                "country": {
-                  "code": "US",
-                  "name": "United States of America"
-                }
-              }
-            ],
-            "personName": {
-              "fullName": "Mary Elizabeth Clark Butler",
-              "givenName": "Mary",
-              "lastName": "Clark",
-              "middleName": "Elizabeth",
-              "secondLastName": "Butler"
-            },
-            "firstNationality": {
-              "code": "US",
-              "name": "United States of America"
-            },
-            "secondNationality": {
-              "code": "US",
-              "name": "United States of America"
-            },
-            "thirdNationality": {
-              "code": "US",
-              "name": "United States of America"
-            },
-            "birthDate": "1986-01-01",
-            "countryOfResidence": {
-              "code": "US",
-              "name": "United States of America"
-            },
-            "employmentInformation": {
-              "economicActivity": {
-                "categoryCode": "K",
-                "categoryDescription": "Financial and insurance activities"
-              },
-              "employer": {
-                "address": {
-                  "country": {
-                    "code": "US",
-                    "name": "United States of America"
-                  }
-                }
-              },
-              "period": {
-                "startDate": "2025-01-18"
-              },
-              "position": {
-                "description": "National government"
-              }
-            }
-          }
-        },
-        "customerLinkTypeCode": "1",
-        "customerLinkTypeDescription": "Power of attorney",
-        "sharePercentage": 50.5,
-        "validityPeriod": {
-          "endDate": "2025-02-18",
-          "startDate": "2025-01-18"
-        },
-        "statusInfo": {
-          "statusCode": "C001",
-          "statusDescription": "New"
-        },
-        "politicalExposure": {
-          "isSelfDeclaredPEP": true,
-          "declarationComments": "I am the mayor of Fuentejuela de Arriba."
-        },
-        "publicOfficeIndicator": true,
-        "purposeOfRelationshipList": [
-          {
-            "code": "001",
-            "description": "Occupation – Business ownership"
-          }
-        ],
-        "riskLevel": "High",
-        "riskScore": 60
-      },
-      "aml": {
-        "statusInfo": {
-          "statusCode": "OK"
-        },
-        "amlId": "921",
-        "riskCategories": [
-          {
-            "riskCategoryCode": "SIP",
-            "riskCategoryDescription": "Special Interest Person"
-          }
-        ],
-        "riskSources": [
-          {
-            "riskSourceCode": "US-OFAC"
-          }
-        ]
-      },
-      "screeningConfirmedFlag": true,
-      "screeningNegativeInformationReference": "NQ-111.222.333-44"
-    }
-  ],
-  "localReference": "Task-338884",
-  "originSystem": "ENRI",
+  "customerLinks": [],
+  "localReference": "",
+  "originSystem": "",
   "audit": {
     "creationChannel": {
-      "code": "01",
-      "description": "Web"
+      "code": "",
+      "description": ""
     }
   },
   "antiMoneyLaundering": {
     "statusInfo": {
-      "statusCode": "OK"
+      "statusCode": ""
     },
-    "amlId": "921",
-    "riskCategories": [
-      {
-        "riskCategoryCode": "SIP",
-        "riskCategoryDescription": "Special Interest Person"
-      }
-    ],
-    "riskSources": [
-      {
-        "riskSourceCode": "US-OFAC"
-      }
-    ]
+    "amlId": "",
+    "riskCategories": [],
+    "riskSources": []
   },
   "analysisResult": {
     "analyst": {
-      "kycAnalystId": "d82h2",
+      "kycAnalystId": "",
       "person": {
         "personName": {
-          "fullName": "Mary Elizabeth Clark Butler"
+          "fullName": ""
         }
       },
       "contactPoint": {
         "electronicAddress": {
-          "emailAddress": "john.doe@santander.us"
+          "emailAddress": ""
         }
       }
     },
-    "isVerified": true
+    "isVerified": null
   },
-  "unfavourableBackgroundReferences": [
-    {
-      "code": "083"
-    }
-  ],
-  "publicOfficeIndicator": true
-}
-
-
-objetoSiSeUsa = {
-  "party": {
-    "partyId": "F123456789",
-    "person": {
-      "documents": [
-        {
-          "documentNumber": "50456713W",
-          "documentTypeCode": "SSN",
-          "documentTypeDescription": "Social Security Number",
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ],
-      "personName": {
-        "fullName": "Mary Elizabeth Clark Butler",
-        "givenName": "Mary",
-        "lastName": "Clark",
-        "middleName": "Elizabeth",
-        "secondLastName": "Butler"
-      },
-      "placeOfBirth": { 
-        "country": {
-          "code": "US",
-          "name": "United States of America"
-        }
-      },
-      "firstNationality": {
-        "code": "US",
-        "name": "United States of America"},
-      "civilStatusDescription": "Divorced",
-      "politicalExposure": {
-        "isSelfDeclaredPEP": true,
-        "declarationComments": "I am the mayor of Fuentejuela de Arriba."
-      },
-      "birthDate": "1986-01-01",
-      "countryOfResidence": {
-        "code": "US",
-        "name": "United States of America"
-      },
-      "genderDescription": "Male",
-      "employmentInformation": {
-        "occupationCode": "1211",
-        "occupationDescription": "Chief Financial Officer",
-        "economicActivity": {
-          "categoryDescription": "Financial and insurance activities",
-          "subCategoryCode": "6491",
-          "subCategoryDescription": "Leasing"
-        }
-        }
-      }
-    },
-  "products": [
-    {
-      "productFamilyId": "005003001",
-      "name": "Mortgage loans",
-      "productCode": "0049300130",
-      "productDescription": "Santander Checking Account"
-    }
-  ],
-  "preferenceChannel": {
-    "code": "01",
-    "description": "Web"
-  },
-  "knowYourCustomerQuestionnaires": [
-    {
-      "questionnaireId": "0233222",
-      "audit": {
-        "lastUpdateDate": "2025-02-18",
-        "lastUpdateProcess": "Onboarding",
-        "expirationDate": "2028-07-21",
-        "completionDate": "2025-11-15",
-        "submissionDate": "2025-11-17"
-      },
-      "questions": [
-        {
-          "typeDescription": "Simple answer",
-          "translationCode": "05_1G03",
-          "answer": "Self-employed",
-          "answerTranslationCode": "05_1G03",
-          "answers": [
-            {
-              "translationCode": "05_1G03",
-              "values": [
-                "PE"
-              ]
-            }
-          ],
-          "description": "What is your activity?",
-          "questionId": "Q8282838"
-        }
-      ],
-      "version": "1"
-    }
-  ]
+  "unfavourableBackgroundReferences": [],
+  "publicOfficeIndicator": null
 }
