@@ -1,271 +1,178 @@
-{
-  "party": {
-    "partyId": "F123456789",
-    "person": {
-      "documents": [
-        {
-          "documentNumber": "50456713W",
-          "documentTypeCode": "SSN",
-          "documentTypeDescription": "Social Security Number",
-          "country": {
-            "code": "US",
-            "name": "United States of America"
-          }
-        }
-      ],
-      "personName": {
-        "fullName": "Mary Elizabeth Clark Butler",
-        "givenName": "Mary",
-        "lastName": "Clark",
-        "middleName": "Elizabeth",
-        "secondLastName": "Butler"
-      },
-      "placeOfBirth": {
-        "country": {
-          "code": "US",
-          "name": "United States of America"
-        }
-      },
-      "firstNationality": {
-        "code": "US",
-        "name": "United States of America"
-      },
-      "secondNationality": {
-        "code": "",
-        "name": ""
-      },
-      "thirdNationality": {
-        "code": "",
-        "name": ""
-      },
-      "civilStatusDescription": "Divorced",
-      "politicalExposure": {
-        "isSelfDeclaredPEP": true,
-        "declarationComments": "I am the mayor of Fuentejuela de Arriba."
-      },
-      "foreignTaxes": [],
-      "birthDate": "1986-01-01",
-      "countryOfResidence": {
-        "code": "US",
-        "name": "United States of America"
-      },
-      "genderDescription": "Male",
-      "employmentInformation": {
-        "occupationCode": "1211",
-        "occupationDescription": "Chief Financial Officer",
-        "statusCode": "",
-        "statusDescription": "",
-        "position": {
-          "code": "",
-          "description": ""
-        },
-        "economicActivity": {
-          "categoryDescription": "Financial and insurance activities",
-          "subCategoryCode": "6491",
-          "subCategoryDescription": "Leasing"
-        },
-        "employer": {
-          "name": "",
-          "typeDescription": "",
-          "address": {
-            "fullAddress": ""
-          }
-        }
-      },
-      "additionalEmployments": []
-    },
-    "organization": {
-      "documents": [],
-      "typeCode": "",
-      "typeDescription": "",
-      "organizationName": {
-        "legalName": "",
-        "tradingName": ""
-      },
-      "foreignTaxes": [],
-      "placeOfRegistration": {
-        "country": {
-          "code": "",
-          "name": ""
-        }
-      },
-      "countryOfOperation": {
-        "code": "",
-        "name": ""
-      },
-      "economicData": {
-        "actualTurnover": {
-          "amount": null,
-          "currency": ""
-        }
-      },
-      "registrationDate": "",
-      "complexOwnershipStructureIndicator": null,
-      "economicActivity": {
-        "categoryDescription": "",
-        "subCategoryCode": "",
-        "subCategoryDescription": ""
-      },
-      "additionalEconomicActivities": [],
-      "otherCountriesOfOperation": []
-    },
-    "statusInfo": {
-      "statusCode": "",
-      "statusDescription": ""
-    },
-    "audit": {
-      "creationDate": ""
-    },
-    "bank": {
-      "center": {
-        "centerId": "",
-        "name": ""
-      }
-    },
-    "structuralSegmentCode": "",
-    "structuralSegmentDescription": "",
-    "structuralSubsegmentCode": "",
-    "structuralSubsegmentDescription": "",
-    "contactPoints": []
-  },
-  "customer": {
-    "confidentialityLevel": ""
-  },
-  "products": [
-    {
-      "family": {
-        "productFamily": {
-          "productFamilyId": "005003001",
-          "name": "Mortgage loans"
-        }
-      },
-      "productCode": "0049300130",
-      "productDescription": "Santander Checking Account"
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+
+
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperGetDocumentsResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchDocumentResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperPostSearchDocumentsResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperGetDocumentsRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperPostDocumentsResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperPostSearchDocumentsRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperPostDocumentsRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.Objects;
+import java.util.UUID;
+
+
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSpecificationBuilder.build;
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
+
+
+/**
+ * The class representative Otp adaptarer
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
+
+  private final AmazonS3 amazonS3;
+
+  private final DocumentMapper mapper;
+
+  private final FileEntityRepository repository;
+
+  @Value("${aws.bucket}")
+  private String bucketName;
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
+    String url = repository.findById(criteria.getDocument().getDocumentId()).get().getUrl();
+
+    return mapper.donwloadMapper(url);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostSearchDocumentsResponse searchDocuments(
+      WrapperPostSearchDocumentsRequest criteria) {
+
+    Specification<FileEntity> entitySpecification = build(criteria.getSearchParameters().getSearchProperties(), criteria.getSearchParameters().getDiscriminator());
+
+    var objectListing = repository.findAll(entitySpecification);
+    return mapper.searchMapper(objectListing);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
+
+    validateRequest(criteria);
+
+    String documentId = UUID.randomUUID().toString();
+    String key = generateKey(documentId);
+
+    try {
+      var document = criteria.getDocument();
+
+      byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
+
+      ObjectMetadata metadata = new ObjectMetadata();
+      metadata.setContentLength(fileBytes.length);
+      metadata.setContentType(document.getMimeType()); // importante
+
+      ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
+
+      // ✅ subir a S3
+      amazonS3.putObject(bucketName, key, inputStream, metadata);
+
+      // ✅ obtener URL correcta
+      String url = amazonS3.getUrl(bucketName, key).toString();
+
+      // ✅ mapear entity
+      FileEntity entity = mapper.toEntity(criteria);
+      entity.setId(documentId);
+      entity.setUrl(url);
+
+      // guardar
+      entity = repository.save(entity);
+
+      return mapper.toDTOUpload(entity);
+
+    } catch (Exception ex) {
+      log.error("Error uploading document", ex);
+      throw new RuntimeException("Error uploading document to S3", ex);
     }
-  ],
-  "employee": {
-    "number": "",
-    "person": {
-      "personName": {
-        "fullName": ""
-      }
+  }
+
+  private void validateRequest(WrapperPostDocumentsRequest criteria) {
+
+    if (criteria == null || criteria.getDocument() == null) {
+      throw new IllegalArgumentException("Document is required");
     }
-  },
-  "bank": {
-    "bankId": "",
-    "bankName": ""
-  },
-  "preferenceChannel": {
-    "code": "01",
-    "description": "Web"
-  },
-  "knowYourCustomerQuestionnaires": [
-    {
-      "questionnaireId": "0233222",
-      "audit": {
-        "lastUpdateDate": "2025-02-18",
-        "lastUpdateProcess": "Onboarding",
-        "expirationDate": "2028-07-21",
-        "completionDate": "2025-11-15",
-        "submissionDate": "2025-11-17"
-      },
-      "questions": [
-        {
-          "typeDescription": "Simple answer",
-          "translationCode": "05_1G03",
-          "answer": "Self-employed",
-          "answerTranslationCode": "05_1G03",
-          "answers": [
-            {
-              "translationCode": "05_1G03",
-              "values": [
-                "PE"
-              ]
-            }
-          ],
-          "description": "What is your activity?",
-          "questionId": "Q8282838"
-        }
-      ],
-      "version": "1"
+
+    var doc = criteria.getDocument();
+
+    if (doc.getFolderReference() == null || doc.getFolderReference().isEmpty()) {
+      throw new IllegalArgumentException("File (base64) is required");
     }
-  ],
-  "knowYourCustomerNonResidents": {
-    "relationshipReason": "",
-    "isInitialDeposit": null,
-    "initialTransactionTypeDescription": "",
-    "amount": {
-      "amount": null,
-      "currency": ""
-    },
-    "originBank": {
-      "bankId": "",
-      "bankName": ""
-    },
-    "location": {
-      "code": "",
-      "name": ""
-    },
-    "otherBankingRelationships": []
-  },
-  "countriesOfRevenue": [],
-  "isInRestrictedCountries": null,
-  "hasPoliticallyExposedPerson": null,
-  "declarationComments": "",
-  "screeningConfirmedFlag": null,
-  "screeningNegativeInformationReference": "",
-  "isPendingNationality": null,
-  "thirdPartyIndicator": null,
-  "purposeOfRelationshipAndSourceOfFunds": {
-    "purposeOfRelationship": "",
-    "typeOfOperations": "",
-    "mainCustomer": "",
-    "mainSupplier": "",
-    "sourceOfWealth": [],
-    "sourceOfFunds": [],
-    "annualIncome": {
-      "amount": null,
-      "currency": ""
-    },
-    "patrimony": {
-      "amount": null,
-      "currency": ""
-    },
-    "purposeOfRelationshipList": []
-  },
-  "customerLinks": [],
-  "localReference": "",
-  "originSystem": "",
-  "audit": {
-    "creationChannel": {
-      "code": "",
-      "description": ""
+
+    if (doc.getName() == null || doc.getName().isEmpty()) {
+      throw new IllegalArgumentException("File name is required");
     }
-  },
-  "antiMoneyLaundering": {
-    "statusInfo": {
-      "statusCode": ""
-    },
-    "amlId": "",
-    "riskCategories": [],
-    "riskSources": []
-  },
-  "analysisResult": {
-    "analyst": {
-      "kycAnalystId": "",
-      "person": {
-        "personName": {
-          "fullName": ""
-        }
-      },
-      "contactPoint": {
-        "electronicAddress": {
-          "emailAddress": ""
-        }
-      }
-    },
-    "isVerified": null
-  },
-  "unfavourableBackgroundReferences": [],
-  "publicOfficeIndicator": null
+  }
+
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperMySearchDocumentResponse getDocument(String documentId) {
+    var objectMetadata =repository.findById(documentId).get();
+    return mapper.getMapper(objectMetadata);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public Void deleteDocument(String documentId) {
+    FileEntity fileEntity = repository.findById(documentId).get();
+    String filename = generateKey(fileEntity.getName());
+    amazonS3.deleteObject(bucketName,filename);
+    repository.delete(fileEntity);
+    return null;
+  }
+
+
 }
