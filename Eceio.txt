@@ -1,1 +1,90 @@
 
+@Mapper(componentModel = "spring")
+public interface KYCEntityMapper {
+
+    @Mapping(target = "id", ignore = true)
+
+    // FACTOR CLIENTE
+    @Mapping(target = "documentNumber", expression = "java(getDocumentNumber(request))")
+    @Mapping(target = "typeCustomer", expression = "java(getTC(request))")
+    @Mapping(target = "typeStructure", expression = "java(getValor(request))")
+
+    @Mapping(target = "economicActivityCategory", source = "request.party.person.employmentInformation.economicActivity.categoryDescription")
+    @Mapping(target = "occupationDescription", source = "request.party.person.employmentInformation.occupationDescription")
+
+    @Mapping(target = "valueOfTheSubject", expression = "java(getVS(request))")
+    @Mapping(target = "dueDiligenceRegime", expression = "java(getDueDiligenceRegime(request))")
+    @Mapping(target = "backgroundOfBlockingList", expression = "java(getBackgroundOfBlockingList(request))")
+
+    @Mapping(target = "isPep", source = "request.party.person.politicalExposure.isSelfDeclaredPEP")
+    @Mapping(target = "birthDate", source = "request.party.person.birthDate")
+    @Mapping(target = "ownershipStructure", expression = "java(getOwnershipStructure(request))")
+
+    // FACTOR CANAL
+    @Mapping(target = "productDescription", expression = "java(request.getProducts().get(0).getProductDescription())")
+    @Mapping(target = "productName", expression = "java(request.getProducts().get(0).getName())")
+    @Mapping(target = "productFamilyId", expression = "java(request.getProducts().get(0).getProductFamilyId())")
+    @Mapping(target = "productCode", expression = "java(request.getProducts().get(0).getProductCode())")
+
+    @Mapping(target = "channelDescription", source = "request.preferenceChannel.description")
+    @Mapping(target = "channelCode", source = "request.preferenceChannel.code")
+
+    @Mapping(target = "transactionality", constant = "Transaccionalidad regular")
+
+    // FACTOR ZG
+    @Mapping(target = "countryOfResidence", source = "request.party.person.countryOfResidence.code")
+    @Mapping(target = "countryOfBirth", source = "request.party.person.placeOfBirth.country.name")
+    @Mapping(target = "stateOfResidence", source = "request.party.person.countryOfResidence.name")
+
+    @Mapping(target = "presenceOfTheGroup", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapPG")
+    @Mapping(target = "expCountryRoot", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapEXP")
+
+    Kyc WrapperPostKycResolutionRequestToKycEntity(WrapperPostKycResolutionRequest request);
+
+
+    // =========================
+    // CUSTOM METHODS
+    // =========================
+
+    default String getDocumentNumber(WrapperPostKycResolutionRequest request){
+        return request.getParty().getPerson().getDocuments().get(0).getDocumentNumber();
+    }
+
+    default String getTC(WrapperPostKycResolutionRequest request){
+        return getDocumentNumber(request).length() <= 8 ? "Persona Natural" : "Persona Jurídica";
+    }
+
+    default String getValor(WrapperPostKycResolutionRequest request){
+        return getDocumentNumber(request).length() <= 8 ? "Física" : "Jurídica";
+    }
+
+    default String getVS(WrapperPostKycResolutionRequest request){
+        return "5ta Categoría".equals(request.getParty().getPerson().getEmploymentInformation().getOccupationDescription())
+                ? "1" : "5";
+    }
+
+    default String getDueDiligenceRegime(WrapperPostKycResolutionRequest request){
+        if(Boolean.TRUE.equals(request.getParty().getPerson().getPoliticalExposure().getIsSelfDeclaredPEP())){
+            return "Régimen Reforzado";
+        }
+        return "Régimen General";
+    }
+
+    default String getBackgroundOfBlockingList(WrapperPostKycResolutionRequest request){
+        return "";
+    }
+
+    default String getOwnershipStructure(WrapperPostKycResolutionRequest request){
+        return getDocumentNumber(request).length() <= 8 ? "Simple" : "";
+    }
+
+    @Named("mapEXP")
+    default String getEXP(String countryCode){
+        return "PE".equals(countryCode) ? "No hay Exposición" : "";
+    }
+
+    @Named("mapPG")
+    default String getPG(String countryCode){
+        return "PE".equals(countryCode) ? "Nacional" : "";
+    }
+}
