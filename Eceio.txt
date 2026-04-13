@@ -1,259 +1,134 @@
+sh-5.2$ kubectl logs cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84 -n cpe-nexhub-neg-dev
 
-@ExtendWith(MockitoExtension.class)
-class KnowYourCustomerAdapterTest {
+Defaulted container "cpe-nxhbsc-beknowyocustomer" out of: cpe-nxhbsc-beknowyocustomer, install-oneagent (init)
 
-    @Mock
-    private KnokYourCustomerRepository repository;
-    @Mock
-    private WeightRepository weightRepository;
-    @Mock
-    private KYCEntityMapper mapper;
-    @Mock
-    private WeightMapper mapperWeight;
-    @Mock
-    private ValueRepository valueRepository;
-    @Mock
-    private InputDefinitionRepository inputDefinitionRepository;
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
 
-    @InjectMocks
-    private KnowYourCustomerAdapter adapter;
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
 
-    @Test
-    void shouldCreateKycSuccessfully() {
-        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
-        Kyc kyc = new Kyc();
-        kyc.setId(1);
-        kyc.setDocumentNumber("12345678");
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
 
-        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request)).thenReturn(kyc);
-        when(repository.save(any())).thenReturn(kyc);
-        when(mapper.toDto("12345678")).thenReturn(new WrapperPostKycResolutionResponse());
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+ 
+             %%
 
-        WrapperPostKycResolutionResponse response = adapter.createProcesstKyc(request);
+             %%%
 
-        assertNotNull(response);
-    }
+          %   %%%                    %%%%                                                                   %%%%
 
-    @Test
-    void shouldReturnEmptyResponseWhenIdIsZero() {
-        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
-        Kyc kyc = new Kyc();
-        kyc.setId(0);
+          %%   %%%%               %%     %%                                                                   %%
 
-        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request)).thenReturn(kyc);
-        when(repository.save(any())).thenReturn(kyc);
+          %%%%   %%%              %%      %                              %                                    %%
 
-        WrapperPostKycResolutionResponse response = adapter.createProcesstKyc(request);
+       %%   %%%   %%%%%           %%%%           %%%        %  %%      %%%       %%%        %  %%         %%% %%       %%%       %  %%
 
-        assertNotNull(response);
-    }
+   %%%%%%%   %%%% %%%%%%%%          %%%%%%     %%  %%%    %%%   %%%   %%%%%    %%   %%    %%%   %%%    %%%    %%    %%    %%  %%%%%  %
 
-    @Test
-    void shouldGetKyc() {
-        Kyc kyc = new Kyc();
-        when(repository.findByDocumentNumber("123")).thenReturn(kyc);
+%%%%%%%%%%%  %%%%%%%%%%%%%            %%%%         %%    %%%    %%    %%%          %%    %%%    %%   %%%     %%   %%%%%%%%%%   %%
 
-        assertEquals(kyc, adapter.getKyc("123"));
-    }
+%%%%%%%%%%%%  %%%%%%%%%%%%      %       %%%   %%%%%%%    %%%    %%    %%%     %%%%%%%    %%%    %%   %%%     %%   %%%          %%
 
-    @Test
-    void shouldGetValues() {
-        when(valueRepository.findAll()).thenReturn(List.of(new ValueMapping()));
+  %%%%%%%%%%%%%%%%%%%%%%%%       %%      %%   %%    %%    %%%    %%    %%%    %%    %%    %%%    %%   %%%     %%    %%%         %%
 
-        assertFalse(adapter.getValues().isEmpty());
-    }
+     %%%%%%%%%%%%%%%%%%           %%%%%%%%     %%%% %%%  %%%%% %%%%%%   %%%%   %%%% %%%  %%%%% %%%%%%   %%%%% %%%    %%%%%%   %%%%%%
+ 
+:: Spring Boot  (v3.5.11) ::                                                                  :: Santander Spring Boot (v1.5.0) ::
+ 
+2026-04-13T18:40:04.421+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication v1.0.0-SNAPSHOT using Java 17.0.18 with PID 1 (/opt/app/BOOT-INF/classes started by java in /opt/app)
 
-    @Test
-    void shouldGetInputs() {
-        when(inputDefinitionRepository.findAll()).thenReturn(List.of(new InputDefinition()));
+2026-04-13T18:40:04.493+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "cert"
 
-        assertFalse(adapter.getAllInputs().isEmpty());
-    }
+2026-04-13T18:40:07.332+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
 
-    @Test
-    void shouldGetRulesByFactor() {
-        when(weightRepository.findByFactorCode("F1")).thenReturn(List.of());
-        when(mapperWeight.toDTOList(any())).thenReturn(List.of(new WeightRule()));
+2026-04-13T18:40:07.588+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 197 ms.Found 1 JPA repository interface.
 
-        assertFalse(adapter.getRulesByFactor("F1").isEmpty());
-    }
-}
+2026-04-13T18:40:08.092+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.c.c.s.GenericScope                   : BeanFactory id=eaf8ede1-cebe-3c1c-a098-3191fc32dfc7
 
+2026-04-13T18:40:09.322+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.b.w.e.t.TomcatWebServer              : Tomcat initialized with port 8080 (http)
 
+2026-04-13T18:40:09.332+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.StandardService                  : Starting service [Tomcat]
 
+2026-04-13T18:40:09.332+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.StandardEngine                   : Starting Servlet engine: [Apache Tomcat/10.1.52]
 
+2026-04-13T18:40:09.419+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.C.[.[.[/]                        : Initializing Spring embedded WebApplicationContext
 
-class KYCEntityMapperTest {
+2026-04-13T18:40:09.421+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4826 ms
 
-    private final KYCEntityMapper mapper = Mappers.getMapper(KYCEntityMapper.class);
+2026-04-13T18:40:09.609+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.c.c.CoreServletAutoConfig        : Initializing SERVLET configuration for Santander Spring Boot Core library...
 
-    @Test
-    void shouldReturnPersonaNatural() {
-        WrapperPostKycResolutionRequest request = TestBuilder.buildRequest("12345678");
+2026-04-13T18:40:09.702+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelServletAutoConfig : Initializing SERVLET configuration for Santander spring Boot  OmniChannel library...
 
-        String result = mapper.getTC(request);
+2026-04-13T18:40:09.704+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Initializing BASE configuration for Santander spring Boot OmniChannel library...
 
-        assertEquals("Persona Natural", result);
-    }
+2026-04-13T18:40:09.808+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Santander Spring Boot OmniChannel config = {ALL={EMP_MOV=ContactPoint.ContactPointBuilder(originChannel=EMP_MOV, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0033, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), OBD=ContactPoint.ContactPointBuilder(originChannel=OBD, marcoChannel=INT, environment=INTERNET, logicalChannel=0079, physicalChannel=0099, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), RML=ContactPoint.ContactPointBuilder(originChannel=RML, marcoChannel=RML, environment=INTERNET, logicalChannel=0031, physicalChannel=0019, commercialChannel=BML, operationalChannel=BML, application=, device=, operatingSystem=, medium=, userType=), RCA=ContactPoint.ContactPointBuilder(originChannel=RCA, marcoChannel=RCA, environment=INTRANET, logicalChannel=0001, physicalChannel=0018, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), OFI=ContactPoint.ContactPointBuilder(originChannel=OFI, marcoChannel=OFI, environment=INTRANET, logicalChannel=0007, physicalChannel=0019, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), PUB=ContactPoint.ContactPointBuilder(originChannel=PUB, marcoChannel=INT, environment=INTERNET, logicalChannel=0080, physicalChannel=0101, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), PLR=ContactPoint.ContactPointBuilder(originChannel=PLR, marcoChannel=PLR, environment=INTERNET, logicalChannel=5017, physicalChannel=0060, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), CIC=ContactPoint.ContactPointBuilder(originChannel=CIC, marcoChannel=CIC, environment=CONTACTCENTER, logicalChannel=0029, physicalChannel=0018, commercialChannel=020, operationalChannel=020, application=, device=, operatingSystem=, medium=, userType=), EMP=ContactPoint.ContactPointBuilder(originChannel=EMP, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0022, physicalChannel=0018,commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), INT=ContactPoint.ContactPointBuilder(originChannel=INT, marcoChannel=INT, environment=INTERNET, logicalChannel=0001, physicalChannel=0022, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=)}}
 
-    @Test
-    void shouldReturnFisica() {
-        WrapperPostKycResolutionRequest request = TestBuilder.buildRequest("12345678");
+2026-04-13T18:40:10.128+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Initializing BASE configuration for Logging library...
 
-        String result = mapper.getValor(request);
+2026-04-13T18:40:10.214+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingProperties            : Gluonlog Log format configured
 
-        assertEquals("Física", result);
-    }
+2026-04-13T18:40:10.398+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Using santander.logging.observability.filter.black-list: [spring.security.authorizations, spring.security.filterchains, spring.security.http.secured.requests, spring.security.http.unsecured.requests]
 
-    @Test
-    void shouldReturnVS1() {
-        WrapperPostKycResolutionRequest request = TestBuilder.withOccupation("5ta Categoría");
+2026-04-13T18:40:10.900+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.j.i.u.LogHelper                      : HHH000204: Processing PersistenceUnitInfo [name: default]
 
-        assertEquals("1", mapper.getVS(request));
-    }
+2026-04-13T18:40:10.993+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.Version                              : HHH000412: Hibernate ORM core version 6.6.42.Final
 
-    @Test
-    void shouldReturnVS5() {
-        WrapperPostKycResolutionRequest request = TestBuilder.withOccupation("Otro");
+2026-04-13T18:40:11.013+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.c.i.RegionFactoryInitiator           : HHH000026: Second-level cache disabled
 
-        assertEquals("5", mapper.getVS(request));
-    }
+2026-04-13T18:40:11.333+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
 
-    @Test
-    void shouldReturnDueDiligenceReforzado() {
-        WrapperPostKycResolutionRequest request = TestBuilder.withPep(true, "Si");
+2026-04-13T18:40:11.402+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Starting...
 
-        assertEquals("Régimen Reforzado", mapper.getDueDiligenceRegime(request));
-    }
+2026-04-13T18:40:11.624+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.z.h.p.HikariPool                       : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
 
-    @Test
-    void shouldReturnDueDiligenceGeneral() {
-        WrapperPostKycResolutionRequest request = TestBuilder.withPep(false, "No");
+2026-04-13T18:40:11.625+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Start completed.
 
-        assertEquals("Régimen General", mapper.getDueDiligenceRegime(request));
-    }
+2026-04-13T18:40:11.696+02:00  WARN 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.o.deprecation                        : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
 
-    @Test
-    void shouldMapEXP() {
-        assertEquals("No hay Exposición", mapper.getEXP("PE"));
-    }
+2026-04-13T18:40:11.711+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.o.c.pooling                          : HHH10001005: Database info:
 
-    @Test
-    void shouldMapPG() {
-        assertEquals("Nacional", mapper.getPG("PE"));
-    }
+        Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 
-    @Test
-    void shouldConvertObjectToJson() {
-        String json = mapper.toStringJson(Map.of("a", 1));
-        assertTrue(json.contains("a"));
-    }
-}
+        Database driver: undefined/unknown
 
+        Database version: 2.3.232
 
+        Autocommit mode: undefined/unknown
 
-@ExtendWith(MockitoExtension.class)
-class ScoreCalculatorTest {
+        Isolation level: undefined/unknown
 
-    @Mock
-    private KnowYourCustomerRepositoryPort repositoryPort;
+        Minimum pool size: undefined/unknown
 
-    @Test
-    void shouldCalculateScoreBaseField() {
-        ScoreCalculator calculator = new ScoreCalculator(repositoryPort);
+        Maximum pool size: undefined/unknown
 
-        WeightRule rule = new WeightRule("A", 2.0);
-        when(repositoryPort.getRulesByFactor("SCORE")).thenReturn(List.of(rule));
+2026-04-13T18:40:12.924+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
 
-        Map<String, String> kycData = Map.of("A", "HIGH");
+2026-04-13T18:40:13.000+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
 
-        ValueMapping mapping = new ValueMapping();
-        mapping.setInputCode("A");
-        mapping.setValueText("HIGH");
-        mapping.setValueNumeric(10);
+{"timestamp":"2026-04-13T16:40:14.089Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Configuring HttpClientsAutoConfig  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity":"ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.HttpClientsAutoConfig","contactPoint":""},"logType":"technical"}
 
-        double result = calculator.calculateScore("SCORE", kycData, List.of(mapping));
+{"timestamp":"2026-04-13T16:40:14.295Z","environment":"CERT","userId":"","logLevel":"WARN","log":"spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration","contactPoint":""},"logType":"technical"}
 
-        assertEquals(20.0, result);
-    }
+{"timestamp":"2026-04-13T16:40:14.319Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Configuring LoggerAutoConfig  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.logging.logger.LoggerAutoConfig","contactPoint":""},"logType":"technical"}
 
-    @Test
-    void shouldReturnZeroWhenNoMapping() {
-        ScoreCalculator calculator = new ScoreCalculator(repositoryPort);
+{"timestamp":"2026-04-13T16:40:14.398Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Create hints for dependencies  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.HintsForGlobalDependenciesConfig","contactPoint":""},"logType":"technical"}
 
-        WeightRule rule = new WeightRule("A", 1.0);
-        when(repositoryPort.getRulesByFactor("SCORE")).thenReturn(List.of(rule));
+{"timestamp":"2026-04-13T16:40:14.399Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing BASE configuration for Spring Boot config Core library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.CoreAutoConfig","contactPoint":""},"logType":"technical"}
 
-        double result = calculator.calculateScore("SCORE", Map.of("A", "X"), List.of());
+{"timestamp":"2026-04-13T16:40:14.704Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing SERVLET BASE configuration for Santander Spring Boot Authentication library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.security.authentication.config.AuthenticationServletAndBaseAutoConfig","contactPoint":""},"logType":"technical"}
 
-        assertEquals(0.0, result);
-    }
-}
+{"timestamp":"2026-04-13T16:40:14.715Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing SERVLET WebApp configuration for Santander Spring Boot Authentication library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.security.authentication.config.AuthenticationServletAutoConfiguration","contactPoint":""},"logType":"technical"}
 
+{"timestamp":"2026-04-13T16:40:15.390Z","environment":"CERT","userId":"","logLevel":"WARN","log":"Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'tokenService' defined in class path resource [com/santander/framework/springboot/security/authentication/config/AuthenticationServletAndBaseAutoConfig.class]: Unsatisfied dependency expressed through method 'tokenService' parameter 1: No qualifying bean of type 'org.springframework.security.oauth2.jwt.JwtDecoder' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext","contactPoint":""},"logType":"technical"}
 
+{"timestamp":"2026-04-13T16:40:15.392Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Closing JPA EntityManagerFactory for persistence unit 'default'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean","contactPoint":""},"logType":"technical"}
 
+{"timestamp":"2026-04-13T16:40:15.395Z","environment":"CERT","userId":"","logLevel":"INFO","log":"HikariPool-1 - Shutdown initiated...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.zaxxer.hikari.HikariDataSource","contactPoint":""},"logType":"technical"}
 
-@ExtendWith(MockitoExtension.class)
-class KnowYourCustomerUseCaseImplTest {
+{"timestamp":"2026-04-13T16:40:15.396Z","environment":"CERT","userId":"","logLevel":"INFO","log":"HikariPool-1 - Shutdown completed.  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.zaxxer.hikari.HikariDataSource","contactPoint":""},"logType":"technical"}
 
-    @Mock
-    private KnowYourCustomerRepositoryPort repositoryPort;
+{"timestamp":"2026-04-13T16:40:15.400Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Stopping service [Tomcat]  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.apache.catalina.core.StandardService","contactPoint":""},"logType":"technical"}
 
-    @InjectMocks
-    private KnowYourCustomerUseCaseImpl useCase;
+{"timestamp":"2026-04-13T16:40:15.419Z","environment":"CERT","userId":"","logLevel":"INFO","log":"\n\nError starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger","contactPoint":""},"logType":"technical"}
 
-    @Test
-    void shouldPostInitKyc() {
-        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
-
-        when(repositoryPort.createProcesstKyc(request))
-                .thenReturn(new WrapperPostKycResolutionResponse());
-
-        assertNotNull(useCase.postInitKyc(request));
-    }
-
-    @Test
-    void shouldCalculateRiskScore() {
-        WrapperPostRiskScoreRequest request = TestBuilder.buildRiskRequest();
-
-        when(repositoryPort.getKyc(any())).thenReturn(new Kyc());
-        when(repositoryPort.getValues()).thenReturn(List.of());
-        when(repositoryPort.getAllInputs()).thenReturn(List.of());
-        when(repositoryPort.getRulesByFactor(any())).thenReturn(List.of());
-
-        WrapperPostRiskScoreResponse response = useCase.getRiskScore(request);
-
-        assertNotNull(response);
-        assertNotNull(response.getRisk());
-    }
-}
-
-
-
-
-
-
-public class TestBuilder {
-
-    public static WrapperPostKycResolutionRequest buildRequest(String doc) {
-        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
-        // construir mínimo necesario
-        return request;
-    }
-
-    public static WrapperPostKycResolutionRequest withOccupation(String occupation) {
-        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
-        // set occupation
-        return request;
-    }
-
-    public static WrapperPostKycResolutionRequest withPep(boolean pep, String comment) {
-        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
-        // set PEP fields
-        return request;
-    }
-
-    public static WrapperPostRiskScoreRequest buildRiskRequest() {
-        return new WrapperPostRiskScoreRequest();
-    }
-}
+{"timestamp":"2026-04-13T16:40:15.481Z","environment":"CERT","userId":"","logLevel":"ERROR","log":"\n\n***************************\nAPPLICATION FAILED TO START\n***************************\n\nDescription:\n\nThere is not bean of type JwtDecoder or ReactiveJwtDecoder\n\nAction:\n\nConsider defining santander.security.connectors.pkm-connector.pkm-endpoint or spring.security.oauth2.resourceserver.jwt.jwk-set-uri in your configuration.\n  ","appKey":"nxhbsc","serviceName":"cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter","contactPoint":""},"logType":"technical"}
+ 
