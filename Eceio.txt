@@ -1,1 +1,259 @@
 
+@ExtendWith(MockitoExtension.class)
+class KnowYourCustomerAdapterTest {
+
+    @Mock
+    private KnokYourCustomerRepository repository;
+    @Mock
+    private WeightRepository weightRepository;
+    @Mock
+    private KYCEntityMapper mapper;
+    @Mock
+    private WeightMapper mapperWeight;
+    @Mock
+    private ValueRepository valueRepository;
+    @Mock
+    private InputDefinitionRepository inputDefinitionRepository;
+
+    @InjectMocks
+    private KnowYourCustomerAdapter adapter;
+
+    @Test
+    void shouldCreateKycSuccessfully() {
+        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
+        Kyc kyc = new Kyc();
+        kyc.setId(1);
+        kyc.setDocumentNumber("12345678");
+
+        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request)).thenReturn(kyc);
+        when(repository.save(any())).thenReturn(kyc);
+        when(mapper.toDto("12345678")).thenReturn(new WrapperPostKycResolutionResponse());
+
+        WrapperPostKycResolutionResponse response = adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldReturnEmptyResponseWhenIdIsZero() {
+        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
+        Kyc kyc = new Kyc();
+        kyc.setId(0);
+
+        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request)).thenReturn(kyc);
+        when(repository.save(any())).thenReturn(kyc);
+
+        WrapperPostKycResolutionResponse response = adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldGetKyc() {
+        Kyc kyc = new Kyc();
+        when(repository.findByDocumentNumber("123")).thenReturn(kyc);
+
+        assertEquals(kyc, adapter.getKyc("123"));
+    }
+
+    @Test
+    void shouldGetValues() {
+        when(valueRepository.findAll()).thenReturn(List.of(new ValueMapping()));
+
+        assertFalse(adapter.getValues().isEmpty());
+    }
+
+    @Test
+    void shouldGetInputs() {
+        when(inputDefinitionRepository.findAll()).thenReturn(List.of(new InputDefinition()));
+
+        assertFalse(adapter.getAllInputs().isEmpty());
+    }
+
+    @Test
+    void shouldGetRulesByFactor() {
+        when(weightRepository.findByFactorCode("F1")).thenReturn(List.of());
+        when(mapperWeight.toDTOList(any())).thenReturn(List.of(new WeightRule()));
+
+        assertFalse(adapter.getRulesByFactor("F1").isEmpty());
+    }
+}
+
+
+
+
+
+class KYCEntityMapperTest {
+
+    private final KYCEntityMapper mapper = Mappers.getMapper(KYCEntityMapper.class);
+
+    @Test
+    void shouldReturnPersonaNatural() {
+        WrapperPostKycResolutionRequest request = TestBuilder.buildRequest("12345678");
+
+        String result = mapper.getTC(request);
+
+        assertEquals("Persona Natural", result);
+    }
+
+    @Test
+    void shouldReturnFisica() {
+        WrapperPostKycResolutionRequest request = TestBuilder.buildRequest("12345678");
+
+        String result = mapper.getValor(request);
+
+        assertEquals("Física", result);
+    }
+
+    @Test
+    void shouldReturnVS1() {
+        WrapperPostKycResolutionRequest request = TestBuilder.withOccupation("5ta Categoría");
+
+        assertEquals("1", mapper.getVS(request));
+    }
+
+    @Test
+    void shouldReturnVS5() {
+        WrapperPostKycResolutionRequest request = TestBuilder.withOccupation("Otro");
+
+        assertEquals("5", mapper.getVS(request));
+    }
+
+    @Test
+    void shouldReturnDueDiligenceReforzado() {
+        WrapperPostKycResolutionRequest request = TestBuilder.withPep(true, "Si");
+
+        assertEquals("Régimen Reforzado", mapper.getDueDiligenceRegime(request));
+    }
+
+    @Test
+    void shouldReturnDueDiligenceGeneral() {
+        WrapperPostKycResolutionRequest request = TestBuilder.withPep(false, "No");
+
+        assertEquals("Régimen General", mapper.getDueDiligenceRegime(request));
+    }
+
+    @Test
+    void shouldMapEXP() {
+        assertEquals("No hay Exposición", mapper.getEXP("PE"));
+    }
+
+    @Test
+    void shouldMapPG() {
+        assertEquals("Nacional", mapper.getPG("PE"));
+    }
+
+    @Test
+    void shouldConvertObjectToJson() {
+        String json = mapper.toStringJson(Map.of("a", 1));
+        assertTrue(json.contains("a"));
+    }
+}
+
+
+
+@ExtendWith(MockitoExtension.class)
+class ScoreCalculatorTest {
+
+    @Mock
+    private KnowYourCustomerRepositoryPort repositoryPort;
+
+    @Test
+    void shouldCalculateScoreBaseField() {
+        ScoreCalculator calculator = new ScoreCalculator(repositoryPort);
+
+        WeightRule rule = new WeightRule("A", 2.0);
+        when(repositoryPort.getRulesByFactor("SCORE")).thenReturn(List.of(rule));
+
+        Map<String, String> kycData = Map.of("A", "HIGH");
+
+        ValueMapping mapping = new ValueMapping();
+        mapping.setInputCode("A");
+        mapping.setValueText("HIGH");
+        mapping.setValueNumeric(10);
+
+        double result = calculator.calculateScore("SCORE", kycData, List.of(mapping));
+
+        assertEquals(20.0, result);
+    }
+
+    @Test
+    void shouldReturnZeroWhenNoMapping() {
+        ScoreCalculator calculator = new ScoreCalculator(repositoryPort);
+
+        WeightRule rule = new WeightRule("A", 1.0);
+        when(repositoryPort.getRulesByFactor("SCORE")).thenReturn(List.of(rule));
+
+        double result = calculator.calculateScore("SCORE", Map.of("A", "X"), List.of());
+
+        assertEquals(0.0, result);
+    }
+}
+
+
+
+
+@ExtendWith(MockitoExtension.class)
+class KnowYourCustomerUseCaseImplTest {
+
+    @Mock
+    private KnowYourCustomerRepositoryPort repositoryPort;
+
+    @InjectMocks
+    private KnowYourCustomerUseCaseImpl useCase;
+
+    @Test
+    void shouldPostInitKyc() {
+        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
+
+        when(repositoryPort.createProcesstKyc(request))
+                .thenReturn(new WrapperPostKycResolutionResponse());
+
+        assertNotNull(useCase.postInitKyc(request));
+    }
+
+    @Test
+    void shouldCalculateRiskScore() {
+        WrapperPostRiskScoreRequest request = TestBuilder.buildRiskRequest();
+
+        when(repositoryPort.getKyc(any())).thenReturn(new Kyc());
+        when(repositoryPort.getValues()).thenReturn(List.of());
+        when(repositoryPort.getAllInputs()).thenReturn(List.of());
+        when(repositoryPort.getRulesByFactor(any())).thenReturn(List.of());
+
+        WrapperPostRiskScoreResponse response = useCase.getRiskScore(request);
+
+        assertNotNull(response);
+        assertNotNull(response.getRisk());
+    }
+}
+
+
+
+
+
+
+public class TestBuilder {
+
+    public static WrapperPostKycResolutionRequest buildRequest(String doc) {
+        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
+        // construir mínimo necesario
+        return request;
+    }
+
+    public static WrapperPostKycResolutionRequest withOccupation(String occupation) {
+        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
+        // set occupation
+        return request;
+    }
+
+    public static WrapperPostKycResolutionRequest withPep(boolean pep, String comment) {
+        WrapperPostKycResolutionRequest request = new WrapperPostKycResolutionRequest();
+        // set PEP fields
+        return request;
+    }
+
+    public static WrapperPostRiskScoreRequest buildRiskRequest() {
+        return new WrapperPostRiskScoreRequest();
+    }
+}
