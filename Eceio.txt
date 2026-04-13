@@ -1,33 +1,28 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
+@ExtendWith(MockitoExtension.class)
+class SecurityConfigTest {
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
+    @InjectMocks
+    private SecurityConfig securityConfig;
 
-@Component
-@EnableWebSecurity
-public class SecurityConfig  {
-    @Bean
-    @ConditionalOnMissingBean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/**")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
-                        .anyRequest().permitAll()
-                )
-                .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers
-                        .contentSecurityPolicy(csp ->
-                                csp.policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
-                        )
-                );
-        return http.build();
+    @Mock
+    private HttpSecurity httpSecurity;
+
+    @Mock
+    private SecurityFilterChain securityFilterChain;
+
+    @Test
+    void shouldBuildSecurityFilterChain() throws Exception {
+        // mocks encadenados (deep stubs sería ideal)
+        HttpSecurity http = Mockito.mock(HttpSecurity.class, RETURNS_DEEP_STUBS);
+
+        when(http.securityMatcher(anyString())).thenReturn(http);
+        when(http.authorizeHttpRequests(any())).thenReturn(http);
+        when(http.csrf(any())).thenReturn(http);
+        when(http.headers(any())).thenReturn(http);
+        when(http.build()).thenReturn(securityFilterChain);
+
+        SecurityFilterChain result = securityConfig.filterChain(http);
+
+        assertNotNull(result);
     }
 }
