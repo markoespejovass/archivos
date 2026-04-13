@@ -1,45 +1,3 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.output.KnowYourCustomerRepositoryPort;
-import lombok.AllArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
-
-@AllArgsConstructor
-public class ScoreCalculator {
-
-    private final KnowYourCustomerRepositoryPort repositoryPort;
-
-    public double calculateScore(
-            String factorCode, Map<String,String> kycData
-    ){
-        List<WeightRule> rules = repositoryPort.getRulesByFactor(factorCode);
-
-       return rules.stream().mapToDouble(rule ->{
-
-           String inputCode =  rule.getCode();
-           double value;
-
-           if(isBaseField(inputCode)){
-               String textValue = kycData.get(inputCode);
-               value = repositoryPort.getValue(inputCode,textValue);
-           } else {
-               value = calculateScore(inputCode,kycData);
-           }
-           return value * rule.getWeight();
-       }).sum();
-    }
-
-    private boolean isBaseField(String inputCode){
-        return inputCode.length()<=3;
-    }
-
-}
-
-
-
-
 package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa;
 
 
@@ -47,10 +5,13 @@ import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.outp
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain.WeightRule;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.WeightMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepository;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.ValueRepository;
 import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.WeightRepository;
@@ -68,6 +29,7 @@ public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
   private final KYCEntityMapper mapper;
   private final WeightMapper mapperWeight;
   private final ValueRepository valueRepository;
+  private final InputDefinitionRepository inputDefinitionRepository;
 
   @Override
   public WrapperPostKycResolutionResponse createProcesstKyc(
@@ -89,8 +51,13 @@ public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
   }
 
   @Override
-  public Double getValue(String code, String input) {
-    return Double.valueOf(String.valueOf(valueRepository.findByInputCode(input).getValueNumeric()));
+  public List<ValueMapping> getValues() {
+    return valueRepository.findAll();
+  }
+
+  @Override
+  public List<InputDefinition> getAllInputs() {
+    return inputDefinitionRepository.findAll();
   }
 
   @Override
@@ -99,3 +66,259 @@ public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
   }
 }
 
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequestKnowYourCustomerQuestionnairesInner;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface KYCEntityMapper {
+
+    JsonMapper jsonMapper = new JsonMapper();
+
+    @Mapping(target = "id", ignore = true)
+    //factor cliente
+    @Mapping(target = "documentNumber", expression = "java(getDocumentNumber(request))")
+    @Mapping(target = "typeCustomer", expression = "java(getTC(request))")// tipo de cliente
+    @Mapping(target = "typeStructure", expression = "java(getValor(request))")//  tipo de pn
+    @Mapping(target = "economicActivityCategory", source = "request.party.person.employmentInformation.economicActivity.categoryDescription")// categoria laboral
+    @Mapping(target = "occupationDescription", source = "request.party.person.employmentInformation.occupationDescription")// profesion, valor del sujeto
+    @Mapping(target = "valueOfTheSubject", expression = "java(getVS(request))")
+    @Mapping(target = "dueDiligenceRegime", expression = "java(getDueDiligenceRegime(request))")// regimen de debida dilgencia
+    @Mapping(target = "backgroundOfBlockingList", expression = "java(getBackgroundOfBlockingList(request))")//antecedente de lista bloqueante
+    @Mapping(target = "isPep", source = "request.party.person.politicalExposure.isSelfDeclaredPEP")// pep
+    @Mapping(target = "birthDate", source = "request.party.person.birthDate")// birthDate
+    @Mapping(target = "ownershipStructure", expression = "java(getOwnershipStructure(request))")
+    //factor canal
+    @Mapping(target = "productDescription", expression = "java(request.getProducts().get(0).getProductDescription())")
+    @Mapping(target = "channelDescription", source = "request.preferenceChannel.description")
+    @Mapping(target = "transactionality", constant = "Transaccionalidad regular")
+    @Mapping(target = "productName", expression = "java(request.getProducts().get(0).getFamily().getProductFamily().getName())")
+    //factor zg
+    @Mapping(target = "countryOfResidence", source = "request.party.person.countryOfResidence.code")// pais de residensia,
+    @Mapping(target = "presenceOfTheGroup", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapPG")// presencia del grupo
+    @Mapping(target = "expCountryRoot", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapEXP")//exp pais rais
+    @Mapping(target = "countryOfBirth", source = "request.party.person.placeOfBirth.country.name")
+    @Mapping(target = "stateOfResidence", source = "request.party.person.countryOfResidence.name")// localidad de residencia
+    Kyc WrapperPostKycResolutionRequestToKycEntity(WrapperPostKycResolutionRequest request);
+
+    @Mapping(target = "kycResolutionId", source = "id")
+    WrapperPostKycResolutionResponse toDto(String id);
+
+    default String getVS(WrapperPostKycResolutionRequest request){
+        if ("5ta Categoría".equals(request.getParty().getPerson().getEmploymentInformation().getOccupationDescription())){
+            return "1";
+        }
+        return "5";
+    }
+
+    default String getDocumentNumber(WrapperPostKycResolutionRequest request){
+        return request.getParty().getPerson().getDocuments().get(0).getDocumentNumber();
+    }
+
+    default String getTC(WrapperPostKycResolutionRequest request){
+        if(request.getParty().getPerson().getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Persona Natural";
+        }
+        return "";
+    }
+
+    default String getValor(WrapperPostKycResolutionRequest request){
+        if(request.getParty().getPerson().getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Física";
+        }
+        return "";
+    }
+
+
+    default String getDueDiligenceRegime(WrapperPostKycResolutionRequest request){
+        if("Si".equalsIgnoreCase(request.getParty().getPerson().getPoliticalExposure().getDeclarationComments()) ||
+                request.getParty().getPerson().getPoliticalExposure().getIsSelfDeclaredPEP()){
+            return "Régimen Reforzado";
+        }
+        return "Régimen General";
+    }
+
+    default String getBackgroundOfBlockingList(WrapperPostKycResolutionRequest request){
+        if("Si".equalsIgnoreCase(request.getParty().getPerson().getPoliticalExposure().getDeclarationComments())){
+            return "SI";
+        }
+        return "";
+    }
+
+    default String getOwnershipStructure(WrapperPostKycResolutionRequest request){
+        if(request.getParty().getPerson().getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Simple";
+        }
+        return "";
+    }
+
+    @Named("mapEXP")
+    default String getEXP(String countryCode){
+        if("PE".equals(countryCode)){
+            return "No hay Exposición";
+        }
+        return "";
+    }
+
+    @Named("mapPG")
+    default String getPG(String countryCode){
+        if("PE".equals(countryCode)){
+            return "Nacional";
+        }
+        return "";
+    }
+
+    default String toStringJson(Object o){
+        if(o instanceof String){
+            return (String)o;
+        }
+        try {
+            return jsonMapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return "Error al parsear objeto";
+        }
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.output.KnowYourCustomerRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostRiskScoreRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import lombok.AllArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.utils.Util.convertPartyIdToDocumento;
+
+@AllArgsConstructor
+public class ScoreCalculator {
+
+    private final KnowYourCustomerRepositoryPort repositoryPort;
+
+    public double calculateScore(
+            String factorCode, Map<String,String> kycData, List<ValueMapping> valueMappingList
+    ){
+        List<WeightRule> rules = repositoryPort.getRulesByFactor(factorCode);
+
+       return rules.stream().mapToDouble(rule ->{
+
+           String inputCode =  rule.getCode();
+           double value;
+
+           if(isBaseField(inputCode)){
+               String textValue = kycData.get(inputCode);
+               value = getValue(inputCode,textValue,valueMappingList);
+           } else {
+               value = calculateScore(inputCode,kycData,valueMappingList);
+           }
+           return value * rule.getWeight();
+       }).sum();
+    }
+
+    private boolean isBaseField(String inputCode){
+        return inputCode.length()<=3;
+    }
+    private Double getValue(String inputCode, String textValue, List<ValueMapping> valueMappingList){
+        double value;
+        var optionalValueMapping =  valueMappingList.stream()
+                        .filter(val->val.getInputCode().equals(inputCode)&& val.getValueText().equals(textValue))
+                        .findFirst();
+        value = optionalValueMapping.map(valueMapping -> valueMapping.getValueNumeric().doubleValue()).orElse(0.0);
+        return value;
+    }
+}
+
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.output.KnowYourCustomerRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.usecases.KnowYourCustomerUseCase;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain.ScoreCalculator;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.utils.Util.convertPartyIdToDocumento;
+
+@AllArgsConstructor
+@Service
+public class KnowYourCustomerUseCaseImpl implements KnowYourCustomerUseCase {
+
+  private final KnowYourCustomerRepositoryPort knowYourCustomerRepositoryPort;
+
+  @Override
+  public WrapperPostKycResolutionResponse postInitKyc(
+      WrapperPostKycResolutionRequest criteria) {
+    return knowYourCustomerRepositoryPort.createProcesstKyc(criteria);
+  }
+
+  @Override
+  public WrapperPostRiskScoreResponse getRiskScore(WrapperPostRiskScoreRequest criteria) {
+    String request = convertPartyIdToDocumento(criteria.getKnowYourCustomerResolution().getParty().getPartyId());
+    ScoreCalculator calculator = new ScoreCalculator(knowYourCustomerRepositoryPort);
+
+    WrapperPostRiskScoreResponse response = new WrapperPostRiskScoreResponse();
+    WrapperPostRiskScoreResponseRisk risk = new WrapperPostRiskScoreResponseRisk();
+    WrapperPostRiskScoreResponseRiskScore score = new WrapperPostRiskScoreResponseRiskScore();
+
+    Map<String,String> kycData = kycEntityToMap(knowYourCustomerRepositoryPort.getKyc(request));
+
+    List<ValueMapping> valueMappingList = knowYourCustomerRepositoryPort.getValues();
+    double scoreCalculado = calculator.calculateScore("SCORE",kycData,valueMappingList);
+    score.setCode(String.valueOf(scoreCalculado));
+    risk.setScore(score);
+    response.setRisk(risk);
+    return response;
+  }
+
+  private Map<String, String> kycEntityToMap(Kyc kyc) {
+
+    List<InputDefinition> allInputs = knowYourCustomerRepositoryPort.getAllInputs();
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, String> result = objectMapper.convertValue(kyc, Map.class);
+
+    allInputs.forEach(inputDefinition -> {
+      String tempValue = result.get(inputDefinition.getKycField());
+      result.remove(inputDefinition.getKycField());
+      result.put(inputDefinition.getInputCode(),tempValue);
+    });
+
+    return result;
+  }
+}
