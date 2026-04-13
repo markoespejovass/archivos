@@ -1,134 +1,33 @@
-sh-5.2$ kubectl logs cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84 -n cpe-nexhub-neg-dev
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
 
-Defaulted container "cpe-nxhbsc-beknowyocustomer" out of: cpe-nxhbsc-beknowyocustomer, install-oneagent (init)
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.stereotype.Component;
 
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
- 
-             %%
-
-             %%%
-
-          %   %%%                    %%%%                                                                   %%%%
-
-          %%   %%%%               %%     %%                                                                   %%
-
-          %%%%   %%%              %%      %                              %                                    %%
-
-       %%   %%%   %%%%%           %%%%           %%%        %  %%      %%%       %%%        %  %%         %%% %%       %%%       %  %%
-
-   %%%%%%%   %%%% %%%%%%%%          %%%%%%     %%  %%%    %%%   %%%   %%%%%    %%   %%    %%%   %%%    %%%    %%    %%    %%  %%%%%  %
-
-%%%%%%%%%%%  %%%%%%%%%%%%%            %%%%         %%    %%%    %%    %%%          %%    %%%    %%   %%%     %%   %%%%%%%%%%   %%
-
-%%%%%%%%%%%%  %%%%%%%%%%%%      %       %%%   %%%%%%%    %%%    %%    %%%     %%%%%%%    %%%    %%   %%%     %%   %%%          %%
-
-  %%%%%%%%%%%%%%%%%%%%%%%%       %%      %%   %%    %%    %%%    %%    %%%    %%    %%    %%%    %%   %%%     %%    %%%         %%
-
-     %%%%%%%%%%%%%%%%%%           %%%%%%%%     %%%% %%%  %%%%% %%%%%%   %%%%   %%%% %%%  %%%%% %%%%%%   %%%%% %%%    %%%%%%   %%%%%%
- 
-:: Spring Boot  (v3.5.11) ::                                                                  :: Santander Spring Boot (v1.5.0) ::
- 
-2026-04-13T18:40:04.421+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication v1.0.0-SNAPSHOT using Java 17.0.18 with PID 1 (/opt/app/BOOT-INF/classes started by java in /opt/app)
-
-2026-04-13T18:40:04.493+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "cert"
-
-2026-04-13T18:40:07.332+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-
-2026-04-13T18:40:07.588+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 197 ms.Found 1 JPA repository interface.
-
-2026-04-13T18:40:08.092+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.c.c.s.GenericScope                   : BeanFactory id=eaf8ede1-cebe-3c1c-a098-3191fc32dfc7
-
-2026-04-13T18:40:09.322+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.b.w.e.t.TomcatWebServer              : Tomcat initialized with port 8080 (http)
-
-2026-04-13T18:40:09.332+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.StandardService                  : Starting service [Tomcat]
-
-2026-04-13T18:40:09.332+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.StandardEngine                   : Starting Servlet engine: [Apache Tomcat/10.1.52]
-
-2026-04-13T18:40:09.419+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.C.[.[.[/]                        : Initializing Spring embedded WebApplicationContext
-
-2026-04-13T18:40:09.421+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4826 ms
-
-2026-04-13T18:40:09.609+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.c.c.CoreServletAutoConfig        : Initializing SERVLET configuration for Santander Spring Boot Core library...
-
-2026-04-13T18:40:09.702+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelServletAutoConfig : Initializing SERVLET configuration for Santander spring Boot  OmniChannel library...
-
-2026-04-13T18:40:09.704+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Initializing BASE configuration for Santander spring Boot OmniChannel library...
-
-2026-04-13T18:40:09.808+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Santander Spring Boot OmniChannel config = {ALL={EMP_MOV=ContactPoint.ContactPointBuilder(originChannel=EMP_MOV, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0033, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), OBD=ContactPoint.ContactPointBuilder(originChannel=OBD, marcoChannel=INT, environment=INTERNET, logicalChannel=0079, physicalChannel=0099, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), RML=ContactPoint.ContactPointBuilder(originChannel=RML, marcoChannel=RML, environment=INTERNET, logicalChannel=0031, physicalChannel=0019, commercialChannel=BML, operationalChannel=BML, application=, device=, operatingSystem=, medium=, userType=), RCA=ContactPoint.ContactPointBuilder(originChannel=RCA, marcoChannel=RCA, environment=INTRANET, logicalChannel=0001, physicalChannel=0018, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), OFI=ContactPoint.ContactPointBuilder(originChannel=OFI, marcoChannel=OFI, environment=INTRANET, logicalChannel=0007, physicalChannel=0019, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), PUB=ContactPoint.ContactPointBuilder(originChannel=PUB, marcoChannel=INT, environment=INTERNET, logicalChannel=0080, physicalChannel=0101, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), PLR=ContactPoint.ContactPointBuilder(originChannel=PLR, marcoChannel=PLR, environment=INTERNET, logicalChannel=5017, physicalChannel=0060, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), CIC=ContactPoint.ContactPointBuilder(originChannel=CIC, marcoChannel=CIC, environment=CONTACTCENTER, logicalChannel=0029, physicalChannel=0018, commercialChannel=020, operationalChannel=020, application=, device=, operatingSystem=, medium=, userType=), EMP=ContactPoint.ContactPointBuilder(originChannel=EMP, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0022, physicalChannel=0018,commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), INT=ContactPoint.ContactPointBuilder(originChannel=INT, marcoChannel=INT, environment=INTERNET, logicalChannel=0001, physicalChannel=0022, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=)}}
-
-2026-04-13T18:40:10.128+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Initializing BASE configuration for Logging library...
-
-2026-04-13T18:40:10.214+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingProperties            : Gluonlog Log format configured
-
-2026-04-13T18:40:10.398+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Using santander.logging.observability.filter.black-list: [spring.security.authorizations, spring.security.filterchains, spring.security.http.secured.requests, spring.security.http.unsecured.requests]
-
-2026-04-13T18:40:10.900+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.j.i.u.LogHelper                      : HHH000204: Processing PersistenceUnitInfo [name: default]
-
-2026-04-13T18:40:10.993+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.Version                              : HHH000412: Hibernate ORM core version 6.6.42.Final
-
-2026-04-13T18:40:11.013+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.c.i.RegionFactoryInitiator           : HHH000026: Second-level cache disabled
-
-2026-04-13T18:40:11.333+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-
-2026-04-13T18:40:11.402+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Starting...
-
-2026-04-13T18:40:11.624+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.z.h.p.HikariPool                       : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
-
-2026-04-13T18:40:11.625+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Start completed.
-
-2026-04-13T18:40:11.696+02:00  WARN 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.o.deprecation                        : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-
-2026-04-13T18:40:11.711+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.o.c.pooling                          : HHH10001005: Database info:
-
-        Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-
-        Database driver: undefined/unknown
-
-        Database version: 2.3.232
-
-        Autocommit mode: undefined/unknown
-
-        Isolation level: undefined/unknown
-
-        Minimum pool size: undefined/unknown
-
-        Maximum pool size: undefined/unknown
-
-2026-04-13T18:40:12.924+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-
-2026-04-13T18:40:13.000+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-
-{"timestamp":"2026-04-13T16:40:14.089Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Configuring HttpClientsAutoConfig  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity":"ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.HttpClientsAutoConfig","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:14.295Z","environment":"CERT","userId":"","logLevel":"WARN","log":"spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:14.319Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Configuring LoggerAutoConfig  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.logging.logger.LoggerAutoConfig","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:14.398Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Create hints for dependencies  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.HintsForGlobalDependenciesConfig","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:14.399Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing BASE configuration for Spring Boot config Core library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.CoreAutoConfig","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:14.704Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing SERVLET BASE configuration for Santander Spring Boot Authentication library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.security.authentication.config.AuthenticationServletAndBaseAutoConfig","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:14.715Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing SERVLET WebApp configuration for Santander Spring Boot Authentication library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.security.authentication.config.AuthenticationServletAutoConfiguration","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.390Z","environment":"CERT","userId":"","logLevel":"WARN","log":"Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'tokenService' defined in class path resource [com/santander/framework/springboot/security/authentication/config/AuthenticationServletAndBaseAutoConfig.class]: Unsatisfied dependency expressed through method 'tokenService' parameter 1: No qualifying bean of type 'org.springframework.security.oauth2.jwt.JwtDecoder' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.392Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Closing JPA EntityManagerFactory for persistence unit 'default'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.395Z","environment":"CERT","userId":"","logLevel":"INFO","log":"HikariPool-1 - Shutdown initiated...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.zaxxer.hikari.HikariDataSource","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.396Z","environment":"CERT","userId":"","logLevel":"INFO","log":"HikariPool-1 - Shutdown completed.  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.zaxxer.hikari.HikariDataSource","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.400Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Stopping service [Tomcat]  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.apache.catalina.core.StandardService","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.419Z","environment":"CERT","userId":"","logLevel":"INFO","log":"\n\nError starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger","contactPoint":""},"logType":"technical"}
-
-{"timestamp":"2026-04-13T16:40:15.481Z","environment":"CERT","userId":"","logLevel":"ERROR","log":"\n\n***************************\nAPPLICATION FAILED TO START\n***************************\n\nDescription:\n\nThere is not bean of type JwtDecoder or ReactiveJwtDecoder\n\nAction:\n\nConsider defining santander.security.connectors.pkm-connector.pkm-endpoint or spring.security.oauth2.resourceserver.jwt.jwk-set-uri in your configuration.\n  ","appKey":"nxhbsc","serviceName":"cpe-nxhbsc-beknowyocustomer","region": "my-deploy-region","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_my-deploy-region","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-fc7c7bd48-sdw84","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter","contactPoint":""},"logType":"technical"}
- 
+@Component
+@EnableWebSecurity
+public class SecurityConfig  {
+    @Bean
+    @ConditionalOnMissingBean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+                        .anyRequest().permitAll()
+                )
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp ->
+                                csp.policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
+                        )
+                );
+        return http.build();
+    }
+}
