@@ -1,1 +1,28 @@
 
+@ExtendWith(MockitoExtension.class)
+class SecurityConfigTest {
+
+    @InjectMocks
+    private SecurityConfig securityConfig;
+
+    @Test
+    void shouldBuildSecurityFilterChain() throws Exception {
+        // mock con deep stubs
+        HttpSecurity http = Mockito.mock(HttpSecurity.class, Mockito.RETURNS_DEEP_STUBS);
+
+        // mock del resultado REAL esperado
+        DefaultSecurityFilterChain filterChainMock =
+                Mockito.mock(DefaultSecurityFilterChain.class);
+
+        // stubbing correcto
+        when(http.securityMatcher(anyString())).thenReturn(http);
+        when(http.authorizeHttpRequests(any())).thenReturn(http);
+        when(http.csrf(any())).thenReturn(http);
+        when(http.headers(any())).thenReturn(http);
+        when(http.build()).thenReturn(filterChainMock); // 👈 SIN CAST
+
+        SecurityFilterChain result = securityConfig.filterChain(http);
+
+        assertNotNull(result);
+    }
+}
