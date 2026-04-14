@@ -1,139 +1,259 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.ResponseOTP;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import reactor.core.publisher.Mono;
-
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class OTPServiceAdapterTest {
-
-    @Mock
-    private WebClient webClient;
-
+class AesEncryptionServiceTest {
 
     @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private WebClient.RequestBodySpec requestBodySpec;
-
-    @Mock
-    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpec;
+    AesProperties properties;
 
     @InjectMocks
-    private OTPServiceAdapter adapter;
+    AesEncryptionService service;
 
-    // =========================
-    // ✅ SUCCESS CASE
-    // =========================
     @Test
-    void shouldSendMailingSuccessfully() throws Exception {
+    void shouldEncryptSuccessfully() {
+        String input = "hola mundo";
 
-        RequestOTP request = new RequestOTP();
-        String xmlRequest = "<xml>request</xml>";
-        String xmlResponse = "<xml>response</xml>";
+        String encrypted = service.encrypt(input);
 
-        ResponseOTP expectedResponse = new ResponseOTP();
+        assertNotNull(encrypted);
+        assertNotEquals(input, encrypted);
+    }
 
-        // Mock XML serialization
+    @Test
+    void shouldGenerateDifferentOutputsForSameInput() {
+        String input = "test";
+
+        String encrypted1 = service.encrypt(input);
+        String encrypted2 = service.encrypt(input);
+
+        assertNotEquals(encrypted1, encrypted2); // por IV aleatorio
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionOnError() {
+        assertThrows(RuntimeException.class, () -> {
+            service.encrypt(null);
+        });
+    }
+
+}
 
 
-        // Mock WebClient chain
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/XTMail")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.TEXT_XML)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(xmlRequest)).thenReturn((WebClient.RequestHeadersSpec)requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(xmlResponse));
 
-        // Mock XML deserialization
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.JwtUtil;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class JwtUtilTest {
+
+    @Test
+    void shouldGenerateValidToken() {
+        String token = JwtUtil.generateToken();
+
+        assertNotNull(token);
+        assertFalse(token.isEmpty());
+        assertTrue(token.split("\\.").length == 3); // estructura JWT
+    }
+}
 
 
-        // Act
-        ResponseOTP result = adapter.sendMailing(request);
 
-        // Assert
+
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper.SkyServiceMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequestActivationPropertiesInner;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@SpringBootTest
+class SkyServiceMapperTest {
+
+    @Autowired
+    private SkyServiceMapper mapper;
+
+    @Test
+    void shouldMapRequestAndEncrypt() {
+        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
+
+        BenefitProgramActivationRequestActivationPropertiesInner prop1 =
+                new BenefitProgramActivationRequestActivationPropertiesInner();
+        prop1.setKey("email");
+        prop1.setValue("test@mail.com");
+
+        BenefitProgramActivationRequestActivationPropertiesInner prop2 =
+                new BenefitProgramActivationRequestActivationPropertiesInner();
+        prop2.setKey("country");
+        prop2.setValue("PE");
+
+        request.setActivationProperties(List.of(prop1, prop2));
+
+        CreateUserRequest result = mapper.CreateUserRequestDtoToCreateUserRequest(request);
+
         assertNotNull(result);
-        assertEquals(expectedResponse, result);
-
-
-
-        verify(webClient).post();
-        verify(requestBodyUriSpec).uri("/XTMail");
-        verify(requestBodySpec).contentType(MediaType.TEXT_XML);
-        verify(requestBodySpec).bodyValue(xmlRequest);
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).bodyToMono(String.class);
+        assertNotNull(result.getData()); // encrypted
     }
 
-    // =========================
-    // ❌ ERROR PARSING XML
-    // =========================
-    @Test
-    void shouldReturnEmptyResponseWhenXmlParsingFails() throws Exception {
 
-        RequestOTP request = new RequestOTP();
-        String xmlRequest = "<xml>request</xml>";
-        String invalidXml = "INVALID_XML";
+}
 
 
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any())).thenReturn((WebClient.RequestHeadersSpec)requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(invalidXml));
+
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
+import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
+
+/**
+ * The class representative Aes ultis class
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@AllArgsConstructor
+public class AesEncryptionService {
+
+    private  final AesProperties aesProperties;
+    private static final String ALGORITHM = "AES";
 
 
+    @SuppressWarnings("java:S5542")
+    public String encrypt(String value){
+        byte[] keyBytes = hexStringToByteArray(aesProperties.getSecret());
+        try {
+            // generar IV aleatorio
+            byte[] iv = new byte[16];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(iv);
 
-        // Act
-        ResponseOTP result = adapter.sendMailing(request);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, ALGORITHM);
 
-        // Assert
-        assertNotNull(result); // retorna objeto vacío según tu lógica
+            Cipher cipher = Cipher.getInstance(ALGORITHM+aesProperties.getMethod());
+
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+
+            byte[] encrypted = cipher.doFinal(value.getBytes("UTF-8"));
+
+            // IV + ciphertext
+            byte[] result = new byte[iv.length + encrypted.length];
+
+            System.arraycopy(iv, 0, result, 0, iv.length);
+            System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);
+
+            return bytesToHex(result);
+        } catch (Exception ex){
+            throw new RuntimeException("Error encrypting");
+        }
     }
 
-    // =========================
-    // ❌ ERROR EN WEBCLIENT
-    // =========================
-    @Test
-    void shouldThrowExceptionWhenWebClientFails() throws Exception {
 
-        RequestOTP request = new RequestOTP();
+    private static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] =
+                    (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                            + Character.digit(s.charAt(i + 1), 16));
+        }
+
+        return data;
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+
+        StringBuilder hex = new StringBuilder(bytes.length * 2);
+
+        for (byte b : bytes) {
+            hex.append(String.format("%02x", b));
+        }
+
+        return hex.toString();
+    }
+
+}
 
 
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any())).thenReturn((WebClient.RequestHeadersSpec)requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
-        when(responseSpec.bodyToMono(String.class))
-                .thenReturn(Mono.error(new RuntimeException("API error")));
 
-        assertThrows(RuntimeException.class,
-                () -> adapter.sendMailing(request));
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.JwtProperties;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * The class representative Jwt ultis class
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+public class JwtUtil {
+
+    private static JwtProperties jwtProperties;
+
+    public static String generateToken() {
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("partnerId", "BSPE"); // opcional
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+
+        long now = System.currentTimeMillis();
+        long expiration = now + 1000 * 60 * 60; // 1 hora
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(expiration))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
     }
 
 
@@ -143,34 +263,81 @@ class OTPServiceAdapterTest {
 
 
 
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
 
-org.mockito.exceptions.misusing.PotentialStubbingProblem: 
-Strict stubbing argument mismatch. Please check:
- - this invocation of 'bodyValue' method:
-    requestBodySpec.bodyValue("<XTMAILING/>");
-    -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.sendMailing(OTPServiceAdapter.java:78)
- - has following stubbing(s) with different arguments:
-    1. requestBodySpec.bodyValue(
-    "<xml>request</xml>"
-);
-      -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.shouldSendMailingSuccessfully(OTPServiceAdapterTest.java:64)
-Typically, stubbing argument mismatch indicates user mistake when writing tests.
-Mockito fails early so that you can debug potential problem easily.
-However, there are legit scenarios when this exception generates false negative signal:
-  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
-    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
-  - stubbed method is intentionally invoked with different arguments by code under test
-    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
-For more information see javadoc for PotentialStubbingProblem class.
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper;
 
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.sendMailing(OTPServiceAdapter.java:78)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.shouldSendMailingSuccessfully(OTPServiceAdapterTest.java:72)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-17:30:39.098 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter - ocurrio un error al trasnformar el response : com.fasterxml.jackson.core.JsonParseException: Unexpected character 'I' (code 73) in prolog; expected '<'
- at [row,col {unknown-source}]: [1,1]
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.Profile;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.CreateUserRequestDTO;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.DocumentSKY;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.UserInfo;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequestActivationPropertiesInner;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-Process finished with exit code -1
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * The class representative Sky service mapper<
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Mapper(componentModel = "spring")
+public interface SkyServiceMapper {
+
+  ObjectMapper objectMapper = new ObjectMapper();
+
+  CreateUserRequest CreateUserRequestDtoToCreateUserRequest(
+          BenefitProgramActivationRequest dto);
+
+  @Mapping(target = "requestId", expression = "java(getUserId(createUserResponse))")
+  @Mapping(target = "status.statusCode", source = "success")
+  @Mapping(target = "status.statusDescription", source = "message")
+  WrapperRegisterCustomer CreateUserResponseToCreateUserResponseDTO(
+          CreateUserResponse createUserResponse);
+
+  @AfterMapping
+  default void mapPropertiesRequest(BenefitProgramActivationRequest dto, @MappingTarget CreateUserRequest request){
+
+    Map<String,String> mapProperties = dto.getActivationProperties()
+                                          .stream()
+                                          .collect(Collectors.toMap(
+                                                  BenefitProgramActivationRequestActivationPropertiesInner::getKey,
+                                                  BenefitProgramActivationRequestActivationPropertiesInner::getValue));
+    request.setPartnerId(Constant.REQUEST_BSPE);
+    CreateUserRequestDTO requestDTO = new CreateUserRequestDTO();
+    requestDTO.setProfile(new Profile(mapProperties.get(Constant.REQUEST_EMAIL), mapProperties.get(Constant.REQUEST_COUNTRY)));
+    requestDTO.setDocument(new DocumentSKY(mapProperties.get(Constant.REQUEST_TYPE), mapProperties.get(Constant.REQUEST_NUMBER), mapProperties.get(Constant.REQUEST_COUNTRY) ));
+    requestDTO.setUserInfo(new UserInfo(mapProperties.get(Constant.REQUEST_NAME), mapProperties.get(Constant.REQUEST_LASTNAME), List.of(mapProperties.get(Constant.REQUEST_EMAIL)), mapProperties.get(Constant.REQUEST_BIRTHDATE)));
+
+    request.setData(encryptRequest(requestDTO));
+
+  }
+
+  default String encryptRequest(CreateUserRequestDTO dto){
+    AesEncryptionService aes = new AesEncryptionService(new AesProperties());
+    try {
+      String json = objectMapper.writeValueAsString(dto);
+      return aes.encrypt(json);
+    } catch (Exception ex){
+        throw new RuntimeException("Error mapping or encrypting request");
+    }
+  }
+
+  default String getUserId(CreateUserResponse createUserResponse){
+    return createUserResponse.getContent().getLoginBffResponse().getContent().getResponse().getUid();
+  }
+}
+
