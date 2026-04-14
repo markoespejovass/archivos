@@ -1,25 +1,429 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
+sh-5.2$ kubectl logs cpe-nxhbsc-bedatacomangment-micro-java-6dc577bdd6-swwqs -n cpe-nexhub-neg-dev
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+Defaulted container "cpe-nxhbsc-bedatacomangment" out of: cpe-nxhbsc-bedatacomangment, install-oneagent (init)
 
-/**
- * The class representative Api properties
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Component
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ConfigurationProperties(prefix = "external.api")
-public class ApiProperties {
-  private String baseUrl;
-  private String username;
-  private String password;
-}
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+ 
+             %%
+
+             %%%
+
+          %   %%%                    %%%%                                                                   %%%%
+
+          %%   %%%%               %%     %%                                                                   %%
+
+          %%%%   %%%              %%      %                              %                                    %%
+
+       %%   %%%   %%%%%           %%%%           %%%        %  %%      %%%       %%%        %  %%         %%% %%       %%%       %  %%
+
+   %%%%%%%   %%%% %%%%%%%%          %%%%%%     %%  %%%    %%%   %%%   %%%%%    %%   %%    %%%   %%%    %%%    %%    %%    %%  %%%%%  %
+
+%%%%%%%%%%%  %%%%%%%%%%%%%            %%%%         %%    %%%    %%    %%%          %%    %%%    %%   %%%     %%   %%%%%%%%%%   %%
+
+%%%%%%%%%%%%  %%%%%%%%%%%%      %       %%%   %%%%%%%    %%%    %%    %%%     %%%%%%%    %%%    %%   %%%     %%   %%%          %%
+
+  %%%%%%%%%%%%%%%%%%%%%%%%       %%      %%   %%    %%    %%%    %%    %%%    %%    %%    %%%    %%   %%%     %%    %%%         %%
+
+     %%%%%%%%%%%%%%%%%%           %%%%%%%%     %%%% %%%  %%%%% %%%%%%   %%%%   %%%% %%%  %%%%% %%%%%%   %%%%% %%%    %%%%%%   %%%%%%
+ 
+:: Spring Boot  (v3.5.13) ::                                                                  :: Santander Spring Boot (v1.5.1) ::
+ 
+2026-04-14T23:19:47.256+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication: Starting OpenApiGeneratorApplication v1.0.0-SNAPSHOT using Java 17.0.18 with PID 1 (/opt/app/BOOT-INF/classes started by java in /opt/app)
+
+2026-04-14T23:19:47.263+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication: The following 1 profile is active: "cert"
+
+2026-04-14T23:19:50.147+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate: Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+
+2026-04-14T23:19:50.413+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate: Finished Spring Data repository scanning in 258 ms. Found 1 JPA repository interface.
+
+2026-04-14T23:19:50.917+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.s.c.c.s.GenericScope: BeanFactory id=4d2ca1a8-55f5-3408-bfbc-a1832253315c
+
+2026-04-14T23:19:52.256+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.s.b.w.e.t.TomcatWebServer: Tomcat initialized with port 8080 (http)
+
+2026-04-14T23:19:52.267+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.a.c.c.StandardService: Starting service [Tomcat]
+
+2026-04-14T23:19:52.267+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.a.c.c.StandardEngine: Starting Servlet engine: [Apache Tomcat/10.1.54]
+
+2026-04-14T23:19:52.363+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.a.c.c.C.[.[.[/]: Initializing Spring embedded WebApplicationContext
+
+2026-04-14T23:19:52.364+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext: Root WebApplicationContext: initialization completed in 4952 ms
+
+2026-04-14T23:19:52.383+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.c.c.CoreServletAutoConfig: Initializing SERVLET configuration for Santander Spring Boot Core library...
+
+2026-04-14T23:19:52.475+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelServletAutoConfig: Initializing SERVLET configuration for Santander spring Boot  OmniChannel library...
+
+2026-04-14T23:19:52.477+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig: Initializing BASE configuration for Santander spring Boot OmniChannel library...
+
+2026-04-14T23:19:52.760+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig: Santander Spring Boot OmniChannel config = {ALL={INT=ContactPoint.ContactPointBuilder(originChannel=INT, marcoChannel=INT, environment=INTERNET, logicalChannel=0001, physicalChannel=0022, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), EMP_MOV=ContactPoint.ContactPointBuilder(originChannel=EMP_MOV, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0033, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), OBD=ContactPoint.ContactPointBuilder(originChannel=OBD, marcoChannel=INT, environment=INTERNET, logicalChannel=0079, physicalChannel=0099, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), RML=ContactPoint.ContactPointBuilder(originChannel=RML, marcoChannel=RML, environment=INTERNET, logicalChannel=0031, physicalChannel=0019, commercialChannel=BML, operationalChannel=BML, application=, device=, operatingSystem=, medium=, userType=), RCA=ContactPoint.ContactPointBuilder(originChannel=RCA, marcoChannel=RCA, environment=INTRANET, logicalChannel=0001, physicalChannel=0018, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), OFI=ContactPoint.ContactPointBuilder(originChannel=OFI, marcoChannel=OFI, environment=INTRANET, logicalChannel=0007, physicalChannel=0019, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), PUB=ContactPoint.ContactPointBuilder(originChannel=PUB, marcoChannel=INT, environment=INTERNET, logicalChannel=0080, physicalChannel=0101, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), PLR=ContactPoint.ContactPointBuilder(originChannel=PLR, marcoChannel=PLR, environment=INTERNET, logicalChannel=5017, physicalChannel=0060, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), CIC=ContactPoint.ContactPointBuilder(originChannel=CIC, marcoChannel=CIC, environment=CONTACTCENTER, logicalChannel=0029, physicalChannel=0018, commercialChannel=020, operationalChannel=020, application=, device=, operatingSystem=, medium=, userType=), EMP=ContactPoint.ContactPointBuilder(originChannel=EMP, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0022, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=)}}
+
+2026-04-14T23:19:53.168+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig: Initializing BASE configuration for Logging library...
+
+2026-04-14T23:19:53.261+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.l.c.LoggingProperties: Gluonlog Log format configured
+
+2026-04-14T23:19:53.449+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig: Using santander.logging.observability.filter.black-list: [spring.security.authorizations, spring.security.filterchains, spring.security.http.secured.requests, spring.security.http.unsecured.requests]
+
+2026-04-14T23:19:53.969+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.h.j.i.u.LogHelper: HHH000204: Processing PersistenceUnitInfo [name: default]
+
+2026-04-14T23:19:54.066+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.h.Version: HHH000412: Hibernate ORM core version 6.6.45.Final
+
+2026-04-14T23:19:54.112+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.h.c.i.RegionFactoryInitiator: HHH000026: Second-level cache disabled
+
+2026-04-14T23:19:54.552+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.s.o.j.p.SpringPersistenceUnitInfo: No LoadTimeWeaver setup: ignoring JPA class transformer
+
+2026-04-14T23:19:54.574+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.z.h.HikariDataSource: HikariPool-1 - Starting...
+
+2026-04-14T23:19:54.861+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.z.h.p.HikariPool: HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+
+2026-04-14T23:19:54.862+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.z.h.HikariDataSource: HikariPool-1 - Start completed.
+
+2026-04-14T23:19:54.879+02:00  WARN 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.h.o.deprecation: HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+
+2026-04-14T23:19:54.950+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.h.o.c.pooling: HHH10001005: Database info:
+
+        Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+
+        Database driver: undefined/unknown
+
+        Database version: 2.3.232
+
+        Autocommit mode: undefined/unknown
+
+        Isolation level: undefined/unknown
+
+        Minimum pool size: undefined/unknown
+
+        Maximum pool size: undefined/unknown
+
+2026-04-14T23:19:55.372+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.h.e.t.j.p.i.JtaPlatformInitiator: HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+
+2026-04-14T23:19:55.376+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] j.LocalContainerEntityManagerFactoryBean: Initialized JPA EntityManagerFactory for persistence unit 'default'
+
+2026-04-14T23:19:55.665+02:00  WARN 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] ConfigServletWebServerApplicationContext: Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.application.ports.input.DataConsentManagementInputPort' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbedatacomangment/application/ports/input/DataConsentManagementInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.DataConsentManagementAdapter' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbedatacomangment/infrastructure/adapters/output/jpa/DataConsentManagementAdapter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean withname 'consentRepository' defined in com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository.ConsentRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Not a managed type: class com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity
+
+2026-04-14T23:19:55.665+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] j.LocalContainerEntityManagerFactoryBean: Closing JPA EntityManagerFactory for persistence unit 'default'
+
+2026-04-14T23:19:55.668+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.z.h.HikariDataSource: HikariPool-1 - Shutdown initiated...
+
+2026-04-14T23:19:55.669+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] c.z.h.HikariDataSource: HikariPool-1 - Shutdown completed.
+
+2026-04-14T23:19:55.673+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.a.c.c.StandardService: Stopping service [Tomcat]
+
+2026-04-14T23:19:55.714+02:00  INFO 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] .s.b.a.l.ConditionEvaluationReportLogger:
+ 
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+
+2026-04-14T23:19:55.755+02:00 ERROR 1 --- [cpe-nxhbsc-bedatacomangment] [           main] [                                                 ] o.s.b.SpringApplication: Application run failed
+ 
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.application.ports.input.DataConsentManagementInputPort' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbedatacomangment/application/ports/input/DataConsentManagementInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.DataConsentManagementAdapter' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbedatacomangment/infrastructure/adapters/output/jpa/DataConsentManagementAdapter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'consentRepository' defined in com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository.ConsentRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Not a managed type: class com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity
+
+        at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:991) ~[spring-context-6.2.17.jar:6.2.17]
+
+        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628) ~[spring-context-6.2.17.jar:6.2.17]
+
+        at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.5.13.jar:3.5.13]
+
+        at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) [spring-boot-3.5.13.jar:3.5.13]
+
+        at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) [spring-boot-3.5.13.jar:3.5.13]
+
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) [spring-boot-3.5.13.jar:3.5.13]
+
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) [spring-boot-3.5.13.jar:3.5.13]
+
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) [spring-boot-3.5.13.jar:3.5.13]
+
+        at com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.OpenApiGeneratorApplication.main(OpenApiGeneratorApplication.java:17) [classes/:1.0.0-SNAPSHOT]
+
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+
+        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[?:?]
+
+        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+
+        at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[?:?]
+
+        at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:106) [app/:?]
+
+        at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:64) [app/:?]
+
+        at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:40) [app/:?]
+
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.DataConsentManagementAdapter' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbedatacomangment/infrastructure/adapters/output/jpa/DataConsentManagementAdapter.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'consentRepository' defined in com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository.ConsentRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Not a managed type: class com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity
+
+        at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1770) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        ... 28 more
+
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'consentRepository' defined in com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository.ConsentRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Not a managed type: class com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1708) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1770) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        ... 28 more
+
+Caused by: java.lang.IllegalArgumentException: Not a managed type: class com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity
+
+        at org.hibernate.metamodel.model.domain.internal.JpaMetamodelImpl.managedType(JpaMetamodelImpl.java:223) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
+
+        at org.hibernate.metamodel.model.domain.internal.MappingMetamodelImpl.managedType(MappingMetamodelImpl.java:470) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
+
+        at org.hibernate.metamodel.model.domain.internal.MappingMetamodelImpl.managedType(MappingMetamodelImpl.java:100) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
+
+        at org.springframework.data.jpa.repository.support.JpaMetamodelEntityInformation.<init>(JpaMetamodelEntityInformation.java:82) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.jpa.repository.support.JpaEntityInformationSupport.getEntityInformation(JpaEntityInformationSupport.java:69) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.jpa.repository.support.JpaRepositoryFactory.getEntityInformation(JpaRepositoryFactory.java:251) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.jpa.repository.support.JpaRepositoryFactory.getTargetRepository(JpaRepositoryFactory.java:215) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.jpa.repository.support.JpaRepositoryFactory.getTargetRepository(JpaRepositoryFactory.java:198) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.jpa.repository.support.JpaRepositoryFactory.getTargetRepository(JpaRepositoryFactory.java:1) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.repository.core.support.RepositoryFactorySupport.getRepository(RepositoryFactorySupport.java:380) ~[spring-data-commons-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport.lambda$afterPropertiesSet$4(RepositoryFactoryBeanSupport.java:355) ~[spring-data-commons-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.util.Lazy.getNullable(Lazy.java:135) ~[spring-data-commons-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.util.Lazy.get(Lazy.java:113) ~[spring-data-commons-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport.afterPropertiesSet(RepositoryFactoryBeanSupport.java:361) ~[spring-data-commons-3.5.10.jar:3.5.10]
+
+        at org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean.afterPropertiesSet(JpaRepositoryFactoryBean.java:132) ~[spring-data-jpa-3.5.10.jar:3.5.10]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1708) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1770) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.17.jar:6.2.17]
+
+        at org.spring
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+************************************************************************************************
+********************************************************************************************************
+sh-5.2$ kubectl logs cpe-nxhbsc-beemailboxes-micro-java-6bd79bf554-w9jh9 -n cpe-nexhub-tec-dev
+Defaulted container "cpe-nxhbsc-beemailboxes" out of: cpe-nxhbsc-beemailboxes, install-oneagent (init)
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+ 
+             %%
+             %%%
+          %   %%%                    %%%%                                                                   %%%%
+          %%   %%%%               %%     %%                                                                   %%
+          %%%%   %%%              %%      %                              %                                    %%
+       %%   %%%   %%%%%           %%%%           %%%        %  %%      %%%       %%%        %  %%         %%% %%       %%%       %  %%
+   %%%%%%%   %%%% %%%%%%%%          %%%%%%     %%  %%%    %%%   %%%   %%%%%    %%   %%    %%%   %%%    %%%    %%    %%    %%  %%%%%  %
+%%%%%%%%%%%  %%%%%%%%%%%%%            %%%%         %%    %%%    %%    %%%          %%    %%%    %%   %%%     %%   %%%%%%%%%%   %%
+%%%%%%%%%%%%  %%%%%%%%%%%%      %       %%%   %%%%%%%    %%%    %%    %%%     %%%%%%%    %%%    %%   %%%     %%   %%%          %%
+  %%%%%%%%%%%%%%%%%%%%%%%%       %%      %%   %%    %%    %%%    %%    %%%    %%    %%    %%%    %%   %%%     %%    %%%         %%
+     %%%%%%%%%%%%%%%%%%           %%%%%%%%     %%%% %%%  %%%%% %%%%%%   %%%%   %%%% %%%  %%%%% %%%%%%   %%%%% %%%    %%%%%%   %%%%%%
+ 
+:: Spring Boot  (v3.5.13) ::                                                                  :: Santander Spring Boot (v1.5.1) ::
+ 
+2026-04-14T23:23:30.437+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication v1.0.0-SNAPSHOT using Java 17.0.18 with PID 1 (/opt/app/BOOT-INF/classes started by java in /opt/app)
+2026-04-14T23:23:30.443+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "cert"
+2026-04-14T23:23:33.535+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.c.c.s.GenericScope                   : BeanFactory id=85881fd9-3d3c-3a20-9627-45caae289273
+2026-04-14T23:23:34.766+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.w.e.t.TomcatWebServer              : Tomcat initialized with port 8080 (http)
+2026-04-14T23:23:34.806+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.a.c.c.StandardService                  : Starting service [Tomcat]
+2026-04-14T23:23:34.806+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.a.c.c.StandardEngine                   : Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-04-14T23:23:34.858+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.a.c.c.C.[.[.[/]                        : Initializing Spring embedded WebApplicationContext
+2026-04-14T23:23:34.859+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4312 ms
+2026-04-14T23:23:34.945+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.c.c.CoreServletAutoConfig        : Initializing SERVLET configuration for Santander Spring Boot Core library...
+2026-04-14T23:23:35.016+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelServletAutoConfig : Initializing SERVLET configuration for Santander spring Boot  OmniChannel library...
+2026-04-14T23:23:35.018+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Initializing BASE configuration for Santander spring Boot OmniChannel library...
+2026-04-14T23:23:35.139+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Santander Spring Boot OmniChannel config = {ALL={OFI=ContactPoint.ContactPointBuilder(originChannel=OFI, marcoChannel=OFI, environment=INTRANET, logicalChannel=0007, physicalChannel=0019, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), PUB=ContactPoint.ContactPointBuilder(originChannel=PUB, marcoChannel=INT, environment=INTERNET, logicalChannel=0080, physicalChannel=0101, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), PLR=ContactPoint.ContactPointBuilder(originChannel=PLR, marcoChannel=PLR, environment=INTERNET, logicalChannel=5017, physicalChannel=0060, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), CIC=ContactPoint.ContactPointBuilder(originChannel=CIC, marcoChannel=CIC, environment=CONTACTCENTER, logicalChannel=0029, physicalChannel=0018, commercialChannel=020, operationalChannel=020, application=, device=, operatingSystem=, medium=, userType=), EMP=ContactPoint.ContactPointBuilder(originChannel=EMP, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0022, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), INT=ContactPoint.ContactPointBuilder(originChannel=INT, marcoChannel=INT, environment=INTERNET, logicalChannel=0001, physicalChannel=0022, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), EMP_MOV=ContactPoint.ContactPointBuilder(originChannel=EMP_MOV, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0033, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), OBD=ContactPoint.ContactPointBuilder(originChannel=OBD, marcoChannel=INT, environment=INTERNET, logicalChannel=0079, physicalChannel=0099, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), RML=ContactPoint.ContactPointBuilder(originChannel=RML, marcoChannel=RML, environment=INTERNET, logicalChannel=0031, physicalChannel=0019, commercialChannel=BML, operationalChannel=BML, application=, device=, operatingSystem=, medium=, userType=), RCA=ContactPoint.ContactPointBuilder(originChannel=RCA, marcoChannel=RCA, environment=INTRANET, logicalChannel=0001, physicalChannel=0018, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=)}}
+2026-04-14T23:23:35.537+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Initializing BASE configuration for Logging library...
+2026-04-14T23:23:35.569+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.l.c.LoggingProperties            : Gluonlog Log format configured
+2026-04-14T23:23:35.713+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Using santander.logging.observability.filter.black-list: [spring.security.authorizations, spring.security.filterchains, spring.security.http.secured.requests, spring.security.http.unsecured.requests]
+2026-04-14T23:23:36.421+02:00  WARN 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPort' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/application/ports/input/EmailboxIdInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter' defined in file [/opt/app/BOOT-INF/classes/com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/infrastructure/adapters/output/OTPServiceAdapter.class]: Unsatisfied dependency expressed through constructor parameter 1: No qualifying bean of type 'com.fasterxml.jackson.dataformat.xml.XmlMapper' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2026-04-14T23:23:36.435+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.a.c.c.StandardService                  : Stopping service [Tomcat]
+2026-04-14T23:23:36.453+02:00  INFO 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] .s.b.a.l.ConditionEvaluationReportLogger :
+ 
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-14T23:23:36.466+02:00 ERROR 1 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.d.LoggingFailureAnalysisReporter   :
+ 
+***************************
+APPLICATION FAILED TO START
+***************************
+ 
+Description:
+ 
+Parameter 1 of constructor in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter required a bean of type 'com.fasterxml.jackson.dataformat.xml.XmlMapper' that could not be found.
+ 
+ 
+Action:
+ 
+Consider defining a bean of type 'com.fasterxml.jackson.dataformat.xml.XmlMapper' in your configuration.
