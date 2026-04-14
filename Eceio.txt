@@ -1,23 +1,176 @@
-2026-04-14T17:05:36.159-05:00  INFO 20612 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication using Java 17.0.18 with PID 20612 (C:\workspace\Q1\cpe-nxhbsc-beemailboxes\target\classes started by tecdesa2537 in C:\workspace\Q1\cpe-nxhbsc-beemailboxes)
-2026-04-14T17:05:36.253-05:00  INFO 20612 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "local"
-2026-04-14T17:05:54.105-05:00  WARN 20612 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Injection of autowired dependencies failed
-2026-04-14T17:05:54.527-05:00 ERROR 20612 --- [cpe-nxhbsc-beemailboxes] [           main] [                                                 ] o.s.b.d.LoggingFailureAnalysisReporter   : 
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
 
-***************************
-APPLICATION FAILED TO START
-***************************
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.ResponseOTP;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
-Description:
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-Parameter 0 of method mappingJackson2HttpMessageConverter in org.springframework.boot.autoconfigure.http.JacksonHttpMessageConvertersConfiguration$MappingJackson2HttpMessageConverterConfiguration required a single bean, but 2 were found:
-	- xmlMapper: defined by method 'xmlMapper' in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbeemailboxes/infrastructure/config/XmlConfig.class]
-	- santanderObjectMapper: defined by method 'santanderObjectMapper' in class path resource [com/santander/framework/springboot/core/config/CoreAutoConfig.class]
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-This may be due to missing parameter name information
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 
-Action:
+import reactor.core.publisher.Mono;
 
-Consider marking one of the beans as @Primary, updating the consumer to accept multiple beans, or using @Qualifier to identify the bean that should be consumed
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-Ensure that your compiler is configured to use the '-parameters' flag.
-You may need to update both your build tool settings as well as your IDE.
+@ExtendWith(MockitoExtension.class)
+class OTPServiceAdapterTest {
+
+    @Mock
+    private WebClient webClient;
+
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    @Mock
+    private WebClient.RequestBodySpec requestBodySpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
+    @InjectMocks
+    private OTPServiceAdapter adapter;
+
+    // =========================
+    // ✅ SUCCESS CASE
+    // =========================
+    @Test
+    void shouldSendMailingSuccessfully() throws Exception {
+
+        RequestOTP request = new RequestOTP();
+        String xmlRequest = "<xml>request</xml>";
+        String xmlResponse = "<xml>response</xml>";
+
+        ResponseOTP expectedResponse = new ResponseOTP();
+
+        // Mock XML serialization
+
+
+        // Mock WebClient chain
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri("/XTMail")).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.TEXT_XML)).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(xmlRequest)).thenReturn((WebClient.RequestHeadersSpec)requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(xmlResponse));
+
+        // Mock XML deserialization
+
+
+        // Act
+        ResponseOTP result = adapter.sendMailing(request);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
+
+
+
+        verify(webClient).post();
+        verify(requestBodyUriSpec).uri("/XTMail");
+        verify(requestBodySpec).contentType(MediaType.TEXT_XML);
+        verify(requestBodySpec).bodyValue(xmlRequest);
+        verify(requestHeadersSpec).retrieve();
+        verify(responseSpec).bodyToMono(String.class);
+    }
+
+    // =========================
+    // ❌ ERROR PARSING XML
+    // =========================
+    @Test
+    void shouldReturnEmptyResponseWhenXmlParsingFails() throws Exception {
+
+        RequestOTP request = new RequestOTP();
+        String xmlRequest = "<xml>request</xml>";
+        String invalidXml = "INVALID_XML";
+
+
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(any())).thenReturn((WebClient.RequestHeadersSpec)requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(invalidXml));
+
+
+
+        // Act
+        ResponseOTP result = adapter.sendMailing(request);
+
+        // Assert
+        assertNotNull(result); // retorna objeto vacío según tu lógica
+    }
+
+    // =========================
+    // ❌ ERROR EN WEBCLIENT
+    // =========================
+    @Test
+    void shouldThrowExceptionWhenWebClientFails() throws Exception {
+
+        RequestOTP request = new RequestOTP();
+
+
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.bodyValue(any())).thenReturn((WebClient.RequestHeadersSpec)requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(String.class))
+                .thenReturn(Mono.error(new RuntimeException("API error")));
+
+        assertThrows(RuntimeException.class,
+                () -> adapter.sendMailing(request));
+    }
+
+
+}
+
+
+
+
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+org.mockito.exceptions.misusing.PotentialStubbingProblem: 
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'bodyValue' method:
+    requestBodySpec.bodyValue("<XTMAILING/>");
+    -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.sendMailing(OTPServiceAdapter.java:78)
+ - has following stubbing(s) with different arguments:
+    1. requestBodySpec.bodyValue(
+    "<xml>request</xml>"
+);
+      -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.shouldSendMailingSuccessfully(OTPServiceAdapterTest.java:64)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.sendMailing(OTPServiceAdapter.java:78)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.shouldSendMailingSuccessfully(OTPServiceAdapterTest.java:72)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+17:30:39.098 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter - ocurrio un error al trasnformar el response : com.fasterxml.jackson.core.JsonParseException: Unexpected character 'I' (code 73) in prolog; expected '<'
+ at [row,col {unknown-source}]: [1,1]
+
+Process finished with exit code -1
