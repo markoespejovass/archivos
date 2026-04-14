@@ -1,28 +1,41 @@
+The mode of operation of a block cipher is an algorithm that describes how to repeatedly apply a cipher's single-block operation to securely transform amounts of data larger than a block. Some modes of operation include Electronic Codebook (ECB), Cipher Block Chaining (CBC), Cipher Feedback (CFB), and Counter (CTR).
 
-@ExtendWith(MockitoExtension.class)
-class SecurityConfigTest {
+ECB mode is inherently weak, as it produces the same ciphertext for identical blocks of plain text. CBC mode is vulnerable to padding oracle attacks. CTR mode is the superior choice because it does not have these weaknesses.
 
-    @InjectMocks
-    private SecurityConfig securityConfig;
+Example 1: The following code uses the AES cipher with ECB mode:
 
-    @Test
-    void shouldBuildSecurityFilterChain() throws Exception {
-        // mock con deep stubs
-        HttpSecurity http = Mockito.mock(HttpSecurity.class, Mockito.RETURNS_DEEP_STUBS);
 
-        // mock del resultado REAL esperado
-        DefaultSecurityFilterChain filterChainMock =
-                Mockito.mock(DefaultSecurityFilterChain.class);
+...
+SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC");
+cipher.init(Cipher.ENCRYPT_MODE, key);
+...
+Avoid using ECB and CBC modes of operation when encrypting data larger than a block. CBC mode is somewhat inefficient and poses a serious risk if used with SSL [1]. Instead, use CCM (Counter with CBC-MAC) mode or, if performance is a concern, GCM (Galois/Counter Mode) mode where they are available.
 
-        // stubbing correcto
-        when(http.securityMatcher(anyString())).thenReturn(http);
-        when(http.authorizeHttpRequests(any())).thenReturn(http);
-        when(http.csrf(any())).thenReturn(http);
-        when(http.headers(any())).thenReturn(http);
-        when(http.build()).thenReturn(filterChainMock); // 👈 SIN CAST
+Example 2: The following code uses the AES cipher with GCM mode:
 
-        SecurityFilterChain result = securityConfig.filterChain(http);
 
-        assertNotNull(result);
-    }
+...
+SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+Cipher cipher = Cipher.getInstance("AES/GCM/PKCS5Padding", "BC");
+cipher.init(Cipher.ENCRYPT_MODE, key);
+...
+
+
+In general, the mode of operation has minimal effect on RSA security. However, it is crucial to have secure padding, such as OAEP padding with SHA-2 hashing, for secure encryption, when you employ ECB or any other mode of operation.
+
+Example 3: The following code performs encryption with an RSA public key using ECB with OAEP padding:
+
+public Cipher getRSACipher() {
+Cipher rsa = null;
+try {
+rsa = javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+}
+catch (java.security.NoSuchAlgorithmException e) {
+handleMissingAlgorithm();
+}
+catch (javax.crypto.NoSuchPaddingException e) {
+handleMissingAlgorithm();
+}
+return rsa;
 }
