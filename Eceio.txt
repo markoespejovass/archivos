@@ -1,41 +1,77 @@
-The mode of operation of a block cipher is an algorithm that describes how to repeatedly apply a cipher's single-block operation to securely transform amounts of data larger than a block. Some modes of operation include Electronic Codebook (ECB), Cipher Block Chaining (CBC), Cipher Feedback (CFB), and Counter (CTR).
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
 
-ECB mode is inherently weak, as it produces the same ciphertext for identical blocks of plain text. CBC mode is vulnerable to padding oracle attacks. CTR mode is the superior choice because it does not have these weaknesses.
+import org.springframework.beans.factory.annotation.Value;
 
-Example 1: The following code uses the AES cipher with ECB mode:
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
+
+/**
+ * The class representative Aes ultis class
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+public class AesEncryptionService {
+
+    private static final String ALGORITHM = "AES";
+    @Value("${aes.secret}")
+    private static String SECRET_KEY;
+
+    @SuppressWarnings("java:S5542")
+    public static String encrypt(String value){
+        byte[] keyBytes = hexStringToByteArray(SECRET_KEY);
+        try {
+            // generar IV aleatorio
+            byte[] iv = new byte[16];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(iv);
+
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, ALGORITHM);
+
+            Cipher cipher = Cipher.getInstance("AES"+"/CBC"+"/PKCS5Padding");
+
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+
+            byte[] encrypted = cipher.doFinal(value.getBytes("UTF-8"));
+
+            // IV + ciphertext
+            byte[] result = new byte[iv.length + encrypted.length];
+
+            System.arraycopy(iv, 0, result, 0, iv.length);
+            System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);
+
+            return bytesToHex(result);
+        } catch (Exception ex){
+            throw new RuntimeException("Error encrypting");
+        }
+    }
 
 
-...
-SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
-Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC");
-cipher.init(Cipher.ENCRYPT_MODE, key);
-...
-Avoid using ECB and CBC modes of operation when encrypting data larger than a block. CBC mode is somewhat inefficient and poses a serious risk if used with SSL [1]. Instead, use CCM (Counter with CBC-MAC) mode or, if performance is a concern, GCM (Galois/Counter Mode) mode where they are available.
+    private static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
 
-Example 2: The following code uses the AES cipher with GCM mode:
+        byte[] data = new byte[len / 2];
 
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] =
+                    (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                            + Character.digit(s.charAt(i + 1), 16));
+        }
 
-...
-SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
-Cipher cipher = Cipher.getInstance("AES/GCM/PKCS5Padding", "BC");
-cipher.init(Cipher.ENCRYPT_MODE, key);
-...
+        return data;
+    }
 
+    private static String bytesToHex(byte[] bytes) {
 
-In general, the mode of operation has minimal effect on RSA security. However, it is crucial to have secure padding, such as OAEP padding with SHA-2 hashing, for secure encryption, when you employ ECB or any other mode of operation.
+        StringBuilder hex = new StringBuilder(bytes.length * 2);
 
-Example 3: The following code performs encryption with an RSA public key using ECB with OAEP padding:
+        for (byte b : bytes) {
+            hex.append(String.format("%02x", b));
+        }
 
-public Cipher getRSACipher() {
-Cipher rsa = null;
-try {
-rsa = javax.crypto.Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-}
-catch (java.security.NoSuchAlgorithmException e) {
-handleMissingAlgorithm();
-}
-catch (javax.crypto.NoSuchPaddingException e) {
-handleMissingAlgorithm();
-}
-return rsa;
+        return hex.toString();
+    }
+
 }
