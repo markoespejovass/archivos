@@ -1,5 +1,61 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * The class representative Jwt ultis class
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+public class JwtUtil {
+
+    @Value("${aes.secret}")
+    private String SECRET;
+    private static SecretKey secretKey;
+    @PostConstruct
+    public void init(){
+        SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+    public static String generateToken() {
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("partnerId", "BSPE"); // opcional
+
+
+
+        long now = System.currentTimeMillis();
+        long expiration = now + 1000 * 60 * 60; // 1 hora
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(expiration))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
+
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.Cipher;
@@ -15,12 +71,22 @@ import java.security.SecureRandom;
 public class AesEncryptionService {
 
     private static final String ALGORITHM = "AES";
+
+    @Value("${aes.method}")
+    private String method;
+    private static String metodo;
     @Value("${aes.secret}")
-    private static String SECRET_KEY;
+    private String SECRET_KEY;
+    private static byte[] keyBytes;
+    @PostConstruct
+    public void init(){
+        keyBytes = hexStringToByteArray(SECRET_KEY);
+        metodo = method;
+    }
 
     @SuppressWarnings("java:S5542")
     public static String encrypt(String value){
-        byte[] keyBytes = hexStringToByteArray(SECRET_KEY);
+
         try {
             // generar IV aleatorio
             byte[] iv = new byte[16];
@@ -30,7 +96,7 @@ public class AesEncryptionService {
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
             SecretKeySpec keySpec = new SecretKeySpec(keyBytes, ALGORITHM);
 
-            Cipher cipher = Cipher.getInstance("AES"+"/CBC"+"/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance(ALGORITHM+metodo);
 
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
 
@@ -75,3 +141,112 @@ public class AesEncryptionService {
     }
 
 }
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.application.ports.output.SKYServiceRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+
+
+/**
+ * The class representative Sky service adapter
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Slf4j
+@Component
+@AllArgsConstructor
+public class SKYServiceAdapter implements SKYServiceRepositoryPort {
+
+    private final WebClient webClient;
+
+    @Override
+    public CreateUserResponse createUser(CreateUserRequest criteria) {
+        return webClient
+                .post()
+                .uri(Constant.URI_API_SKY)
+                .header("Ocp-Apim-Subscription-Key", "5cfc7d2fea014ede83c5bd0086d81d2c")
+                .header("Content-Type", "application/json")
+                .bodyValue(criteria)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        response -> response.bodyToMono(String.class).map(body ->{
+                            log.error("error: {}", body);
+                            throw new RuntimeException("error: "+ body);
+                        })
+                )
+                .bodyToMono(CreateUserResponse.class)
+                .block();
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external.TokenService;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+/**
+ * The class representative Web client
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+public class WebClientConfig {
+
+
+  public WebClientConfig() {
+  }
+
+  @Bean
+  public WebClient webClient(
+      TokenService tokenService) throws Exception{
+
+      SslContext sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+      HttpClient httpClient = HttpClient.create().secure(t -> t.sslContext(sslContext));
+    return WebClient.builder()
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .baseUrl("https://dev-api.skyairline.com/partners")
+        .filter(addTokenFilter(tokenService))
+        .build();
+  }
+
+  private ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
+    return (request, next) ->
+        tokenService
+            .getToken()
+            .flatMap(
+                token -> {
+                  ClientRequest authorizedRequest =
+                      ClientRequest.from(request)
+                          .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                          .build();
+                  return next.exchange(authorizedRequest);
+                });
+  }
+}
+
+
