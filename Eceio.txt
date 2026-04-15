@@ -1,1 +1,67 @@
 
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class AesEncryptionServiceTest {
+
+    @Mock
+    private AesProperties properties;
+
+    @InjectMocks
+    private AesEncryptionService service;
+
+    private static final String VALID_SECRET = "00112233445566778899aabbccddeeff";
+    private static final String VALID_METHOD = "/CBC/PKCS5Padding";
+
+    @Test
+    void shouldEncryptSuccessfully() {
+        // Arrange
+        String input = "hola mundo";
+        when(properties.getMethod()).thenReturn(VALID_METHOD);
+        when(properties.getSecret()).thenReturn(VALID_SECRET);
+
+        // Act
+        String encrypted = service.encrypt(input);
+
+        // Assert
+        assertNotNull(encrypted);
+        assertNotEquals(input, encrypted);
+        assertFalse(encrypted.isEmpty());
+    }
+
+    @Test
+    void shouldGenerateDifferentOutputsForSameInput() {
+        // Arrange
+        String input = "test";
+        when(properties.getMethod()).thenReturn(VALID_METHOD);
+        when(properties.getSecret()).thenReturn(VALID_SECRET);
+
+        // Act
+        String encrypted1 = service.encrypt(input);
+        String encrypted2 = service.encrypt(input);
+
+        // Assert
+        assertNotEquals(encrypted1, encrypted2); // IV aleatorio
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionOnError() {
+        // Arrange
+        when(properties.getMethod()).thenReturn(VALID_METHOD);
+        when(properties.getSecret()).thenReturn(VALID_SECRET);
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> service.encrypt(null));
+    }
+}
