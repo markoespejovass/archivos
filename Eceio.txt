@@ -1,1 +1,118 @@
 
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.application.ports.input.SkyServicelnputPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.CreateUserRequestDTO;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper.SkyServiceMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ApiDelegateImplTest {
+
+    @Mock
+    private SkyServicelnputPort service;
+
+    @Mock
+    private SkyServiceMapper mapper;
+
+    @Mock
+    private AesEncryptionService encryptionService;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @InjectMocks
+    private HelloApiDelegateImpl delegate;
+
+    @Test
+    void shouldRegisterCustomerSuccessfully() throws Exception {
+        // Arrange
+        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
+        CreateUserResponse domainResponse = new CreateUserResponse();
+        WrapperRegisterCustomer response = new WrapperRegisterCustomer();
+        CreateUserRequestDTO requestDTO = new CreateUserRequestDTO();
+
+        when(mapper.CreateUserRequestDtoToCreateUserRequest(request)).thenReturn(requestDTO);
+        when(objectMapper.writeValueAsString(any())).thenReturn("json");
+        when(encryptionService.encrypt(anyString())).thenReturn("encrypted");
+        when(service.createUser(any(CreateUserRequest.class))).thenReturn(domainResponse);
+        when(mapper.CreateUserResponseToCreateUserResponseDTO(domainResponse)).thenReturn(response);
+
+        // Act
+        ResponseEntity<WrapperRegisterCustomer> result = delegate.registerCustomer(request);
+
+        // Assert
+        assertEquals(200, result.getStatusCodeValue());
+        assertEquals(response, result.getBody());
+
+        // Verificar request construido correctamente
+        ArgumentCaptor<CreateUserRequest> captor = ArgumentCaptor.forClass(CreateUserRequest.class);
+        verify(service).createUser(captor.capture());
+
+        CreateUserRequest captured = captor.getValue();
+        assertEquals(Constant.REQUEST_BSPE, captured.getPartnerId());
+        assertEquals("encrypted", captured.getData());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEncryptionFails() throws Exception {
+        // Arrange
+        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
+        CreateUserRequestDTO requestDTO = new CreateUserRequestDTO();
+
+        when(mapper.CreateUserRequestDtoToCreateUserRequest(request)).thenReturn(requestDTO);
+        when(objectMapper.writeValueAsString(any()))
+                .thenThrow(new JsonProcessingException("error") {});
+
+        // Act + Assert
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> delegate.registerCustomer(request));
+
+        assertEquals("Error mapping or encrypting request", ex.getMessage());
+
+        verify(service, never()).createUser(any());
+    }
+
+    @Test
+    void shouldCallDependenciesInOrder() throws Exception {
+        // Arrange
+        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
+        CreateUserResponse domainResponse = new CreateUserResponse();
+        WrapperRegisterCustomer response = new WrapperRegisterCustomer();
+        CreateUserRequestDTO requestDTO = new CreateUserRequestDTO();
+
+        when(mapper.CreateUserRequestDtoToCreateUserRequest(request)).thenReturn(requestDTO);
+        when(objectMapper.writeValueAsString(any())).thenReturn("json");
+        when(encryptionService.encrypt(anyString())).thenReturn("encrypted");
+        when(service.createUser(any())).thenReturn(domainResponse);
+        when(mapper.CreateUserResponseToCreateUserResponseDTO(domainResponse)).thenReturn(response);
+
+        // Act
+        delegate.registerCustomer(request);
+
+        // Assert orden de ejecución
+        InOrder inOrder = inOrder(mapper, objectMapper, encryptionService, service);
+
+        inOrder.verify(mapper).CreateUserRequestDtoToCreateUserRequest(request);
+        inOrder.verify(objectMapper).writeValueAsString(any());
+        inOrder.verify(encryptionService).encrypt(anyString());
+        inOrder.verify(service).createUser(any());
+    }
+}
