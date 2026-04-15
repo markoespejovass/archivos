@@ -1,1 +1,16 @@
 
+prop1.setKey("email");
+prop1.setValue("test@mail.com");
+
+prop2.setKey("country");
+prop2.setValue("PE");
+
+BenefitProgramActivationRequestActivationPropertiesInner prop3 = new ...;
+prop3.setKey("name");
+prop3.setValue("John");
+
+BenefitProgramActivationRequestActivationPropertiesInner prop4 = new ...;
+prop4.setKey("lastname");
+prop4.setValue("Doe");
+
+request.setActivationProperties(List.of(prop1, prop2, prop3, prop4));
