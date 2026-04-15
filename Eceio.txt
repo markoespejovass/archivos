@@ -1,263 +1,77 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
-/**
- * The class representative Api properties
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Component
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ConfigurationProperties(prefix = "jwt")
-public class JwtProperties {
-  private String secret;
-}
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
 
 
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
 
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
-/**
- * The class representative Api properties
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Component
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ConfigurationProperties(prefix = "aes")
-public class AesProperties {
-  private String method;
-  private String secret;
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
-import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
-
-/**
- * The class representative Aes ultis class
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Component
-@AllArgsConstructor
-public class AesEncryptionService {
-
-    private  final AesProperties aesProperties;
-    private static final String ALGORITHM = "AES";
-
-
-    @SuppressWarnings("java:S5542")
-    public String encrypt(String value){
-        byte[] keyBytes = hexStringToByteArray(aesProperties.getSecret());
-        try {
-            // generar IV aleatorio
-            byte[] iv = new byte[16];
-            SecureRandom secureRandom = new SecureRandom();
-            secureRandom.nextBytes(iv);
-
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, ALGORITHM);
-
-            Cipher cipher = Cipher.getInstance(ALGORITHM+aesProperties.getMethod());
-
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-
-            byte[] encrypted = cipher.doFinal(value.getBytes("UTF-8"));
-
-            // IV + ciphertext
-            byte[] result = new byte[iv.length + encrypted.length];
-
-            System.arraycopy(iv, 0, result, 0, iv.length);
-            System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);
-
-            return bytesToHex(result);
-        } catch (Exception ex){
-            throw new RuntimeException("Error encrypting");
-        }
-    }
-
-
-    private static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-
-        byte[] data = new byte[len / 2];
-
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] =
-                    (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                            + Character.digit(s.charAt(i + 1), 16));
-        }
-
-        return data;
-    }
-
-    private static String bytesToHex(byte[] bytes) {
-
-        StringBuilder hex = new StringBuilder(bytes.length * 2);
-
-        for (byte b : bytes) {
-            hex.append(String.format("%02x", b));
-        }
-
-        return hex.toString();
-    }
-
-}
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.JwtProperties;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-
-/**
- * The class representative Jwt ultis class
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-public class JwtUtil {
-
-    private static JwtProperties jwtProperties;
-
-    public static String generateToken() {
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("partnerId", "BSPE"); // opcional
-
-        SecretKey secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
-
-        long now = System.currentTimeMillis();
-        long expiration = now + 1000 * 60 * 60; // 1 hora
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date(now))
-                .setExpiration(new Date(expiration))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper;
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.Profile;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.CreateUserRequestDTO;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.DocumentSKY;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.beforeEncripted.UserInfo;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequestActivationPropertiesInner;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-/**
- * The class representative Sky service mapper<
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Mapper(componentModel = "spring")
-public interface SkyServiceMapper {
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.constants.Constant.*;
 
-  ObjectMapper objectMapper = new ObjectMapper();
+public class FileSpecificationBuilder {
 
-  CreateUserRequest CreateUserRequestDtoToCreateUserRequest(
-          BenefitProgramActivationRequest dto);
+    public static Specification<FileEntity> build(
+            List<WrapperMySearchFilterRequestSearchPropertiesInner> filters,
+            String discriminator
+    ) {
 
-  @Mapping(target = "requestId", expression = "java(getUserId(createUserResponse))")
-  @Mapping(target = "status.statusCode", source = "success")
-  @Mapping(target = "status.statusDescription", source = "message")
-  WrapperRegisterCustomer CreateUserResponseToCreateUserResponseDTO(
-          CreateUserResponse createUserResponse);
+        return (root, query, cb) -> {
 
-  @AfterMapping
-  default void mapPropertiesRequest(BenefitProgramActivationRequest dto, @MappingTarget CreateUserRequest request){
+            List<Predicate> predicates = new ArrayList<>();
 
-    Map<String,String> mapProperties = dto.getActivationProperties()
-                                          .stream()
-                                          .collect(Collectors.toMap(
-                                                  BenefitProgramActivationRequestActivationPropertiesInner::getKey,
-                                                  BenefitProgramActivationRequestActivationPropertiesInner::getValue));
-    request.setPartnerId(Constant.REQUEST_BSPE);
-    CreateUserRequestDTO requestDTO = new CreateUserRequestDTO();
-    requestDTO.setProfile(new Profile(mapProperties.get(Constant.REQUEST_EMAIL), mapProperties.get(Constant.REQUEST_COUNTRY)));
-    requestDTO.setDocument(new DocumentSKY(mapProperties.get(Constant.REQUEST_TYPE), mapProperties.get(Constant.REQUEST_NUMBER), mapProperties.get(Constant.REQUEST_COUNTRY) ));
-    requestDTO.setUserInfo(new UserInfo(mapProperties.get(Constant.REQUEST_NAME), mapProperties.get(Constant.REQUEST_LASTNAME), List.of(mapProperties.get(Constant.REQUEST_EMAIL)), mapProperties.get(Constant.REQUEST_BIRTHDATE)));
+            for (WrapperMySearchFilterRequestSearchPropertiesInner filter : filters) {
 
-    request.setData(encryptRequest(requestDTO));
+                String field = mapField(filter.getKeyId());
+                String value = filter.getKeyValue();
 
-  }
+                switch (filter.getKeyOperator().getValue()) {
+                    case CONTAINS:
+                        predicates.add(
+                                cb.like(
+                                        cb.lower(root.get(field)),
+                                        "%" + value.toLowerCase() + "%"
+                                )
+                        );
+                        break;
 
-  default String encryptRequest(CreateUserRequestDTO dto){
-    AesEncryptionService aes = new AesEncryptionService(new AesProperties());
-    try {
-      String json = objectMapper.writeValueAsString(dto);
-      return aes.encrypt(json);
-    } catch (Exception ex){
-        throw new RuntimeException("Error mapping or encrypting request");
+                    case EQUAL:
+                        predicates.add(
+                                cb.equal(root.get(field), castValue(field, value))
+                        );
+                        break;
+                }
+            }
+
+            // AND por defecto
+            if ("OR".equalsIgnoreCase(discriminator)) {
+                return cb.or(predicates.toArray(new Predicate[0]));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
     }
-  }
 
-  default String getUserId(CreateUserResponse createUserResponse){
-    return createUserResponse.getContent().getLoginBffResponse().getContent().getResponse().getUid();
-  }
+
+    private static String mapField(String keyId) {
+        return switch (keyId) {
+            case NAME -> "name";
+            case MIME_TYPE -> "mimeType";
+            case STATUS -> "status";
+            case VERSION -> "version";
+            case ID -> "id";
+            default -> throw new IllegalArgumentException("Invalid field");
+        };
+    }
+
+
+    private static Object castValue(String field, String value) {
+        return switch (field) {
+            case "version" -> Integer.valueOf(value);
+            case "id" -> Long.valueOf(value);
+            default -> value;
+        };
+    }
 }
