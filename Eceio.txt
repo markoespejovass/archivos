@@ -1,77 +1,148 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
 
-
 import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.constants.Constant.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class FileSpecificationBuilder {
+class FileSpecificationBuilderTest {
 
-    public static Specification<FileEntity> build(
-            List<WrapperMySearchFilterRequestSearchPropertiesInner> filters,
-            String discriminator
-    ) {
+    @Test
+    void shouldBuildSpecificationWithContainsOperator() {
+        // Arrange
+        WrapperMySearchFilterRequestSearchPropertiesInner filter = mock(WrapperMySearchFilterRequestSearchPropertiesInner.class);
+        when(filter.getKeyId()).thenReturn("NAME");
+        when(filter.getKeyValue()).thenReturn("test");
+        when(filter.getKeyOperator().getValue()).thenReturn("CONTAINS");
 
-        return (root, query, cb) -> {
+        Specification<FileEntity> spec = FileSpecificationBuilder.build(List.of(filter), "AND");
 
-            List<Predicate> predicates = new ArrayList<>();
+        Root<FileEntity> root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
 
-            for (WrapperMySearchFilterRequestSearchPropertiesInner filter : filters) {
+        Path<String> path = mock(Path.class);
+        Predicate predicate = mock(Predicate.class);
 
-                String field = mapField(filter.getKeyId());
-                String value = filter.getKeyValue();
+        when(root.get("name")).thenReturn(path);
+        when(cb.lower(path)).thenReturn(path);
+        when(cb.like(path, "%test%")).thenReturn(predicate);
+        when(cb.and(any())).thenReturn(predicate);
 
-                switch (filter.getKeyOperator().getValue()) {
-                    case CONTAINS:
-                        predicates.add(
-                                cb.like(
-                                        cb.lower(root.get(field)),
-                                        "%" + value.toLowerCase() + "%"
-                                )
-                        );
-                        break;
+        // Act
+        Predicate result = spec.toPredicate(root, query, cb);
 
-                    case EQUAL:
-                        predicates.add(
-                                cb.equal(root.get(field), castValue(field, value))
-                        );
-                        break;
-                }
-            }
-
-            // AND por defecto
-            if ("OR".equalsIgnoreCase(discriminator)) {
-                return cb.or(predicates.toArray(new Predicate[0]));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
+        // Assert
+        assertNotNull(result);
+        verify(cb).like(path, "%test%");
     }
 
+    @Test
+    void shouldBuildSpecificationWithEqualOperator() {
+        // Arrange
+        WrapperMySearchFilterRequestSearchPropertiesInner filter = mock(WrapperMySearchFilterRequestSearchPropertiesInner.class);
+        when(filter.getKeyId()).thenReturn("STATUS");
+        when(filter.getKeyValue()).thenReturn("ACTIVE");
+        when(filter.getKeyOperator().getValue()).thenReturn("EQUAL");
 
-    private static String mapField(String keyId) {
-        return switch (keyId) {
-            case NAME -> "name";
-            case MIME_TYPE -> "mimeType";
-            case STATUS -> "status";
-            case VERSION -> "version";
-            case ID -> "id";
-            default -> throw new IllegalArgumentException("Invalid field");
-        };
+        Specification<FileEntity> spec = FileSpecificationBuilder.build(List.of(filter), "AND");
+
+        Root<FileEntity> root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+
+        Path<String> path = mock(Path.class);
+        Predicate predicate = mock(Predicate.class);
+
+        when(root.get("status")).thenReturn(path);
+        when(cb.equal(path, "ACTIVE")).thenReturn(predicate);
+        when(cb.and(any())).thenReturn(predicate);
+
+        // Act
+        Predicate result = spec.toPredicate(root, query, cb);
+
+        // Assert
+        assertNotNull(result);
+        verify(cb).equal(path, "ACTIVE");
     }
 
+    @Test
+    void shouldUseOrWhenDiscriminatorIsOr() {
+        // Arrange
+        WrapperMySearchFilterRequestSearchPropertiesInner filter = mock(WrapperMySearchFilterRequestSearchPropertiesInner.class);
+        when(filter.getKeyId()).thenReturn("NAME");
+        when(filter.getKeyValue()).thenReturn("test");
+        when(filter.getKeyOperator().getValue()).thenReturn("CONTAINS");
 
-    private static Object castValue(String field, String value) {
-        return switch (field) {
-            case "version" -> Integer.valueOf(value);
-            case "id" -> Long.valueOf(value);
-            default -> value;
-        };
+        Specification<FileEntity> spec = FileSpecificationBuilder.build(List.of(filter), "OR");
+
+        Root<FileEntity> root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+
+        Path<String> path = mock(Path.class);
+        Predicate predicate = mock(Predicate.class);
+
+        when(root.get("name")).thenReturn(path);
+        when(cb.lower(path)).thenReturn(path);
+        when(cb.like(path, "%test%")).thenReturn(predicate);
+        when(cb.or(any())).thenReturn(predicate);
+
+        // Act
+        Predicate result = spec.toPredicate(root, query, cb);
+
+        // Assert
+        assertNotNull(result);
+        verify(cb).or(any());
+    }
+
+    @Test
+    void shouldCastValueForVersionField() {
+        // Arrange
+        WrapperMySearchFilterRequestSearchPropertiesInner filter = mock(WrapperMySearchFilterRequestSearchPropertiesInner.class);
+        when(filter.getKeyId()).thenReturn("VERSION");
+        when(filter.getKeyValue()).thenReturn("5");
+        when(filter.getKeyOperator().getValue()).thenReturn("EQUAL");
+
+        Specification<FileEntity> spec = FileSpecificationBuilder.build(List.of(filter), "AND");
+
+        Root<FileEntity> root = mock(Root.class);
+        CriteriaQuery<?> query = mock(CriteriaQuery.class);
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+
+        Path<Integer> path = mock(Path.class);
+        Predicate predicate = mock(Predicate.class);
+
+        when(root.get("version")).thenReturn(path);
+        when(cb.equal(path, 5)).thenReturn(predicate);
+        when(cb.and(any())).thenReturn(predicate);
+
+        // Act
+        Predicate result = spec.toPredicate(root, query, cb);
+
+        // Assert
+        assertNotNull(result);
+        verify(cb).equal(path, 5);
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidField() {
+        // Arrange
+        WrapperMySearchFilterRequestSearchPropertiesInner filter = mock(WrapperMySearchFilterRequestSearchPropertiesInner.class);
+        when(filter.getKeyId()).thenReturn("INVALID");
+        when(filter.getKeyValue()).thenReturn("test");
+        when(filter.getKeyOperator().getValue()).thenReturn("EQUAL");
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class,
+                () -> FileSpecificationBuilder.build(List.of(filter), "AND")
+                        .toPredicate(mock(Root.class), mock(CriteriaQuery.class), mock(CriteriaBuilder.class))
+        );
     }
 }
