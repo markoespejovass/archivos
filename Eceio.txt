@@ -1,126 +1,53 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.AesProperties;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.AesEncryptionService;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-class AesEncryptionServiceTest {
-
-    @Mock
-    AesProperties properties;
-
-    @InjectMocks
-    AesEncryptionService service;
-
-    @Test
-    void shouldEncryptSuccessfully() {
-        String input = "hola mundo";
-
-        String encrypted = service.encrypt(input);
-
-        assertNotNull(encrypted);
-        assertNotEquals(input, encrypted);
-    }
-
-    @Test
-    void shouldGenerateDifferentOutputsForSameInput() {
-        String input = "test";
-
-        String encrypted1 = service.encrypt(input);
-        String encrypted2 = service.encrypt(input);
-
-        assertNotEquals(encrypted1, encrypted2); // por IV aleatorio
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionOnError() {
-        assertThrows(RuntimeException.class, () -> {
-            service.encrypt(null);
-        });
-    }
-
+/**
+ * The class representative Api properties
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ConfigurationProperties(prefix = "jwt")
+public class JwtProperties {
+  private String secret;
 }
 
 
 
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util.JwtUtil;
-import org.junit.jupiter.api.Test;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class JwtUtilTest {
-
-    @Test
-    void shouldGenerateValidToken() {
-        String token = JwtUtil.generateToken();
-
-        assertNotNull(token);
-        assertFalse(token.isEmpty());
-        assertTrue(token.split("\\.").length == 3); // estructura JWT
-    }
+/**
+ * The class representative Api properties
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ConfigurationProperties(prefix = "aes")
+public class AesProperties {
+  private String method;
+  private String secret;
 }
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.mapper.SkyServiceMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.BenefitProgramActivationRequestActivationPropertiesInner;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperRegisterCustomer;
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-@SpringBootTest
-class SkyServiceMapperTest {
-
-    @Autowired
-    private SkyServiceMapper mapper;
-
-    @Test
-    void shouldMapRequestAndEncrypt() {
-        BenefitProgramActivationRequest request = new BenefitProgramActivationRequest();
-
-        BenefitProgramActivationRequestActivationPropertiesInner prop1 =
-                new BenefitProgramActivationRequestActivationPropertiesInner();
-        prop1.setKey("email");
-        prop1.setValue("test@mail.com");
-
-        BenefitProgramActivationRequestActivationPropertiesInner prop2 =
-                new BenefitProgramActivationRequestActivationPropertiesInner();
-        prop2.setKey("country");
-        prop2.setValue("PE");
-
-        request.setActivationProperties(List.of(prop1, prop2));
-
-        CreateUserRequest result = mapper.CreateUserRequestDtoToCreateUserRequest(request);
-
-        assertNotNull(result);
-        assertNotNull(result.getData()); // encrypted
-    }
-
-
-}
-
 
 
 
@@ -210,9 +137,6 @@ public class AesEncryptionService {
 }
 
 
-
-
-
 package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.util;
 
 import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config.JwtProperties;
@@ -258,9 +182,6 @@ public class JwtUtil {
 
 
 }
-
-
-
 
 
 
@@ -340,4 +261,3 @@ public interface SkyServiceMapper {
     return createUserResponse.getContent().getLoginBffResponse().getContent().getResponse().getUid();
   }
 }
-
