@@ -1,4 +1,474 @@
-org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "create table kyc_answer_values (answer_id integer, id integer not null, translation_code varchar(255), value varchar(255), primary key (id))" via JDBC [Error de Sintaxis en sentencia SQL "create table kyc_answer_values (answer_id integer, id integer not null, translation_code varchar(255), [*]value varchar(255), primary key (id))"; se esperaba "identifier"
-Syntax error in SQL statement "create table kyc_answer_values (answer_id integer, id integer not null, translation_code varchar(255), [*]value varchar(255), primary key (id))"; expected "identifier";]
-	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.6.33.Final.jar:6.6.33.Final]
-	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.6.33.Final.jar:6.6.33.Final]
+{
+  "party": {
+    "partyId": "F123456789",
+    "person": {
+      "documents": [
+        {
+          "documentNumber": "50456713W",
+          "documentTypeCode": "SSN",
+          "documentTypeDescription": "Social Security Number",
+          "country": {
+            "code": "US",
+            "name": "United States of America"
+          }
+        }
+      ],
+      "personName": {
+        "fullName": "Mary Elizabeth Clark Butler",
+        "givenName": "Mary",
+        "lastName": "Clark",
+        "middleName": "Elizabeth",
+        "secondLastName": "Butler"
+      },
+      "placeOfBirth": {
+        "country": {
+          "code": "US",
+          "name": "United States of America"
+        }
+      },
+      "firstNationality": {
+        "code": "US",
+        "name": "United States of America"
+      },
+      "secondNationality": {
+        "code": "",
+        "name": ""
+      },
+      "thirdNationality": {
+        "code": "",
+        "name": ""
+      },
+      "civilStatusDescription": "Divorced",
+      "politicalExposure": {
+        "isSelfDeclaredPEP": true,
+        "declarationComments": "I am the mayor of Fuentejuela de Arriba."
+      },
+      "foreignTaxes": [],
+      "birthDate": "1986-01-01",
+      "countryOfResidence": {
+        "code": "US",
+        "name": "United States of America"
+      },
+      "genderDescription": "Male",
+      "employmentInformation": {
+        "occupationCode": "1211",
+        "occupationDescription": "Chief Financial Officer",
+        "statusCode": "",
+        "statusDescription": "",
+        "position": {
+          "code": "",
+          "description": ""
+        },
+        "economicActivity": {
+          "categoryDescription": "Financial and insurance activities",
+          "subCategoryCode": "6491",
+          "subCategoryDescription": "Leasing"
+        },
+        "employer": {
+          "name": "",
+          "typeDescription": "",
+          "address": {
+            "fullAddress": ""
+          }
+        }
+      },
+      "additionalEmployments": []
+    },
+    "organization": {
+      "documents": [],
+      "typeCode": "",
+      "typeDescription": "",
+      "organizationName": {
+        "legalName": "",
+        "tradingName": ""
+      },
+      "foreignTaxes": [],
+      "placeOfRegistration": {
+        "country": {
+          "code": "",
+          "name": ""
+        }
+      },
+      "countryOfOperation": {
+        "code": "",
+        "name": ""
+      },
+      "economicData": {
+        "actualTurnover": {
+          "amount": null,
+          "currency": ""
+        }
+      },
+      "registrationDate": "",
+      "complexOwnershipStructureIndicator": null,
+      "economicActivity": {
+        "categoryDescription": "",
+        "subCategoryCode": "",
+        "subCategoryDescription": ""
+      },
+      "additionalEconomicActivities": [],
+      "otherCountriesOfOperation": []
+    },
+    "statusInfo": {
+      "statusCode": "",
+      "statusDescription": ""
+    },
+    "audit": {
+      "creationDate": ""
+    },
+    "bank": {
+      "center": {
+        "centerId": "",
+        "name": ""
+      }
+    },
+    "structuralSegmentCode": "",
+    "structuralSegmentDescription": "",
+    "structuralSubsegmentCode": "",
+    "structuralSubsegmentDescription": "",
+    "contactPoints": []
+  },
+  "customer": {
+    "confidentialityLevel": ""
+  },
+  "products": [
+    {
+      "family": {
+        "productFamily": {
+          "productFamilyId": "005003001",
+          "name": "Mortgage loans"
+        }
+      },
+      "productCode": "0049300130",
+      "productDescription": "Santander Checking Account"
+    }
+  ],
+  "employee": {
+    "number": "",
+    "person": {
+      "personName": {
+        "fullName": ""
+      }
+    }
+  },
+  "bank": {
+    "bankId": "",
+    "bankName": ""
+  },
+  "preferenceChannel": {
+    "code": "01",
+    "description": "Web"
+  },
+  "knowYourCustomerQuestionnaires": [
+    {
+      "questionnaireId": "0233222",
+      "audit": {
+        "lastUpdateDate": "2025-02-18",
+        "lastUpdateProcess": "Onboarding",
+        "expirationDate": "2028-07-21",
+        "completionDate": "2025-11-15",
+        "submissionDate": "2025-11-17"
+      },
+      "questions": [
+        {
+          "typeDescription": "Simple answer",
+          "translationCode": "05_1G03",
+          "answer": "Self-employed",
+          "answerTranslationCode": "05_1G03",
+          "answers": [
+            {
+              "translationCode": "05_1G03",
+              "values": [
+                "PE"
+              ]
+            }
+          ],
+          "description": "What is your activity?",
+          "questionId": "Q8282838"
+        }
+      ],
+      "version": "1"
+    }
+  ],
+  "knowYourCustomerNonResidents": {
+    "relationshipReason": "",
+    "isInitialDeposit": null,
+    "initialTransactionTypeDescription": "",
+    "amount": {
+      "amount": null,
+      "currency": ""
+    },
+    "originBank": {
+      "bankId": "",
+      "bankName": ""
+    },
+    "location": {
+      "code": "",
+      "name": ""
+    },
+    "otherBankingRelationships": []
+  },
+  "countriesOfRevenue": [],
+  "isInRestrictedCountries": null,
+  "hasPoliticallyExposedPerson": null,
+  "declarationComments": "",
+  "screeningConfirmedFlag": null,
+  "screeningNegativeInformationReference": "",
+  "isPendingNationality": null,
+  "thirdPartyIndicator": null,
+  "purposeOfRelationshipAndSourceOfFunds": {
+    "purposeOfRelationship": "",
+    "typeOfOperations": "",
+    "mainCustomer": "",
+    "mainSupplier": "",
+    "sourceOfWealth": [],
+    "sourceOfFunds": [],
+    "annualIncome": {
+      "amount": null,
+      "currency": ""
+    },
+    "patrimony": {
+      "amount": null,
+      "currency": ""
+    },
+    "purposeOfRelationshipList": []
+  },
+  "customerLinks": [],
+  "localReference": "",
+  "originSystem": "",
+  "audit": {
+    "creationChannel": {
+      "code": "",
+      "description": ""
+    }
+  },
+  "antiMoneyLaundering": {
+    "statusInfo": {
+      "statusCode": ""
+    },
+    "amlId": "",
+    "riskCategories": [],
+    "riskSources": []
+  },
+  "analysisResult": {
+    "analyst": {
+      "kycAnalystId": "",
+      "person": {
+        "personName": {
+          "fullName": ""
+        }
+      },
+      "contactPoint": {
+        "electronicAddress": {
+          "emailAddress": ""
+        }
+      }
+    },
+    "isVerified": null
+  },
+  "unfavourableBackgroundReferences": [],
+  "publicOfficeIndicator": null
+}
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.PoliticalExposure;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.EmploymentInformation;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.Party;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.Person;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+/**
+ * The class representative Mapper
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Mapper(componentModel = "spring")
+public interface KYCEntityMapper {
+
+    JsonMapper jsonMapper = new JsonMapper();
+
+    @Mapping(target = "id", ignore = true)
+    //factor cliente
+    @Mapping(target = "documentNumber", expression = "java(getDocumentNumber(request))")
+    @Mapping(target = "typeCustomer", expression = "java(getTC(request))")// tipo de cliente
+    @Mapping(target = "typeStructure", expression = "java(getValor(request))")//  tipo de pn
+    @Mapping(target = "economicActivityCategory", source = "request.party.person.employmentInformation.economicActivity.categoryDescription")// categoria laboral
+    @Mapping(target = "occupationDescription", source = "request.party.person.employmentInformation.occupationDescription")// profesion, valor del sujeto
+    @Mapping(target = "valueOfTheSubject", expression = "java(getVS(request))")
+    @Mapping(target = "dueDiligenceRegime", expression = "java(getDueDiligenceRegime(request))")// regimen de debida dilgencia
+    @Mapping(target = "backgroundOfBlockingList", expression = "java(getBackgroundOfBlockingList(request))")//antecedente de lista bloqueante
+    @Mapping(target = "isPep", source = "request.party.person.politicalExposure.isSelfDeclaredPEP")// pep
+    @Mapping(target = "birthDate", source = "request.party.person.birthDate")// birthDate
+    @Mapping(target = "ownershipStructure", expression = "java(getOwnershipStructure(request))")
+    //factor canal
+    @Mapping(target = "productDescription", expression = "java(request.getProducts().get(0).getProductDescription())")
+    @Mapping(target = "channelDescription", source = "request.preferenceChannel.description")
+    @Mapping(target = "transactionality", constant = "Transaccionalidad regular")
+    @Mapping(target = "productName", expression = "java(request.getProducts().get(0).getFamily().getProductFamily().getName())")
+    //factor zg
+    @Mapping(target = "countryOfResidence", source = "request.party.person.countryOfResidence.code")// pais de residensia,
+    @Mapping(target = "presenceOfTheGroup", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapPG")// presencia del grupo
+    @Mapping(target = "expCountryRoot", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapEXP")//exp pais rais
+    @Mapping(target = "countryOfBirth", source = "request.party.person.placeOfBirth.country.name")
+    @Mapping(target = "stateOfResidence", source = "request.party.person.countryOfResidence.name")// localidad de residencia
+    Kyc WrapperPostKycResolutionRequestToKycEntity(WrapperPostKycResolutionRequest request);
+
+    @Mapping(target = "kycResolutionId", source = "id")
+    WrapperPostKycResolutionResponse toDto(String id);
+
+    default String getVS(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "5";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "5";
+        }
+        EmploymentInformation employmentInformation = person.getEmploymentInformation();
+        if(employmentInformation == null){
+            return "5";
+        }
+        String ocupation = employmentInformation.getOccupationDescription();
+        if(ocupation == null){
+            return "5";
+        }
+        if ("5ta Categoría".equals(ocupation)){
+            return "1";
+        }
+        return "5";
+    }
+
+    default String getDocumentNumber(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        return person.getDocuments().get(0).getDocumentNumber();
+    }
+
+    default String getTC(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        if(person.getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Persona Natural";
+        }
+        return "";
+    }
+
+    default String getValor(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        if(person.getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Física";
+        }
+        return "";
+    }
+
+
+    default String getDueDiligenceRegime(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        PoliticalExposure politicalExposure = person.getPoliticalExposure();
+        if(politicalExposure == null){
+            return "";
+        }
+        if("Si".equalsIgnoreCase(politicalExposure.getDeclarationComments()) ||
+                politicalExposure.getIsSelfDeclaredPEP()){
+            return "Régimen Reforzado";
+        }
+        return "Régimen General";
+    }
+
+    default String getBackgroundOfBlockingList(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        PoliticalExposure politicalExposure = person.getPoliticalExposure();
+        if(politicalExposure == null){
+            return "";
+        }
+        if("Si".equalsIgnoreCase(politicalExposure.getDeclarationComments())){
+            return "SI";
+        }
+        return "";
+    }
+
+    default String getOwnershipStructure(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        if(person.getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Simple";
+        }
+        return "";
+    }
+
+    @Named("mapEXP")
+    default String getEXP(String countryCode){
+        if("PE".equals(countryCode)){
+            return "No hay Exposición";
+        }
+        return "";
+    }
+
+    @Named("mapPG")
+    default String getPG(String countryCode){
+        if("PE".equals(countryCode)){
+            return "Nacional";
+        }
+        return "";
+    }
+
+    default String toStringJson(Object o){
+        if(o instanceof String){
+            return (String)o;
+        }
+        try {
+            return jsonMapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return "Error al parsear objeto";
+        }
+    }
+}
