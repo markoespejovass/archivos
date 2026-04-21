@@ -1,1 +1,258 @@
 
+import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Presigner;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class S3ConfigTest {
+
+    private final S3Config config = new S3Config();
+
+    @Test
+    void shouldCreateS3Client() {
+        S3Client client = config.s3Client();
+        assertNotNull(client);
+    }
+
+    @Test
+    void shouldCreateS3Presigner() {
+        S3Presigner presigner = config.s3Presigner();
+        assertNotNull(presigner);
+    }
+}
+
+
+
+
+
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class DocumentMapperTest {
+
+    private final DocumentMapper mapper = new DocumentMapper();
+
+    @Test
+    void shouldMapDownload() {
+        String url = "http://test.com";
+
+        var response = mapper.donwloadMapper(url);
+
+        assertNotNull(response);
+        assertEquals(url, response.getAccessInformation().getHref());
+    }
+
+    @Test
+    void shouldMapSearch() {
+        FileEntity entity = new FileEntity();
+        entity.setId("1");
+        entity.setName("file.pdf");
+        entity.setMimeType("application/pdf");
+
+        var response = mapper.searchMapper(List.of(entity));
+
+        assertEquals(1, response.getDocuments().size());
+        assertEquals("1", response.getDocuments().get(0).getDocumentId());
+    }
+
+    @Test
+    void shouldMapToEntity() {
+        WrapperPostDocumentsRequest request = new WrapperPostDocumentsRequest();
+        WrapperMyDocumentRequest doc = new WrapperMyDocumentRequest();
+        doc.setName("file.pdf");
+        doc.setMimeType("application/pdf");
+
+        request.setDocument(doc);
+
+        FileEntity entity = mapper.toEntity(request);
+
+        assertEquals("file.pdf", entity.getName());
+    }
+
+    @Test
+    void shouldMapToDTOUpload() {
+        FileEntity entity = new FileEntity();
+        entity.setId("123");
+
+        var response = mapper.toDTOUpload(entity);
+
+        assertEquals("123", response.getDocument().getDocumentId());
+    }
+
+    @Test
+    void shouldReturnEmptyDTOUploadWhenIdNull() {
+        FileEntity entity = new FileEntity();
+
+        var response = mapper.toDTOUpload(entity);
+
+        assertNull(response.getDocument());
+    }
+
+    @Test
+    void shouldMapGetMapper() {
+        FileEntity entity = new FileEntity();
+        entity.setId("1");
+        entity.setName("file");
+        entity.setMimeType("pdf");
+        entity.setStatus("ACTIVE");
+
+        var response = mapper.getMapper(entity);
+
+        assertEquals("1", response.getDocumentId());
+        assertEquals("file", response.getName());
+    }
+}
+
+
+
+
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+
+import java.util.Base64;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class DocumentManagementAdapterTest {
+
+    @Mock
+    private S3Client s3Client;
+
+    @Mock
+    private S3Presigner s3Presigner;
+
+    @Mock
+    private DocumentMapper mapper;
+
+    @Mock
+    private FileEntityRepository repository;
+
+    @InjectMocks
+    private DocumentManagementAdapter adapter;
+
+    @BeforeEach
+    void setup() {
+        // set bucket manual porque @Value no funciona en test
+        adapter.bucketName = "bucket-test";
+    }
+
+    // ========================
+    // DOWNLOAD
+    // ========================
+    @Test
+    void shouldReturnEmptyWhenRequestNull() {
+        var response = adapter.downloadDocument(new WrapperGetDocumentsRequest());
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenDocumentNotFound() {
+        WrapperGetDocumentsRequest request = new WrapperGetDocumentsRequest();
+        WrapperMyDocumentResponse doc = new WrapperMyDocumentResponse();
+        doc.setDocumentId("123");
+        request.setDocument(doc);
+
+        when(repository.findById("123")).thenReturn(Optional.empty());
+
+        var response = adapter.downloadDocument(request);
+
+        assertNotNull(response);
+    }
+
+    // ========================
+    // UPLOAD
+    // ========================
+    @Test
+    void shouldUploadDocumentSuccessfully() {
+        WrapperPostDocumentsRequest request = new WrapperPostDocumentsRequest();
+        WrapperMyDocumentRequest doc = new WrapperMyDocumentRequest();
+
+        doc.setName("file.pdf");
+        doc.setMimeType("application/pdf");
+        doc.setFolderReference(Base64.getEncoder().encodeToString("data".getBytes()));
+
+        request.setDocument(doc);
+
+        FileEntity entity = new FileEntity();
+        entity.setId("123");
+
+        when(mapper.toEntity(request)).thenReturn(entity);
+        when(repository.save(any())).thenReturn(entity);
+        when(mapper.toDTOUpload(entity)).thenReturn(new WrapperPostDocumentsResponse());
+
+        var response = adapter.uploadDocument(request);
+
+        assertNotNull(response);
+        verify(s3Client).putObject(any(), any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInvalidRequest() {
+        assertThrows(IllegalArgumentException.class,
+                () -> adapter.uploadDocument(new WrapperPostDocumentsRequest()));
+    }
+
+    // ========================
+    // GET DOCUMENT
+    // ========================
+    @Test
+    void shouldReturnDocument() {
+        FileEntity entity = new FileEntity();
+        entity.setId("1");
+
+        when(repository.findById("1")).thenReturn(Optional.of(entity));
+        when(mapper.getMapper(entity)).thenReturn(new WrapperMySearchDocumentResponse());
+
+        var response = adapter.getDocument("1");
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenDocumentNotExists() {
+        when(repository.findById("1")).thenReturn(Optional.empty());
+
+        var response = adapter.getDocument("1");
+
+        assertNotNull(response);
+    }
+
+    // ========================
+    // DELETE
+    // ========================
+    @Test
+    void shouldDeleteDocument() {
+        FileEntity entity = new FileEntity();
+        entity.setId("1");
+        entity.setName("file");
+
+        when(repository.findById("1")).thenReturn(Optional.of(entity));
+
+        adapter.deleteDocument("1");
+
+        verify(s3Client).deleteObject(any());
+        verify(repository).delete(entity);
+    }
+
+    @Test
+    void shouldNotDeleteWhenNotFound() {
+        when(repository.findById("1")).thenReturn(Optional.empty());
+
+        adapter.deleteDocument("1");
+
+        verify(s3Client, never()).deleteObject(any());
+    }
+}
