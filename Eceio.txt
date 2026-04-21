@@ -1,188 +1,62 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.*;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.KnowYourCustomerAdapter;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.*;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
-import com.santander.framework.springboot.core.exceptions.SantanderException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.enhanced.dynamodb.*;
+import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+@Service
+@RequiredArgsConstructor
+public class S3Service {
 
-@ExtendWith(MockitoExtension.class)
-class KnowYourCustomerAdapterTest {
+    private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
-    @Mock
-    private DynamoDbEnhancedClient dynamoDbEnhancedClient;
+    private final String bucket = "tu-bucket";
 
-    @Mock
-    private DynamoDbTable<Kyc> dynamoDbTable;
+    // ✅ UPLOAD
+    public void uploadFile(String key, byte[] fileBytes, String contentType) {
 
-    @Mock
-    private KYCEntityMapper mapper;
-
-    @InjectMocks
-    private KnowYourCustomerAdapter adapter;
-
-    @BeforeEach
-    void setup() {
-        // inyectar nombre de tabla manualmente
-        ReflectionTestUtils.setField(adapter, "tableName", "test-table");
-    }
-
-    private WrapperPostKycResolutionRequest buildRequest() {
-        WrapperPostKycResolutionRequest request = mock(WrapperPostKycResolutionRequest.class);
-        var party = mock(WrapperPostKycResolutionRequest.Party.class);
-
-        when(request.getParty()).thenReturn(party);
-        when(party.getPartyId()).thenReturn("123");
-
-        return request;
-    }
-
-    @Test
-    void shouldCreateKycSuccessfully() {
-        var request = buildRequest();
-        Kyc newEntity = new Kyc();
-
-        when(dynamoDbEnhancedClient.table(anyString(), any()))
-                .thenReturn(dynamoDbTable);
-
-        when(dynamoDbTable.getItem(any(Key.class)))
-                .thenReturn(null); // no existe → OK
-
-        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request))
-                .thenReturn(newEntity);
-
-        when(mapper.toDto(anyString()))
-                .thenReturn(new WrapperPostKycResolutionResponse());
-
-        var response = adapter.createProcesstKyc(request);
-
-        assertNotNull(response);
-        verify(dynamoDbTable).putItem(any(PutItemEnhancedRequest.class));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenDuplicate() {
-        var request = buildRequest();
-
-        when(dynamoDbEnhancedClient.table(anyString(), any()))
-                .thenReturn(dynamoDbTable);
-
-        when(dynamoDbTable.getItem(any(Key.class)))
-                .thenReturn(new Kyc()); // ya existe
-
-        assertThrows(SantanderException.class,
-                () -> adapter.createProcesstKyc(request));
-    }
-
-    @Test
-    void shouldGetKyc() {
-        when(dynamoDbEnhancedClient.table(anyString(), any()))
-                .thenReturn(dynamoDbTable);
-
-        Kyc kyc = new Kyc();
-
-        when(dynamoDbTable.getItem(any(Key.class)))
-                .thenReturn(kyc);
-
-        var result = adapter.getKyc("123");
-
-        assertEquals(kyc, result);
-    }
-}
-
-
-
-
-
-@ExtendWith(MockitoExtension.class)
-class BaseDynamoRepositoryTest {
-
-    @Mock
-    DynamoDbEnhancedClient client;
-
-    @Mock
-    DynamoDbTable<Object> table;
-
-    BaseDynamoRepository<Object> repository;
-
-    @BeforeEach
-    void setup() {
-        when(client.table(anyString(), any())).thenReturn(table);
-
-        repository = new BaseDynamoRepository<>(
-                client,
-                "test-table",
-                TableSchema.fromBean(Object.class),
-                Object.class,
-                "pk",
-                "sk"
-        ) {};
-    }
-
-    @Test
-    void shouldPutIfAbsent() {
-        Object item = new Object();
-
-        repository.putIfAbsent(item);
-
-        verify(table).putItem(any(PutItemEnhancedRequest.class));
-    }
-
-    @Test
-    void shouldGetByKey() {
-        Object item = new Object();
-
-        when(table.getItem(any())).thenReturn(item);
-
-        var result = repository.getByKey("pk", "sk");
-
-        assertTrue(result.isPresent());
-    }
-
-    @Test
-    void shouldReturnEmptyWhenNotFound() {
-        when(table.getItem(any())).thenReturn(null);
-
-        var result = repository.getByKey("pk", "sk");
-
-        assertTrue(result.isEmpty());
-    }
-}
-
-
-
-
-class DynamoDBConfigTest {
-
-    @Test
-    void shouldCreateDynamoDbClient() {
-        DynamoDBConfig config = new DynamoDBConfig();
-        ReflectionTestUtils.setField(config, "awsRegion", "us-east-1");
-
-        var client = config.dynamoDbClient();
-
-        assertNotNull(client);
-    }
-
-    @Test
-    void shouldCreateEnhancedClient() {
-        DynamoDBConfig config = new DynamoDBConfig();
-
-        var dynamoClient = DynamoDbClient.builder()
-                .region(Region.US_EAST_1)
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .contentType(contentType)
                 .build();
 
-        var enhanced = config.dynamoDbEnhancedClient(dynamoClient);
+        s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+    }
 
-        assertNotNull(enhanced);
+    // ✅ DELETE
+    public void deleteFile(String key) {
+
+        DeleteObjectRequest request = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        s3Client.deleteObject(request);
+    }
+
+    // ✅ GENERAR URL DE DESCARGA (Pre-signed)
+    public String generateDownloadUrl(String key) {
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        GetObjectPresignRequest presignRequest =
+                GetObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
+                        .getObjectRequest(getObjectRequest)
+                        .build();
+
+        PresignedGetObjectRequest presignedRequest =
+                s3Presigner.presignGetObject(presignRequest);
+
+        return presignedRequest.url().toString();
     }
 }
-
