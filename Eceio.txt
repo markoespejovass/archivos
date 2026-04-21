@@ -1,6 +1,4 @@
- Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project cpe-nxhbsc-bedocmanagement: Compilation failure: Compilation failure: 
-Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentMapper.java:[3,39] package com.amazonaws.services.s3.model does not exist
-Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentMapper.java:[4,39] package com.amazonaws.services.s3.model does not exist
+Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project cpe-nxhbsc-bedocmanagement: Compilation failure: Compilation failure: 
 Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[4,40] package software.amazon.awssdk.core.sync does not exist
 Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[5,42] package software.amazon.awssdk.services.s3 does not exist
 Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[40,17] cannot find symbol
@@ -10,7 +8,7 @@ Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/
 Error:    symbol:   class S3Client
 Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter
 Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[6,1] package software.amazon.awssdk.services.s3.model does not exist
-Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.java:[4,33] package software.amazon.awssdk.s3 does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.java:[4,42] package software.amazon.awssdk.services.s3 does not exist
 Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.java:[17,12] cannot find symbol
 Error:    symbol:   class S3Client
 Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config.S3Config
