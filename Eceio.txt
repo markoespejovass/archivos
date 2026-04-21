@@ -1,62 +1,24 @@
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.*;
-
-import java.time.Duration;
-
-@Service
-@RequiredArgsConstructor
-public class S3Service {
-
-    private final S3Client s3Client;
-    private final S3Presigner s3Presigner;
-
-    private final String bucket = "tu-bucket";
-
-    // ✅ UPLOAD
-    public void uploadFile(String key, byte[] fileBytes, String contentType) {
-
-        PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .contentType(contentType)
-                .build();
-
-        s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
-    }
-
-    // ✅ DELETE
-    public void deleteFile(String key) {
-
-        DeleteObjectRequest request = DeleteObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        s3Client.deleteObject(request);
-    }
-
-    // ✅ GENERAR URL DE DESCARGA (Pre-signed)
-    public String generateDownloadUrl(String key) {
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        GetObjectPresignRequest presignRequest =
-                GetObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
-                        .getObjectRequest(getObjectRequest)
-                        .build();
-
-        PresignedGetObjectRequest presignedRequest =
-                s3Presigner.presignGetObject(presignRequest);
-
-        return presignedRequest.url().toString();
-    }
-}
+ Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project cpe-nxhbsc-bedocmanagement: Compilation failure: Compilation failure: 
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentMapper.java:[3,39] package com.amazonaws.services.s3.model does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentMapper.java:[4,39] package com.amazonaws.services.s3.model does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[4,40] package software.amazon.awssdk.core.sync does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[5,42] package software.amazon.awssdk.services.s3 does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[40,17] cannot find symbol
+Error:    symbol:   class S3Client
+Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[36,1] cannot find symbol
+Error:    symbol:   class S3Client
+Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapter.java:[6,1] package software.amazon.awssdk.services.s3.model does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.java:[4,33] package software.amazon.awssdk.s3 does not exist
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/main/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.java:[17,12] cannot find symbol
+Error:    symbol:   class S3Client
+Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config.S3Config
+Error:  -> [Help 1]
+Error:  
+Error:  To see the full stack trace of the errors, re-run Maven with the -e switch.
+Error:  Re-run Maven using the -X switch to enable full debug logging.
+Error:  
+Error:  For more information about the errors and possible solutions, please read the following articles:
+Error:  [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Error: Process completed with exit code 1.
