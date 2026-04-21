@@ -1,62 +1,386 @@
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+
+
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Presigner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * The class representative Xml config
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+public class S3Config {
+
+    @Bean
+    public S3Client s3Client() {
+        return S3Client.builder().build();
+    }
+
+    @Bean
+    public S3Presigner s3Presigner() {
+        return S3Presigner.builder().build();
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+
+
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.*;
 
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.UUID;
 
-@Service
+
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSpecificationBuilder.build;
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
+
+
+/**
+ * The class representative Otp adaptarer
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
 @RequiredArgsConstructor
-public class S3Service {
+@Slf4j
+public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
 
-    private final S3Client s3Client;
-    private final S3Presigner s3Presigner;
+  private final S3Client s3Client;
 
-    private final String bucket = "tu-bucket";
+  private final S3Presigner s3Presigner;
 
-    // ✅ UPLOAD
-    public void uploadFile(String key, byte[] fileBytes, String contentType) {
+  private final DocumentMapper mapper;
 
-        PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .contentType(contentType)
-                .build();
+  private final FileEntityRepository repository;
 
-        s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+  @Value("${aws.bucket}")
+  private String bucketName;
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
+    String documentId;
+    String url;
+    WrapperMyDocumentResponse documentResponse;
+    if(criteria.getDocument() == null){
+      return new WrapperGetDocumentsResponse();
+    }
+    documentResponse = criteria.getDocument();
+    if(documentResponse.getDocumentId() == null){
+      return new WrapperGetDocumentsResponse();
+    }
+    documentId = documentResponse.getDocumentId();
+    Optional<FileEntity> fileEntity = repository.findById(documentId);
+
+    if(fileEntity.isEmpty()){
+      return new WrapperGetDocumentsResponse();
+    }
+    url = generateDownloadUrl(fileEntity.get().getId());
+
+    return mapper.donwloadMapper(url);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostSearchDocumentsResponse searchDocuments(
+      WrapperPostSearchDocumentsRequest criteria) {
+    var paramters = criteria.getSearchParameters();
+    if (paramters == null){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    if(paramters.getSearchProperties() == null || paramters.getSearchProperties().isEmpty()){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    if(paramters.getDiscriminator() == null){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    Specification<FileEntity> entitySpecification = build(paramters.getSearchProperties(), paramters.getDiscriminator());
+
+    var objectListing = repository.findAll(entitySpecification);
+    return mapper.searchMapper(objectListing);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
+
+    validateRequest(criteria);
+
+    String documentId = UUID.randomUUID().toString();
+    String key = generateKey(documentId);
+
+    try {
+      var document = criteria.getDocument();
+      if(document == null){
+        return new WrapperPostDocumentsResponse();
+      }
+      if (document.getFolderReference()==null){
+        return new WrapperPostDocumentsResponse();
+      }
+      byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
+
+      PutObjectRequest request = PutObjectRequest.builder()
+              .bucket(bucketName)
+              .key(key)
+              .contentType(document.getMimeType())
+              .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+
+      // ✅ mapear entity
+      FileEntity entity = mapper.toEntity(criteria);
+
+      // guardar
+      entity = repository.save(entity);
+
+      return mapper.toDTOUpload(entity);
+
+    } catch (Exception ex) {
+      log.error("Error uploading document", ex);
+      throw new RuntimeException("Error uploading document to S3", ex);
+    }
+  }
+
+  private void validateRequest(WrapperPostDocumentsRequest criteria) {
+
+    if (criteria == null || criteria.getDocument() == null) {
+      throw new IllegalArgumentException("Document is required");
     }
 
-    // ✅ DELETE
-    public void deleteFile(String key) {
-
-        DeleteObjectRequest request = DeleteObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        s3Client.deleteObject(request);
+    var doc = criteria.getDocument();
+    if (doc == null){
+      throw new IllegalArgumentException("File (base64) is required");
+    }
+    String folder = doc.getFolderReference();
+    if (folder == null ) {
+      throw new IllegalArgumentException("File (base64) is required");
     }
 
-    // ✅ GENERAR URL DE DESCARGA (Pre-signed)
-    public String generateDownloadUrl(String key) {
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        GetObjectPresignRequest presignRequest =
-                GetObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
-                        .getObjectRequest(getObjectRequest)
-                        .build();
-
-        PresignedGetObjectRequest presignedRequest =
-                s3Presigner.presignGetObject(presignRequest);
-
-        return presignedRequest.url().toString();
+    if (folder.isEmpty()) {
+      throw new IllegalArgumentException("File (base64) is required");
     }
+    String name = doc.getName();
+    if (name == null) {
+      throw new IllegalArgumentException("File name is required");
+    }
+
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("File name is required");
+    }
+  }
+
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperMySearchDocumentResponse getDocument(String documentId) {
+    var objectMetadataOptional =repository.findById(documentId);
+    if(objectMetadataOptional.isEmpty()){
+      return new WrapperMySearchDocumentResponse();
+    }
+    var objectMetadata = objectMetadataOptional.get();
+    return mapper.getMapper(objectMetadata);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public Void deleteDocument(String documentId) {
+    Optional<FileEntity> fileEntityOptional = repository.findById(documentId);
+    if (fileEntityOptional.isEmpty()){
+      return null;
+    }
+    FileEntity fileEntity = fileEntityOptional.get();
+    String filename = generateKey(fileEntity.getName());
+    DeleteObjectRequest request = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(filename)
+            .build();
+
+    s3Client.deleteObject(request);
+    repository.delete(fileEntity);
+    return null;
+  }
+
+  private String generateDownloadUrl(String key) {
+
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build();
+
+    GetObjectPresignRequest presignRequest =
+            GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+
+    PresignedGetObjectRequest presignedRequest =
+            s3Presigner.presignGetObject(presignRequest);
+
+    return presignedRequest.url().toString();
+  }
+
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+
+/**
+ * The class representative Otp adaptarer
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@Slf4j
+public class DocumentMapper {
+
+    /**
+     * Metodo de salida para validar otp
+     *
+     * @param url valor del onjecto request
+     * @return WrapperClassifyEmail objecto de response valid
+     */
+    public WrapperGetDocumentsResponse donwloadMapper(String url){
+        WrapperGetDocumentsResponse response = new WrapperGetDocumentsResponse();
+        LinkReference linkReference = new LinkReference();
+        linkReference.setHref(url);
+        response.setAccessInformation(linkReference);
+        return response;
+    }
+
+    /**
+     * Metodo de salida para validar otp
+     *
+     * @param objectListing valor del onjecto request
+     * @return WrapperClassifyEmail objecto de response valid
+     */
+    public WrapperPostSearchDocumentsResponse searchMapper(List<FileEntity> objectListing){
+        WrapperPostSearchDocumentsResponse response = new WrapperPostSearchDocumentsResponse();
+        List<WrapperMySearchDocumentResponse> documents = objectListing.stream().map(objectSumary ->{
+            WrapperMySearchDocumentResponse wrapper = new WrapperMySearchDocumentResponse();
+            wrapper.setDocumentId(objectSumary.getId());
+            wrapper.setName(objectSumary.getName());
+            wrapper.setMimeType(objectSumary.getMimeType());
+            return wrapper;
+        }).collect(Collectors.toList());
+        response.setDocuments(documents);
+        return response;
+    }
+
+    /**
+     * Metodo de salida para validar otp
+     *
+     * @param documentId valor del onjecto request
+     * @return WrapperClassifyEmail objecto de response valid
+     */
+    public WrapperPostDocumentsResponse uploadMapper(String documentId){
+        WrapperMyDocumentResponse documentResponse = new WrapperMyDocumentResponse();
+        documentResponse.documentId(documentId);
+        WrapperPostDocumentsResponse response = new WrapperPostDocumentsResponse();
+        response.setDocument(documentResponse);
+        return response;
+    }
+
+    public FileEntity toEntity(WrapperPostDocumentsRequest criteria){
+        FileEntity entity = new FileEntity();
+        WrapperMyDocumentRequest documentRequest = criteria.getDocument();
+        if(documentRequest == null){
+            return new FileEntity();
+        }
+        if (documentRequest.getName() == null){
+            return new FileEntity();
+        }
+        entity.setName(documentRequest.getName());
+        entity.setMimeType(documentRequest.getMimeType());
+
+        return entity;
+    }
+
+
+    public WrapperPostDocumentsResponse toDTOUpload(FileEntity criteria){
+        WrapperPostDocumentsResponse entity = new WrapperPostDocumentsResponse();
+        WrapperMyDocumentResponse documentResponse = new WrapperMyDocumentResponse();
+        if(criteria.getId() == null){
+            return new WrapperPostDocumentsResponse();
+        }
+        documentResponse.setDocumentId(criteria.getId());
+
+        entity.setDocument(documentResponse);
+        return entity;
+    }
+
+    /**
+     * Metodo de salida para validar otp
+     *
+     * @param entity valor de la entidad
+     * @return WrapperClassifyEmail objecto de response valid
+     */
+    public WrapperMySearchDocumentResponse getMapper(FileEntity entity){
+        WrapperMySearchDocumentResponse response = new WrapperMySearchDocumentResponse();
+        response.setName(entity.getName());
+        response.setDocumentId(entity.getId());
+        response.setStatus((new WrapperMySearchDocumentResponseStatus()).statusCode(entity.getStatus()));
+        response.setMimeType(entity.getMimeType());
+        return response;
+    }
+
 }
