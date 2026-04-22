@@ -1,6 +1,7 @@
-Error:  Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project cpe-nxhbsc-bedocmanagement: Compilation failure
-Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[157,34] reference to deleteObject is ambiguous
-Error:    both method deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest) in software.amazon.awssdk.services.s3.S3Client and method deleteObject(java.util.function.Consumer<software.amazon.awssdk.services.s3.model.DeleteObjectRequest.Builder>) in software.amazon.awssdk.services.s3.S3Client match
+Error:  Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.5:test (default-test) on project cpe-nxhbsc-bedocmanagement: 
+Error:  
+Error:  See /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/target/surefire-reports for the individual test results.
+Error:  See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
 Error:  -> [Help 1]
 Error:  
 Error:  To see the full stack trace of the errors, re-run Maven with the -e switch.
