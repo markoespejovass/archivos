@@ -1,68 +1,14 @@
-[
-  {
-    "id": 1,
-    "factorCode": "SCORE",
-    "inputCode": "FACTOR_CLIENTE",
-    "weight": 0.6
-  },
-  {
-    "id": 2,
-    "factorCode": "SCORE",
-    "inputCode": "FACTOR_CANAL",
-    "weight": 0.2
-  },
-  {
-    "id": 3,
-    "factorCode": "SCORE",
-    "inputCode": "FACTOR_ZG",
-    "weight": 0.2
-  }
-]
-
-
-
-
-[
-  { "id": 10, "factorCode": "FACTOR_CLIENTE", "inputCode": "TC", "weight": 0.05 },
-  { "id": 11, "factorCode": "FACTOR_CLIENTE", "inputCode": "CL", "weight": 0.05 },
-  { "id": 12, "factorCode": "FACTOR_CLIENTE", "inputCode": "VALOR", "weight": 0.05 },
-  { "id": 13, "factorCode": "FACTOR_CLIENTE", "inputCode": "P", "weight": 0.05 },
-  { "id": 14, "factorCode": "FACTOR_CLIENTE", "inputCode": "SO", "weight": 0.1 },
-  { "id": 15, "factorCode": "FACTOR_CLIENTE", "inputCode": "RDD", "weight": 0.2 },
-  { "id": 16, "factorCode": "FACTOR_CLIENTE", "inputCode": "ALB", "weight": 0.2 },
-  { "id": 17, "factorCode": "FACTOR_CLIENTE", "inputCode": "PEP", "weight": 0.2 },
-  { "id": 18, "factorCode": "FACTOR_CLIENTE", "inputCode": "RE", "weight": 0.0 },
-  { "id": 19, "factorCode": "FACTOR_CLIENTE", "inputCode": "EP", "weight": 0.1 }
-]
-
-
-
-[
-  { "id": 30, "factorCode": "FACTOR_CANAL", "inputCode": "TP2", "weight": 0.25 },
-  { "id": 31, "factorCode": "FACTOR_CANAL", "inputCode": "CD", "weight": 0.25 },
-  { "id": 32, "factorCode": "FACTOR_CANAL", "inputCode": "T", "weight": 0.35 },
-  { "id": 33, "factorCode": "FACTOR_CANAL", "inputCode": "M", "weight": 0.15 }
-]
-
-
-
-[
-  { "id": 40, "factorCode": "FACTOR_ZG", "inputCode": "L", "weight": 0.2 },
-  { "id": 41, "factorCode": "FACTOR_ZG", "inputCode": "P2", "weight": 0.25 },
-  { "id": 42, "factorCode": "FACTOR_ZG", "inputCode": "R", "weight": 0.25 },
-  { "id": 43, "factorCode": "FACTOR_ZG", "inputCode": "PG", "weight": 0.1 },
-  { "id": 44, "factorCode": "FACTOR_ZG", "inputCode": "EXP", "weight": 0.2 }
-]
-
-
-
-
-
-[
-  { "id": 100, "inputCode": "TC", "valueText": "ALTO", "valueNumeric": 10 },
-  { "id": 101, "inputCode": "TC", "valueText": "MEDIO", "valueNumeric": 5 },
-  { "id": 102, "inputCode": "TC", "valueText": "BAJO", "valueNumeric": 1 },
-
-  { "id": 103, "inputCode": "PEP", "valueText": "SI", "valueNumeric": 0 },
-  { "id": 104, "inputCode": "PEP", "valueText": "NO", "valueNumeric": 10 }
-]
+Error:  Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project cpe-nxhbsc-bedocmanagement: Compilation failure: Compilation failure: 
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[98,69] cannot find symbol
+Error:    symbol:   class RequestBody
+Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[155,34] reference to deleteObject is ambiguous
+Error:    both method deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest) in software.amazon.awssdk.services.s3.S3Client and method deleteObject(java.util.function.Consumer<software.amazon.awssdk.services.s3.model.DeleteObjectRequest.Builder>) in software.amazon.awssdk.services.s3.S3Client match
+Error:  -> [Help 1]
+Error:  
+Error:  To see the full stack trace of the errors, re-run Maven with the -e switch.
+Error:  Re-run Maven using the -X switch to enable full debug logging.
+Error:  
+Error:  For more information about the errors and possible solutions, please read the following articles:
+Error:  [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Error: Process completed with exit code 1.
