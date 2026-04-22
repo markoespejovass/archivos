@@ -1,8 +1,5 @@
-Error:  Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project cpe-nxhbsc-bedocmanagement: Compilation failure: Compilation failure: 
-Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[98,69] cannot find symbol
-Error:    symbol:   class RequestBody
-Error:    location: class com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest
-Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[155,34] reference to deleteObject is ambiguous
+Error:  Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project cpe-nxhbsc-bedocmanagement: Compilation failure
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[157,34] reference to deleteObject is ambiguous
 Error:    both method deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest) in software.amazon.awssdk.services.s3.S3Client and method deleteObject(java.util.function.Consumer<software.amazon.awssdk.services.s3.model.DeleteObjectRequest.Builder>) in software.amazon.awssdk.services.s3.S3Client match
 Error:  -> [Help 1]
 Error:  
