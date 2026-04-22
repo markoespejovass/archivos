@@ -1,128 +1,15 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.constant;
-
-/**
- * The class representative Constant
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-public final class ConstantScore {
-
-    public static double PESO_FACTOR_CLIENTE = 0.6;
-    public static double PESO_FACTOR_CANAL = 0.2;
-    public static double PESO_FACTOR_ZG = 0.2;
-
-    // Para calcular el factor cliente
-    public static double PESO_TC = 0.05;
-    public static double PESO_CL = 0.05;
-    public static double PESO_VALOR = 0.05;
-    public static double PESO_P = 0.05;
-    public static double PESO_SO = 0.1;
-    public static double PESO_RDD = 0.2;
-    public static double PESO_ALB = 0.2;
-    public static double PESO_PEP = 0.2;
-    public static double PESO_RE = 0.0;
-    public static double PESO_EP = 0.1;
-
-
-    // Para calcular el factor canal
-    public static double PESO_TP2 = 0.25;
-    public static double PESO_CD = 0.25;
-    public static double PESO_T = 0.35;
-    public static double PESO_M = 0.15;
-
-    // Para calcular el factor zg
-    public static double PESO_L = 0.2;
-    public static double PESO_P2 = 0.25;
-    public static double PESO_R = 0.25;
-    public static double PESO_PG = 0.1;
-    public static double PESO_EXP = 0.2;
-
-
-    public static double PESO_DEFAULT = 5.0;
-}
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
-
-import jakarta.annotation.Generated;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-
-
-/** FactorRule is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
-@Getter
-@Setter
-@NoArgsConstructor
-@Entity
-@Table(name = "factor_rule")
-@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
-public class FactorRule {
-
-    @Id
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "factor_code")
-    private String factorCode;//SCORE
-
-    @Column(name = "input_code")
-    private String inputCode;//Factor canal
-
-    @Column(name = "weight")
-    private java.math.BigDecimal weight;//0.6
-
-
-
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
-
-import jakarta.annotation.Generated;
-import java.io.Serializable;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import jakarta.persistence.Id;
-
-/** ValueMapping is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
-@Getter
-@Setter
-@NoArgsConstructor
-@Entity
-@Table(name = "value_mapping")
-@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
-public class ValueMapping {
-
-    @Id
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "input_code")
-    private String inputCode;
-
-    @Column(name = "value_text")
-    private String valueText;
-
-    @Column(name = "value_numeric")
-    private java.math.BigDecimal valueNumeric;
-
-
-
-}
+Error:  Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project cpe-nxhbsc-bedocmanagement: Compilation failure: Compilation failure: 
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[97,25] reference to putObject is ambiguous
+Error:    both method putObject(software.amazon.awssdk.services.s3.model.PutObjectRequest,java.nio.file.Path) in software.amazon.awssdk.services.s3.S3Client and method putObject(java.util.function.Consumer<software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder>,java.nio.file.Path) in software.amazon.awssdk.services.s3.S3Client match
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[144,25] reference to deleteObject is ambiguous
+Error:    both method deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest) in software.amazon.awssdk.services.s3.S3Client and method deleteObject(java.util.function.Consumer<software.amazon.awssdk.services.s3.model.DeleteObjectRequest.Builder>) in software.amazon.awssdk.services.s3.S3Client match
+Error:  /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/src/test/java/com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/adapters/output/DocumentManagementAdapterTest.java:[154,34] reference to deleteObject is ambiguous
+Error:    both method deleteObject(software.amazon.awssdk.services.s3.model.DeleteObjectRequest) in software.amazon.awssdk.services.s3.S3Client and method deleteObject(java.util.function.Consumer<software.amazon.awssdk.services.s3.model.DeleteObjectRequest.Builder>) in software.amazon.awssdk.services.s3.S3Client match
+Error:  -> [Help 1]
+Error:  
+Error:  To see the full stack trace of the errors, re-run Maven with the -e switch.
+Error:  Re-run Maven using the -X switch to enable full debug logging.
+Error:  
+Error:  For more information about the errors and possible solutions, please read the following articles:
+Error:  [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+Error: Process completed with exit code 1.
