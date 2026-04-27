@@ -1,205 +1,201 @@
-sh-5.2$ kubectl logs cpe-nxhbsc-bedocmanagement-micro-java-6fd878d588-drrbx -n cpe-nexhub-tec-dev
-
-Defaulted container "cpe-nxhbsc-bedocmanagement" out of: cpe-nxhbsc-bedocmanagement, install-oneagent (init)
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
-
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
- 
-             %%
-
-             %%%
-
-          %   %%%                    %%%%                                                                   %%%%
-
-          %%   %%%%               %%     %%                                                                   %%
-
-          %%%%   %%%              %%      %                              %                                    %%
-
-       %%   %%%   %%%%%           %%%%           %%%        %  %%      %%%       %%%        %  %%         %%% %%       %%%       %  %%
-
-   %%%%%%%   %%%% %%%%%%%%          %%%%%%     %%  %%%    %%%   %%%   %%%%%    %%   %%    %%%   %%%    %%%    %%    %%    %%  %%%%%  %
-
-%%%%%%%%%%%  %%%%%%%%%%%%%            %%%%         %%    %%%    %%    %%%          %%    %%%    %%   %%%     %%   %%%%%%%%%%   %%
-
-%%%%%%%%%%%%  %%%%%%%%%%%%      %       %%%   %%%%%%%    %%%    %%    %%%     %%%%%%%    %%%    %%   %%%     %%   %%%          %%
-
-  %%%%%%%%%%%%%%%%%%%%%%%%       %%      %%   %%    %%    %%%    %%    %%%    %%    %%    %%%    %%   %%%     %%    %%%         %%
-
-     %%%%%%%%%%%%%%%%%%           %%%%%%%%     %%%% %%%  %%%%% %%%%%%   %%%%   %%%% %%%  %%%%% %%%%%%   %%%%% %%%    %%%%%%   %%%%%%
- 
-:: Spring Boot  (v3.5.13) ::                                                                  :: Santander Spring Boot (v1.5.1) ::
- 
-2026-04-24T19:22:24.988+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication v1.0.0-SNAPSHOTusing Java 17.0.18 with PID 1 (/opt/app/BOOT-INF/classes started by java in /opt/app)
-
-2026-04-24T19:22:25.000+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "cert"
-
-2026-04-24T19:22:29.701+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-
-2026-04-24T19:22:30.189+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 474 ms. Found 1 JPA repository interface.
-
-2026-04-24T19:22:31.112+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.s.c.c.s.GenericScope                   : BeanFactory id=c493db9a-2170-39ff-85a8-0274bdd64303
-
-2026-04-24T19:22:33.697+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.s.b.w.e.t.TomcatWebServer              : Tomcat initialized with port 8080 (http)
-
-2026-04-24T19:22:33.727+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.a.c.c.StandardService                  : Starting service [Tomcat]
-
-2026-04-24T19:22:33.727+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.a.c.c.StandardEngine                   : Starting Servlet engine: [Apache Tomcat/10.1.54]
-
-2026-04-24T19:22:33.894+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.a.c.c.C.[.[.[/]                        : Initializing Spring embedded WebApplicationContext
-
-2026-04-24T19:22:33.897+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completedin 8714 ms
-
-2026-04-24T19:22:33.996+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.c.c.CoreServletAutoConfig        : Initializing SERVLET configuration for Santander Spring Boot Core library...
-
-2026-04-24T19:22:34.177+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelServletAutoConfig : Initializing SERVLET configuration for Santander spring Boot  OmniChannel library...
-
-2026-04-24T19:22:34.181+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Initializing BASE configuration for Santander springBoot OmniChannel library...
-
-2026-04-24T19:22:34.370+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Santander Spring Boot OmniChannel config = {ALL={RML=ContactPoint.ContactPointBuilder(originChannel=RML, marcoChannel=RML, environment=INTERNET, logicalChannel=0031, physicalChannel=0019, commercialChannel=BML, operationalChannel=BML, application=, device=, operatingSystem=, medium=, userType=), RCA=ContactPoint.ContactPointBuilder(originChannel=RCA, marcoChannel=RCA, environment=INTRANET, logicalChannel=0001, physicalChannel=0018, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), OFI=ContactPoint.ContactPointBuilder(originChannel=OFI, marcoChannel=OFI, environment=INTRANET, logicalChannel=0007, physicalChannel=0019, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), PUB=ContactPoint.ContactPointBuilder(originChannel=PUB, marcoChannel=INT, environment=INTERNET, logicalChannel=0080, physicalChannel=0101, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), PLR=ContactPoint.ContactPointBuilder(originChannel=PLR, marcoChannel=PLR, environment=INTERNET, logicalChannel=5017, physicalChannel=0060, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), CIC=ContactPoint.ContactPointBuilder(originChannel=CIC, marcoChannel=CIC, environment=CONTACTCENTER, logicalChannel=0029, physicalChannel=0018, commercialChannel=020, operationalChannel=020, application=, device=, operatingSystem=, medium=, userType=), EMP=ContactPoint.ContactPointBuilder(originChannel=EMP, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0022, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), INT=ContactPoint.ContactPointBuilder(originChannel=INT, marcoChannel=INT, environment=INTERNET, logicalChannel=0001, physicalChannel=0022, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), EMP_MOV=ContactPoint.ContactPointBuilder(originChannel=EMP_MOV, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0033, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), OBD=ContactPoint.ContactPointBuilder(originChannel=OBD, marcoChannel=INT, environment=INTERNET, logicalChannel=0079, physicalChannel=0099, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=)}}
-
-2026-04-24T19:22:35.110+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Initializing BASE configuration for Logging library...
-
-2026-04-24T19:22:35.267+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.l.c.LoggingProperties            : Gluonlog Log format configured
-
-2026-04-24T19:22:35.573+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Using santander.logging.observability.filter.black-list: [spring.security.authorizations, spring.security.filterchains, spring.security.http.secured.requests, spring.security.http.unsecured.requests]
-
-2026-04-24T19:22:36.411+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Starting...
-
-2026-04-24T19:22:36.877+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.z.h.p.HikariPool                       : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:c546327e-a134-4794-a9b9-fec007f5c13d user=SA
-
-2026-04-24T19:22:36.879+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Start completed.
-
-2026-04-24T19:22:36.996+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.h.j.i.u.LogHelper                      : HHH000204: Processing PersistenceUnitInfo [name: default]
-
-2026-04-24T19:22:37.110+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.h.Version                              : HHH000412: Hibernate ORM core version 6.6.45.Final
-
-2026-04-24T19:22:37.210+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.h.c.i.RegionFactoryInitiator           : HHH000026: Second-level cache disabled
-
-2026-04-24T19:22:37.926+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-
-2026-04-24T19:22:38.099+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.h.o.c.pooling                          : HHH10001005: Database info:
-
-        Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-
-        Database driver: undefined/unknown
-
-        Database version: 2.3.232
-
-        Autocommit mode: undefined/unknown
-
-        Isolation level: undefined/unknown
-
-        Minimum pool size: undefined/unknown
-
-        Maximum pool size: undefined/unknown
-
-2026-04-24T19:22:38.376+02:00 ERROR 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] j.LocalContainerEntityManagerFactoryBean : Failed to initialize JPA EntityManagerFactory: Entity 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity' has no identifier (every '@Entity' class must declare or inherit at least one '@Id' or '@EmbeddedId' property)
-
-2026-04-24T19:22:38.377+02:00  WARN 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Entity 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity' has no identifier (every '@Entity' class must declare or inherit at least one '@Id' or '@EmbeddedId' property)
-
-2026-04-24T19:22:38.378+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Shutdown initiated...
-
-2026-04-24T19:22:38.382+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] c.z.h.HikariDataSource                   : HikariPool-1 - Shutdown completed.
-
-2026-04-24T19:22:38.389+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.a.c.c.StandardService                  : Stopping service [Tomcat]
-
-2026-04-24T19:22:38.481+02:00  INFO 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] .s.b.a.l.ConditionEvaluationReportLogger :
- 
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-
-2026-04-24T19:22:38.506+02:00 ERROR 1 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.s.b.SpringApplication                  : Application run failed
- 
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Entity 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity' has no identifier (every '@Entity' class must declare or inherit at least one '@Id' or '@EmbeddedId' property)
-
-        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:974) ~[spring-context-6.2.17.jar:6.2.17]
-
-        at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628) ~[spring-context-6.2.17.jar:6.2.17]
-
-        at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.5.13.jar:3.5.13]
-
-        at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) [spring-boot-3.5.13.jar:3.5.13]
-
-        at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) [spring-boot-3.5.13.jar:3.5.13]
-
-        at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) [spring-boot-3.5.13.jar:3.5.13]
-
-        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) [spring-boot-3.5.13.jar:3.5.13]
-
-        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) [spring-boot-3.5.13.jar:3.5.13]
-
-        at com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.OpenApiGeneratorApplication.main(OpenApiGeneratorApplication.java:17) [classes/:1.0.0-SNAPSHOT]
-
-        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
-
-        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[?:?]
-
-        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
-
-        at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[?:?]
-
-        at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:106) [app/:?]
-
-        at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:64) [app/:?]
-
-        at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:40) [app/:?]
-
-Caused by: org.hibernate.AnnotationException: Entity 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity' has no identifier (every '@Entity' class must declare or inherit at least one '@Id' or '@EmbeddedId' property)
-
-        at org.hibernate.boot.model.internal.InheritanceState.determineDefaultAccessType(InheritanceState.java:289) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.internal.InheritanceState.getElementsToProcess(InheritanceState.java:226) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.internal.InheritanceState.postProcess(InheritanceState.java:162) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.internal.EntityBinder.handleIdentifier(EntityBinder.java:410) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.internal.EntityBinder.bindEntityClass(EntityBinder.java:251) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.internal.AnnotationBinder.bindClass(AnnotationBinder.java:404) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.source.internal.annotations.AnnotationMetadataSourceProcessorImpl.processEntityHierarchies(AnnotationMetadataSourceProcessorImpl.java:266) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.process.spi.MetadataBuildingProcess$1.processEntityHierarchies(MetadataBuildingProcess.java:281) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:324) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1442) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1513) ~[hibernate-core-6.6.45.Final.jar:6.6.45.Final]
-
-        at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.17.jar:6.2.17]
-
-        at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:388) ~[spring-orm-6.2.17.jar:6.2.17]
-
-        at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.17.jar:6.2.17]
-
-        at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.17.jar:6.2.17]
-
-        at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:364) ~[spring-orm-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822) ~[spring-beans-6.2.17.jar:6.2.17]
-
-        ... 22 more
-
- 
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.PoliticalExposure;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.EmploymentInformation;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.Party;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.Person;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+/**
+ * The class representative Mapper
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Mapper(componentModel = "spring")
+public interface KYCEntityMapper {
+
+    JsonMapper jsonMapper = new JsonMapper();
+
+    @Mapping(target = "id", ignore = true)
+    //factor cliente
+    @Mapping(target = "documentNumber", expression = "java(getDocumentNumber(request))")
+    @Mapping(target = "typeCustomer", expression = "java(getTC(request))")// tipo de cliente
+    @Mapping(target = "typeStructure", expression = "java(getValor(request))")//  tipo de pn
+    @Mapping(target = "economicActivityCategory", source = "request.party.person.employmentInformation.economicActivity.categoryDescription")// categoria laboral
+    @Mapping(target = "occupationDescription", source = "request.party.person.employmentInformation.occupationDescription")// profesion, valor del sujeto
+    @Mapping(target = "valueOfTheSubject", expression = "java(getVS(request))")
+    @Mapping(target = "dueDiligenceRegime", expression = "java(getDueDiligenceRegime(request))")// regimen de debida dilgencia
+    @Mapping(target = "backgroundOfBlockingList", expression = "java(getBackgroundOfBlockingList(request))")//antecedente de lista bloqueante
+    @Mapping(target = "isPep", source = "request.party.person.politicalExposure.isSelfDeclaredPEP")// pep
+    @Mapping(target = "birthDate", source = "request.party.person.birthDate")// birthDate
+    @Mapping(target = "ownershipStructure", expression = "java(getOwnershipStructure(request))")
+    //factor canal
+    @Mapping(target = "productDescription", expression = "java(request.getProducts().get(0).getProductDescription())")
+    @Mapping(target = "channelDescription", source = "request.preferenceChannel.description")
+    @Mapping(target = "transactionality", constant = "Transaccionalidad regular")
+    @Mapping(target = "productName", expression = "java(request.getProducts().get(0).getFamily().getProductFamily().getName())")
+    //factor zg
+    @Mapping(target = "countryOfResidence", source = "request.party.person.countryOfResidence.code")// pais de residensia,
+    @Mapping(target = "presenceOfTheGroup", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapPG")// presencia del grupo
+    @Mapping(target = "expCountryRoot", source = "request.party.person.countryOfResidence.code", qualifiedByName = "mapEXP")//exp pais rais
+    @Mapping(target = "countryOfBirth", source = "request.party.person.placeOfBirth.country.name")
+    @Mapping(target = "stateOfResidence", source = "request.party.person.countryOfResidence.name")// localidad de residencia
+    Kyc WrapperPostKycResolutionRequestToKycEntity(WrapperPostKycResolutionRequest request);
+
+    @Mapping(target = "kycResolutionId", source = "id")
+    WrapperPostKycResolutionResponse toDto(String id);
+
+    default String getVS(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "5";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "5";
+        }
+        EmploymentInformation employmentInformation = person.getEmploymentInformation();
+        if(employmentInformation == null){
+            return "5";
+        }
+        String ocupation = employmentInformation.getOccupationDescription();
+        if(ocupation == null){
+            return "5";
+        }
+        if ("5ta Categoría".equals(ocupation)){
+            return "1";
+        }
+        return "5";
+    }
+
+    default String getDocumentNumber(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        return person.getDocuments().get(0).getDocumentNumber();
+    }
+
+    default String getTC(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        if(person.getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Persona Natural";
+        }
+        return "";
+    }
+
+    default String getValor(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        if(person.getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Física";
+        }
+        return "";
+    }
+
+
+    default String getDueDiligenceRegime(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        PoliticalExposure politicalExposure = person.getPoliticalExposure();
+        if(politicalExposure == null){
+            return "";
+        }
+        if("Si".equalsIgnoreCase(politicalExposure.getDeclarationComments()) ||
+                politicalExposure.getIsSelfDeclaredPEP()){
+            return "Régimen Reforzado";
+        }
+        return "Régimen General";
+    }
+
+    default String getBackgroundOfBlockingList(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        PoliticalExposure politicalExposure = person.getPoliticalExposure();
+        if(politicalExposure == null){
+            return "";
+        }
+        if("Si".equalsIgnoreCase(politicalExposure.getDeclarationComments())){
+            return "SI";
+        }
+        return "";
+    }
+
+    default String getOwnershipStructure(WrapperPostKycResolutionRequest request){
+        Party party = request.getParty();
+        if(party == null){
+            return "";
+        }
+        Person person = party.getPerson();
+        if (person == null){
+            return "";
+        }
+        if(person.getDocuments().get(0).getDocumentNumber().length()<=8){
+            return "Simple";
+        }
+        return "";
+    }
+
+    @Named("mapEXP")
+    default String getEXP(String countryCode){
+        if("PE".equals(countryCode)){
+            return "No hay Exposición";
+        }
+        return "";
+    }
+
+    @Named("mapPG")
+    default String getPG(String countryCode){
+        if("PE".equals(countryCode)){
+            return "Nacional";
+        }
+        return "";
+    }
+
+    default String toStringJson(Object o){
+        if(o instanceof String){
+            return (String)o;
+        }
+        try {
+            return jsonMapper.writeValueAsString(o);
+        } catch (JsonProcessingException e) {
+            return "Error al parsear objeto";
+        }
+    }
+}
