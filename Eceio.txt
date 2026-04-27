@@ -1,1 +1,45 @@
 
+{
+  "party": {
+    "person": {
+      "birthDate": "1995-05-10",
+      "documents": [
+        {
+          "documentNumber": "12345678"
+        }
+      ],
+      "employmentInformation": {
+        "economicActivity": {
+          "categoryDescription": "Empleado"
+        },
+        "occupationDescription": "5ta Categoría"
+      },
+      "politicalExposure": {
+        "isSelfDeclaredPEP": false,
+        "declarationComments": "No"
+      },
+      "countryOfResidence": {
+        "code": "PE",
+        "name": "Perú"
+      },
+      "placeOfBirth": {
+        "country": {
+          "name": "Perú"
+        }
+      }
+    }
+  },
+  "products": [
+    {
+      "productDescription": "Cuenta de Ahorro",
+      "family": {
+        "productFamily": {
+          "name": "Pasivos"
+        }
+      }
+    }
+  ],
+  "preferenceChannel": {
+    "description": "Digital"
+  }
+}
