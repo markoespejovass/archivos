@@ -1,45 +1,154 @@
-
 {
-  "party": {
-    "person": {
-      "birthDate": "1995-05-10",
-      "documents": [
+  "knowYourCustomerResolution": {
+    "knowYourCustomerQuestionnaire": {
+      "questionnaireId": "GE00000120250620",
+      "questionnaireAssetsId": "Origen",
+      "questions": [
         {
-          "documentNumber": "12345678"
+          "translationCode": "PF01",
+          "answer": "Save money",
+          "answers": [
+            {
+              "values": [
+                "PE"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "party": {
+      "partyId": "54532019",
+      "types": [
+        {
+          "code": "F"
         }
       ],
-      "employmentInformation": {
-        "economicActivity": {
-          "categoryDescription": "Empleado"
+      "person": {
+        "personName": {
+          "givenName": "Mary",
+          "lastName": "Clark",
+          "secondLastName": "Butler"
         },
-        "occupationDescription": "5ta Categoría"
+        "birthDate": "1980-01-15",
+        "countryOfResidence": {
+          "code": "052"
+        },
+        "firstNationality": {
+          "code": "052"
+        },
+        "secondNationality": {
+          "code": "National"
+        },
+        "genderCode": "Mujer",
+        "placeOfBirth": {
+          "country": {
+            "code": "052"
+          }
+        },
+        "additionalEmployments": [
+          {
+            "economicActivity": {
+              "description": "Business administrator",
+              "categoryCode": "08V",
+              "subCategoryCode": "0950109"
+            }
+          }
+        ],
+        "documents": [
+          {
+            "documentNumber": "MEMA8700512HDFRRS06",
+            "documentTypeCode": "CURP"
+          }
+        ]
       },
-      "politicalExposure": {
-        "isSelfDeclaredPEP": false,
-        "declarationComments": "No"
+      "organization": {
+        "organizationName": {
+          "legalName": "Commercial Business & Sons Co.",
+          "tradingName": "Business Co."
+        },
+        "registrationDate": "2010-05-10",
+        "economicActivity": {
+          "categoryCode": "08V",
+          "subCategoryCode": "0950109",
+          "description": "Department store"
+        },
+        "documents": [
+          {
+            "documentNumber": "DECJ880426XXX",
+            "documentTypeCode": "RFC"
+          }
+        ],
+        "countryOfOperation": {
+          "code": "052"
+        }
       },
-      "countryOfResidence": {
-        "code": "PE",
-        "name": "Perú"
+      "contactPoint": {
+        "postalAddress": {
+          "streetName": "Av. Reforma",
+          "streetBuildingIdentification": "1234",
+          "unitNumber": "89",
+          "location": "Col. Centro",
+          "districtCode": "00014",
+          "countyIdentification": {
+            "name": "00014QT"
+          },
+          "city": {
+            "code": "QT"
+          },
+          "state": {
+            "code": "00014QT"
+          },
+          "zipCode": "07570"
+        },
+        "phoneAddress": {
+          "phoneNumber": "4421231234"
+        },
+        "electronicAddress": {
+          "emailAddress": "user@email.com"
+        }
       },
-      "placeOfBirth": {
-        "country": {
-          "name": "Perú"
+      "structuralSegmentCode": "013",
+      "structuralSegmentDescription": "RAL RM",
+      "bank": {
+        "bankId": "0220",
+        "bankName": "Sucursal patio Santa Fe.",
+        "touchpoints": [
+          {
+            "name": "Matt Gilmartin"
+          }
+        ],
+        "contactPoint": {
+          "postalAddress": {
+            "fullAddress": "Av. Reforma 123, Ciudad de México, 06600",
+            "land": {
+              "code": "0525",
+              "name": "Patio Santa Fe."
+            },
+            "buildingName": "CONS. DIR. ZONA PONIENTE",
+            "detailCode": "0877",
+            "province": {
+              "code": "9168",
+              "name": "CONS. REGIONAL OCCIDENTE"
+            }
+          }
         }
       }
-    }
+    },
+    "products": [
+      {
+        "productCode": "01",
+        "productDescription": "CONTRATOS DE PRESTACIÓN DE SERVICIOS FINANCIEROS",
+        "subproduct": {
+          "code": "0100"
+        }
+      }
+    ]
   },
-  "products": [
-    {
-      "productDescription": "Cuenta de Ahorro",
-      "family": {
-        "productFamily": {
-          "name": "Pasivos"
-        }
-      }
-    }
-  ],
-  "preferenceChannel": {
-    "description": "Digital"
+  "currency": {
+    "code": "MXP"
+  },
+  "Verification": {
+    "isVerificationSuccessful": false
   }
 }
