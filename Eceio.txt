@@ -1,359 +1,68 @@
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
 
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
-@DynamoDbBean
-@Setter
-public class FileEntity {
+import java.util.*;
+import java.util.stream.Collectors;
 
-    private String id;
-    private String name;
-    private Integer version;
-    private String mimeType;
-    private String status;
-    private String url;
+public abstract class BaseDynamoRepository<T> {
 
-    @DynamoDbPartitionKey
-    public String getId() {
-        return id;
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
     }
 
-    public String getName() {
-        return name;
+    public void putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
     }
 
-    public Integer getVersion() {
-        return version;
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T item = table.getItem(r -> r.key(key));
+        return Optional.ofNullable(item);
     }
 
-    public String getMimeType() {
-        return mimeType;
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-
-@DynamoDbBean
-@Setter
-public class ConsentEntity {
-
-    private String id;
-    private String partyId;
-    private String statusInfoJson;
-    private String validityPeriodJson;
-    private String bankJson;
-    private String legitimateCode;
-    private String treatmentCode;
-    private String purposeCode;
-
-    @DynamoDbPartitionKey
-    public String getId() {
-        return id;
-    }
-
-    public String getPartyId() {
-        return partyId;
-    }
-
-    public String getStatusInfoJson() {
-        return statusInfoJson;
-    }
-
-    public String getValidityPeriodJson() {
-        return validityPeriodJson;
-    }
-
-    public String getBankJson() {
-        return bankJson;
-    }
-
-    public String getLegitimateCode() {
-        return legitimateCode;
-    }
-
-    public String getTreatmentCode() {
-        return treatmentCode;
-    }
-
-    public String getPurposeCode() {
-        return purposeCode;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-import java.math.BigDecimal;
-
-@DynamoDbBean
-@Setter
-public class ValueMappingEntity {
-
-    private Integer id;
-    private String inputCode;
-    private String valueText;
-    private BigDecimal valueNumeric;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public String getInputCode() {
-        return inputCode;
-    }
-
-    public String getValueText() {
-        return valueText;
-    }
-
-    public BigDecimal getValueNumeric() {
-        return valueNumeric;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-import java.time.LocalDate;
-
-@DynamoDbBean
-@Setter
-public class KycQuestionnaireEntity {
-
-    private Integer id;
-    private Integer kycId;
-    private String questionnaireId;
-    private String version;
-    private LocalDate lastUpdateDate;
-    private LocalDate expirationDate;
-    private LocalDate completionDate;
-    private LocalDate submissionDate;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public Integer getKycId() {
-        return kycId;
-    }
-
-    public String getQuestionnaireId() {
-        return questionnaireId;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public LocalDate getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(LocalDate lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public LocalDate getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDate expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public LocalDate getCompletionDate() {
-        return completionDate;
-    }
-
-    public void setCompletionDate(LocalDate completionDate) {
-        this.completionDate = completionDate;
-    }
-
-    public LocalDate getSubmissionDate() {
-        return submissionDate;
-    }
-
-    public void setSubmissionDate(LocalDate submissionDate) {
-        this.submissionDate = submissionDate;
-    }
-}
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-
-@DynamoDbBean
-@Setter
-public class KycQuestionEntity {
-
-    private Integer id;
-    private Integer questionnaireId;
-    private String questionId;
-    private String description;
-    private String typeDescription;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public Integer getQuestionnaireId() {
-        return questionnaireId;
-    }
-
-    public String getQuestionId() {
-        return questionId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getTypeDescription() {
-        return typeDescription;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-
-@DynamoDbBean
-@Setter
-public class KycAnswerValuesEntity {
-
-    private Integer id;
-    private Integer answerId;
-    private String translationCode;
-    private String value;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public Integer getAnswerId() {
-        return answerId;
-    }
-
-    public String getTranslationCode() {
-        return translationCode;
-    }
-
-    public String getValue() {
-        return value;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-
-@DynamoDbBean
-@Setter
-public class KycAnswerEntity {
-
-    private Integer id;
-    private Integer questionId;
-    private String answer;
-    private String answerTranslationCode;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public Integer getQuestionId() {
-        return questionId;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public String getAnswerTranslationCode() {
-        return answerTranslationCode;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-
-@DynamoDbBean
-@Setter
-public class InputDefinitionEntity {
-
-    private Integer id;
-    private String inputCode;
-    private String kycField;
-    private String description;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public String getInputCode() {
-        return inputCode;
-    }
-
-    public String getKycField() {
-        return kycField;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-}
-
-
-
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
-import lombok.Setter;
-import java.math.BigDecimal;
-
-@DynamoDbBean
-@Setter
-public class FactorRuleEntity {
-
-    private Integer id;
-    private String factorCode;
-    private String inputCode;
-    private BigDecimal weight;
-
-    @DynamoDbPartitionKey
-    public Integer getId() {
-        return id;
-    }
-
-    public String getFactorCode() {
-        return factorCode;
-    }
-
-    public String getInputCode() {
-        return inputCode;
-    }
-
-    public BigDecimal getWeight() {
-        return weight;
-    }
 }
