@@ -1,68 +1,10 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
-
-import org.jetbrains.annotations.Nullable;
-import software.amazon.awssdk.enhanced.dynamodb.*;
-import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.Expression;
-import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-public abstract class BaseDynamoRepository<T> {
-
-    protected final DynamoDbEnhancedClient enhancedClient;
-    protected final DynamoDbTable<T> table;
-    private final String partitionKeyAttr;
-    @Nullable
-    private final String sortKeyAttr;
-    private final Class<T> itemClass;
-
-    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
-                                   String tableName,
-                                   TableSchema<T> schema,
-                                   Class<T> itemClass,
-                                   String partitionKeyAttr,
-                                   @Nullable String sortKeyAttr) {
-        this.enhancedClient = enhancedClient;
-        this.table = enhancedClient.table(tableName, schema);
-        this.itemClass = itemClass;
-        this.partitionKeyAttr = partitionKeyAttr;
-        this.sortKeyAttr = sortKeyAttr;
-    }
-
-    public void putIfAbsent(T item) {
-        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
-        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
-            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
-        }
-        Expression condition = Expression.builder()
-                .expression(expr)
-                .build();
-        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
-                .item(item)
-                .conditionExpression(condition)
-                .build();
-        table.putItem(request);
-    }
-
-    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
-        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
-                ? Key.builder().partitionValue(partitionKeyValue).build()
-                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
-
-        T item = table.getItem(r -> r.key(key));
-        return Optional.ofNullable(item);
-    }
-
-
-    public List<T> findAll() {
-        List<T> results = new ArrayList<>();
-        table.scan(ScanEnhancedRequest.builder().build())
-                .items()
-                .forEach(results::add);
-        return results;
-    }
-
-}
+<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.42.33</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>sts</artifactId>
+			<version>2.42.33</version>
+		</dependency>
