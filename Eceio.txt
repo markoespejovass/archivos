@@ -1,1 +1,100 @@
 
+public enum FileField {
+
+    NAME("name"),
+    MIME_TYPE("mimeType"),
+    STATUS("status"),
+    VERSION("version"),
+    ID("id");
+
+    private final String dynamoField;
+
+    FileField(String dynamoField) {
+        this.dynamoField = dynamoField;
+    }
+
+    public String getDynamoField() {
+        return dynamoField;
+    }
+}
+
+
+public enum RequestOperator {
+    EQUAL,
+    CONTAINS;
+
+    public static Operator toDomain(RequestOperator op) {
+        return switch (op) {
+            case EQUAL -> Operator.EQ;
+            case CONTAINS -> Operator.CONTAINS;
+        };
+    }
+}
+
+
+
+
+
+
+
+
+
+import java.util.List;
+
+public class FileSearchMapper {
+
+    public static FileSearch toSearch(SearchParameters request) {
+
+        FileSearch.Builder builder = FileSearch.builder();
+
+        boolean isOr = "OR".equalsIgnoreCase(request.getDiscriminator());
+
+        for (SearchProperty prop : request.getSearchProperties()) {
+
+            String field = mapField(prop.getKeyId());
+            Operator operator = mapOperator(prop.getKeyOperator());
+            Object value = castValue(prop.getKeyId(), prop.getKeyValue());
+
+            if (isOr) {
+                builder.or(field, operator, value);
+            } else {
+                builder.and(field, operator, value);
+            }
+        }
+
+        return builder.build();
+    }
+
+    private static String mapField(String keyId) {
+        try {
+            return FileField.valueOf(keyId.toUpperCase()).getDynamoField();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Campo no permitido: " + keyId);
+        }
+    }
+
+    private static Operator mapOperator(String op) {
+        try {
+            return RequestOperator
+                    .valueOf(op.toUpperCase())
+                    .toDomain(RequestOperator.valueOf(op.toUpperCase()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Operador no permitido: " + op);
+        }
+    }
+
+    private static Object castValue(String keyId, String value) {
+
+        // Tipado básico (importante para DynamoDB)
+        return switch (keyId.toUpperCase()) {
+            case "VERSION" -> Integer.valueOf(value);
+            default -> value;
+        };
+    }
+}
+
+
+
+FileSearch search = FileSearchMapper.toSearch(request.getSearchParameters());
+
+List<FileEntity> result = repository.search(search);
