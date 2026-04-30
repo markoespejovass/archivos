@@ -1,47 +1,30 @@
-[INFO] 
-[INFO] --- maven-surefire-plugin:3.5.3:test (default-test) @ cpe-nxhbsc-bedocmanagement ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.input.DocumenManagementInputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.318 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.input.DocumenManagementInputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.457 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest
-[ERROR] Tests run: 11, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 2.482 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest.searchDocuments_ok -- Time elapsed: 0.019 s <<< ERROR!
-java.lang.IllegalArgumentException: No enum constant com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner.KeyOperatorEnum.Equal
-	at java.base/java.lang.Enum.valueOf(Enum.java:273)
-	at com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner$KeyOperatorEnum.valueOf(WrapperMySearchFilterRequestSearchPropertiesInner.java:34)
-	at com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest.searchDocuments_ok(DocumentManagementAdapterTest.java:129)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest.downloadDocument_ok -- Time elapsed: 0.054 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest.url()" because "presignedRequest" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter.generateDownloadUrl(DocumentManagementAdapter.java:240)
-	at com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter.downloadDocument(DocumentManagementAdapter.java:78)
-	at com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapterTest.downloadDocument_ok(DocumentManagementAdapterTest.java:86)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.FileSpecificationBuilderTest
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.036 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.FileSpecificationBuilderTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.679 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.ServiceMapperTest
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.ServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.UtilsFileTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.UtilsFileTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   DocumentManagementAdapterTest.downloadDocument_ok:86 » NullPointer Cannot invoke "software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest.url()" because "presignedRequest" is null
-[ERROR]   DocumentManagementAdapterTest.searchDocuments_ok:129 » IllegalArgument No enum constant com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner.KeyOperatorEnum.Equal
-[INFO] 
-[ERROR] Tests run: 37, Failures: 0, Errors: 2, Skipped: 0
-[INFO] 
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+
+@Test
+void downloadDocument_ok() {
+
+    WrapperGetDocumentsRequest request = new WrapperGetDocumentsRequest();
+    WrapperMyDocumentResponse doc = new WrapperMyDocumentResponse();
+    doc.setDocumentId("123");
+    request.setDocument(doc);
+
+    FileEntity entity = new FileEntity();
+    entity.setId("123");
+
+    when(repository.getByKey("123", null))
+            .thenReturn(Optional.of(entity));
+
+    // 🔥 MOCK IMPORTANTE
+    PresignedGetObjectRequest presigned = mock(PresignedGetObjectRequest.class);
+    when(presigned.url()).thenReturn(java.net.URI.create("http://test-url").toURL());
+
+    when(s3Presigner.presignGetObject(any()))
+            .thenReturn(presigned);
+
+    when(mapper.donwloadMapper(any()))
+            .thenReturn(new WrapperGetDocumentsResponse());
+
+    var response = adapter.downloadDocument(request);
+
+    assertNotNull(response);
+}
