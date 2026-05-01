@@ -1,195 +1,16 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
-
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class ConditionTest {
-
-    @Test
-    void constructor_withOperator() {
-        Condition cond = new Condition("name", Operator.EQ, "test");
-
-        assertEquals("name", cond.field);
-        assertEquals(Operator.EQ, cond.operator);
-        assertEquals("test", cond.value);
-        assertNull(cond.values);
-    }
-
-    @Test
-    void constructor_withInOperator() {
-        Condition cond = new Condition("status", List.of("A", "B"));
-
-        assertEquals("status", cond.field);
-        assertEquals(Operator.IN, cond.operator);
-        assertNotNull(cond.values);
-        assertEquals(2, cond.values.size());
-    }
-}
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class FileFieldTest {
-
-    @Test
-    void shouldMapCorrectFields() {
-        assertEquals("name", FileField.NAME.getDynamoField());
-        assertEquals("mimeType", FileField.MIME_TYPE.getDynamoField());
-        assertEquals("status", FileField.STATUS.getDynamoField());
-        assertEquals("version", FileField.VERSION.getDynamoField());
-        assertEquals("id", FileField.ID.getDynamoField());
-    }
-}
-
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
-
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class FileSearchTest {
-
-    @Test
-    void builder_andCondition() {
-        FileSearch search = FileSearch.builder()
-                .and("name", Operator.EQ, "test")
-                .build();
-
-        assertFalse(search.useOr);
-        assertEquals(1, search.conditions.size());
-    }
-
-    @Test
-    void builder_orCondition() {
-        FileSearch search = FileSearch.builder()
-                .or("name", Operator.EQ, "test")
-                .build();
-
-        assertTrue(search.useOr);
-        assertEquals(1, search.conditions.size());
-    }
-
-    @Test
-    void builder_inCondition() {
-        FileSearch search = FileSearch.builder()
-                .in("status", List.of("A", "B"))
-                .build();
-
-        assertEquals(1, search.conditions.size());
-    }
-
-    @Test
-    void builder_groupCondition() {
-        FileSearch group = FileSearch.builder()
-                .and("status", Operator.EQ, "A")
-                .build();
-
-        FileSearch search = FileSearch.builder()
-                .andGroup(group)
-                .build();
-
-        assertEquals(1, search.conditions.size());
-    }
-}
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
-
-import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.enhanced.dynamodb.Expression;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class ExpressionBuilderTest {
-
-    @Test
-    void shouldBuildSimpleExpression() {
-        FileSearch search = FileSearch.builder()
-                .and("name", Operator.EQ, "test")
-                .build();
-
-        ExpressionBuilder builder = new ExpressionBuilder();
-        Expression expr = builder.build(search);
-
-        assertNotNull(expr);
-        assertTrue(expr.expression().contains("="));
-    }
-
-    @Test
-    void shouldBuildContainsExpression() {
-        FileSearch search = FileSearch.builder()
-                .and("name", Operator.CONTAINS, "pdf")
-                .build();
-
-        Expression expr = new ExpressionBuilder().build(search);
-
-        assertTrue(expr.expression().contains("contains"));
-    }
-
-    @Test
-    void shouldBuildInExpression() {
-        FileSearch search = FileSearch.builder()
-                .in("status", List.of("A", "B"))
-                .build();
-
-        Expression expr = new ExpressionBuilder().build(search);
-
-        assertTrue(expr.expression().contains("IN"));
-    }
-
-    @Test
-    void shouldBuildOrExpression() {
-        FileSearch search = FileSearch.builder()
-                .or("name", Operator.EQ, "A")
-                .or("status", Operator.EQ, "B")
-                .build();
-
-        Expression expr = new ExpressionBuilder().build(search);
-
-        assertTrue(expr.expression().contains("OR"));
-    }
-
-    @Test
-    void shouldThrowForUnsupportedType() {
-        FileSearch search = FileSearch.builder()
-                .and("name", Operator.EQ, new Object()) // tipo inválido
-                .build();
-
-        ExpressionBuilder builder = new ExpressionBuilder();
-
-        assertThrows(IllegalArgumentException.class, () -> builder.build(search));
-    }
-}
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
 
 import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.Operator;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config.BaseDynamoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 
 import java.util.List;
 
@@ -210,7 +31,7 @@ class BaseDynamoRepositoryTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        when(enhancedClient.table(anyString(), any()))
+        when(enhancedClient.table(anyString(), any(TableSchema.class)))
                 .thenReturn(table);
 
         repository = new BaseDynamoRepository<>(
@@ -247,10 +68,29 @@ class BaseDynamoRepositoryTest {
         when(table.scan(any(ScanEnhancedRequest.class)))
                 .thenReturn(iterable);
 
-        when(iterable.items()).thenReturn(List.of("a", "b"));
+        when(iterable.items()).thenReturn((SdkIterable<String>) List.of("a", "b"));
 
         List<String> result = repository.search(search);
 
         assertEquals(2, result.size());
     }
 }
+
+
+
+
+
+
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.ServiceMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.UtilsFileTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.UtilsFileTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   BaseDynamoRepositoryTest.setup:40 » IllegalArgument A DynamoDb bean class must be annotated with @DynamoDbBean, but java.lang.String was not.
+[ERROR]   BaseDynamoRepositoryTest.setup:40 » IllegalArgument A DynamoDb bean class must be annotated with @DynamoDbBean, but java.lang.String was not.
+[ERROR]   BaseDynamoRepositoryTest.setup:40 » IllegalArgument A DynamoDb bean class must be annotated with @DynamoDbBean, but java.lang.String was not.
+[INFO] 
+[ERROR] Tests run: 52, Failures: 0, Errors: 3, Skipped: 0
+[INFO] 
