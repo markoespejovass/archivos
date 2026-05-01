@@ -1,1 +1,121 @@
 
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+
+@DynamoDbBean
+public static class TestEntity {
+
+    private String id;
+
+    @DynamoDbPartitionKey
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.Operator;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config.BaseDynamoRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class BaseDynamoRepositoryTest {
+
+    @DynamoDbBean
+    public static class TestEntity {
+
+        private String id;
+
+        @DynamoDbPartitionKey
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+    }
+
+    @Mock
+    DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    DynamoDbTable<TestEntity> table;
+
+    BaseDynamoRepository<TestEntity> repository;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+
+        when(enhancedClient.table(anyString(), any(TableSchema.class)))
+                .thenReturn(table);
+
+        repository = new BaseDynamoRepository<>(
+                enhancedClient,
+                "test-table",
+                TableSchema.fromBean(TestEntity.class),
+                TestEntity.class,
+                "id",
+                null
+        ) {};
+    }
+
+    @Test
+    void putIfAbsent_shouldCallDynamo() {
+        TestEntity entity = new TestEntity();
+        entity.setId("1");
+
+        repository.putIfAbsent(entity);
+
+        verify(table).putItem(any(PutItemEnhancedRequest.class));
+    }
+
+    @Test
+    void delete_shouldCallDynamo() {
+        TestEntity entity = new TestEntity();
+        entity.setId("1");
+
+        repository.delete(entity);
+
+        verify(table).deleteItem(entity);
+    }
+
+    @Test
+    void search_shouldCallScan() {
+        FileSearch search = FileSearch.builder()
+                .and("name", Operator.EQ, "test")
+                .build();
+
+        PageIterable<TestEntity> iterable = mock(PageIterable.class);
+
+        when(table.scan(any(ScanEnhancedRequest.class)))
+                .thenReturn(iterable);
+
+        when(iterable.items()).thenReturn(List.of(new TestEntity(), new TestEntity()));
+
+        List<TestEntity> result = repository.search(search);
+
+        assertEquals(2, result.size());
+        verify(table).scan(any(ScanEnhancedRequest.class));
+    }
+}
