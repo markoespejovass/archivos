@@ -1,1 +1,21 @@
 
+@Test
+void search_shouldCallScan() {
+    FileSearch search = FileSearch.builder()
+            .and("name", Operator.EQ, "test")
+            .build();
+
+    PageIterable<TestEntity> iterable = mock(PageIterable.class);
+
+    SdkIterable<TestEntity> sdkIterable =
+            () -> List.of(new TestEntity(), new TestEntity()).iterator();
+
+    when(table.scan(any(ScanEnhancedRequest.class)))
+            .thenReturn(iterable);
+
+    when(iterable.items()).thenReturn(sdkIterable);
+
+    List<TestEntity> result = repository.search(search);
+
+    assertEquals(2, result.size());
+}
