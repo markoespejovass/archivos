@@ -1,30 +1,284 @@
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
 
-@Test
-void downloadDocument_ok() {
+import java.util.*;
 
-    WrapperGetDocumentsRequest request = new WrapperGetDocumentsRequest();
-    WrapperMyDocumentResponse doc = new WrapperMyDocumentResponse();
-    doc.setDocumentId("123");
-    request.setDocument(doc);
+public class Condition {
 
-    FileEntity entity = new FileEntity();
-    entity.setId("123");
+    String field;
+    Operator operator;
+    Object value;
+    List<Object> values; // para IN
 
-    when(repository.getByKey("123", null))
-            .thenReturn(Optional.of(entity));
+    public Condition(String field, Operator operator, Object value) {
+        this.field = field;
+        this.operator = operator;
+        this.value = value;
+    }
 
-    // 🔥 MOCK IMPORTANTE
-    PresignedGetObjectRequest presigned = mock(PresignedGetObjectRequest.class);
-    when(presigned.url()).thenReturn(java.net.URI.create("http://test-url").toURL());
+    public Condition(String field, List<Object> values) {
+        this.field = field;
+        this.operator = Operator.IN;
+        this.values = values;
+    }
+}
 
-    when(s3Presigner.presignGetObject(any()))
-            .thenReturn(presigned);
 
-    when(mapper.donwloadMapper(any()))
-            .thenReturn(new WrapperGetDocumentsResponse());
 
-    var response = adapter.downloadDocument(request);
 
-    assertNotNull(response);
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
+
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+
+import java.util.*;
+
+public class ExpressionBuilder {
+
+    private int counter = 0;
+
+    public Expression build(FileSearch search) {
+        Map<String, String> names = new HashMap<>();
+        Map<String, AttributeValue> values = new HashMap<>();
+
+        String expr = buildExpression(search, names, values);
+
+        return Expression.builder()
+                .expression(expr)
+                .expressionNames(names)
+                .expressionValues(values)
+                .build();
+    }
+
+    private String buildExpression(FileSearch search,
+                                   Map<String, String> names,
+                                   Map<String, AttributeValue> values) {
+
+        List<String> parts = new ArrayList<>();
+
+        for (Object obj : search.conditions) {
+            if (obj instanceof Condition cond) {
+                parts.add(buildCondition(cond, names, values));
+            } else if (obj instanceof FileSearch group) {
+                parts.add("(" + buildExpression(group, names, values) + ")");
+            }
+        }
+
+        return String.join(search.useOr ? " OR " : " AND ", parts);
+    }
+
+    private String buildCondition(Condition cond,
+                                  Map<String, String> names,
+                                  Map<String, AttributeValue> values) {
+
+        String nameKey = "#n" + counter;
+        names.put(nameKey, cond.field);
+
+        if (cond.operator == Operator.IN) {
+            List<String> inValues = new ArrayList<>();
+            for (Object val : cond.values) {
+                String valKey = ":v" + counter++;
+                values.put(valKey, toAttributeValue(val));
+                inValues.add(valKey);
+            }
+            return nameKey + " IN (" + String.join(",", inValues) + ")";
+        }
+
+        String valKey = ":v" + counter++;
+        values.put(valKey, toAttributeValue(cond.value));
+
+        return switch (cond.operator) {
+            case CONTAINS -> "contains(" + nameKey + ", " + valKey + ")";
+            case BEGINS_WITH -> "begins_with(" + nameKey + ", " + valKey + ")";
+            default -> nameKey + " " + cond.operator.getSymbol() + " " + valKey;
+        };
+    }
+
+    private AttributeValue toAttributeValue(Object value) {
+        if (value instanceof String v) {
+            return AttributeValue.builder().s(v).build();
+        }
+        if (value instanceof Integer v) {
+            return AttributeValue.builder().n(String.valueOf(v)).build();
+        }
+        if (value instanceof Boolean v) {
+            return AttributeValue.builder().bool(v).build();
+        }
+        throw new IllegalArgumentException("Tipo no soportado: " + value.getClass());
+    }
+}
+
+
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
+
+public enum FileField {
+
+    NAME("name"),
+    MIME_TYPE("mimeType"),
+    STATUS("status"),
+    VERSION("version"),
+    ID("id");
+
+    private final String dynamoField;
+
+    FileField(String dynamoField) {
+        this.dynamoField = dynamoField;
+    }
+
+    public String getDynamoField() {
+        return dynamoField;
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
+
+import java.util.*;
+
+public class FileSearch {
+
+    List<Object> conditions = new ArrayList<>();
+    boolean useOr = false;
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final FileSearch search = new FileSearch();
+
+        public Builder and(String field, Operator op, Object value) {
+            search.conditions.add(new Condition(field, op, value));
+            return this;
+        }
+
+        public Builder or(String field, Operator op, Object value) {
+            search.useOr = true;
+            search.conditions.add(new Condition(field, op, value));
+            return this;
+        }
+
+        public Builder in(String field, List<Object> values) {
+            search.conditions.add(new Condition(field, values));
+            return this;
+        }
+
+        public Builder andGroup(FileSearch group) {
+            search.conditions.add(group);
+            return this;
+        }
+
+        public Builder orGroup(FileSearch group) {
+            search.useOr = true;
+            search.conditions.add(group);
+            return this;
+        }
+
+        public FileSearch build() {
+            return search;
+        }
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.ExpressionBuilder;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public abstract class BaseDynamoRepository<T> {
+
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
+    }
+
+    public T putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
+        return request.item();
+    }
+
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T item = table.getItem(r -> r.key(key));
+        return Optional.ofNullable(item);
+    }
+
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
+    }
+
+    public void delete(T item){
+        table.deleteItem(item);
+    }
+
+    public List<T> search(FileSearch search) {
+
+        ExpressionBuilder builder = new ExpressionBuilder();
+        Expression expression = builder.build(search);
+
+        ScanEnhancedRequest request = ScanEnhancedRequest.builder()
+                .filterExpression(expression)
+                .build();
+
+        List<T> results = new ArrayList<>();
+
+        table.scan(request)
+                .items()
+                .forEach(results::add);
+
+        return results;
+    }
+
 }
