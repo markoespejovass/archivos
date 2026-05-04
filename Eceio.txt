@@ -1,72 +1,77 @@
-[INFO] 
-[INFO] --- maven-surefire-plugin:3.5.3:test (default-test) @ cpe-nxhbsc-beemailboxes ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.794 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.957 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.038 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.041 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.generarOTP_shouldReturnOtpCode -- Time elapsed: 0.012 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.generarOTP_shouldReturnOtpCode(JsonApiClientTest.java:31)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.validOTP_shouldReturnMessage -- Time elapsed: 0.006 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.validOTP_shouldReturnMessage(JsonApiClientTest.java:46)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.066 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
-[ERROR] Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.277 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.sendMailing_shouldGenerateOtpAndSendEmail -- Time elapsed: 0.032 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Recipient.getPersonalization()" because the return value of "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP.getRecipient()" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.setearOtp(OTPServiceAdapter.java:79)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.sendMailing(OTPServiceAdapter.java:72)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.sendMailing_shouldGenerateOtpAndSendEmail(OTPServiceAdapterTest.java:82)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
-[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.093 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.657 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.021 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException -- Time elapsed: 0.006 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:44)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse -- Time elapsed: 0.006 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse(XmlApiClientTest.java:30)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   JsonApiClientTest.generarOTP_shouldReturnOtpCode:31 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-[ERROR]   JsonApiClientTest.validOTP_shouldReturnMessage:46 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-[ERROR]   OTPServiceAdapterTest.sendMailing_shouldGenerateOtpAndSendEmail:82 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Recipient.getPersonalization()" because the return value of "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP.getRecipient()" is null
-[ERROR]   XmlApiClientTest.sendXml_shouldHandleException:44 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-[ERROR]   XmlApiClientTest.sendXml_shouldReturnResponse:30 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
-[INFO] 
-[ERROR] Tests run: 26, Failures: 0, Errors: 5, Skipped: 0
-[INFO] 
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileField;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.Operator;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.RequestOperator;
+import org.apache.logging.log4j.util.Strings;
+
+import java.util.List;
+
+public class FileSearchMapper {
+
+    public static FileSearch toSearch(WrapperMySearchFilterRequest request) {
+
+        FileSearch.Builder builder = FileSearch.builder();
+
+        boolean isOr = "OR".equalsIgnoreCase(request.getDiscriminator());
+
+        for (WrapperMySearchFilterRequestSearchPropertiesInner prop : request.getSearchProperties()) {
+            if(prop.getKeyId() == null){
+                prop.setKeyId("0");
+            }
+            String keyId = prop.getKeyId();
+
+            String field = mapField(keyId);
+            if(field == null){
+                field="";
+            }
+            WrapperMySearchFilterRequestSearchPropertiesInner.KeyOperatorEnum keyOperator = prop.getKeyOperator();
+            if(keyOperator == null){
+                keyOperator = WrapperMySearchFilterRequestSearchPropertiesInner.KeyOperatorEnum.IN;
+            }
+            Operator operator = mapOperator(keyOperator.name());
+            Object value = castValue(keyId, prop.getKeyValue());
+            if (value == null){
+                value = prop.getKeyValue();
+            }
+            if (isOr) {
+                builder.or(field, operator, value);
+            } else {
+                builder.and(field, operator, value);
+            }
+        }
+
+        return builder.build();
+    }
+
+    private static String mapField(String keyId) {
+        try {
+            return FileField.valueOf(keyId.toUpperCase()).getDynamoField();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Campo no permitido: " + keyId);
+        }
+    }
+
+    private static Operator mapOperator(String op) {
+        try {
+            return RequestOperator
+                    .valueOf(op.toUpperCase())
+                    .toDomain(RequestOperator.valueOf(op.toUpperCase()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Operador no permitido: " + op);
+        }
+    }
+
+    private static Object castValue(String keyId, String value) {
+
+        // Tipado básico (importante para DynamoDB)
+        return switch (keyId.toUpperCase()) {
+            case "VERSION" -> Integer.valueOf(value);
+            default -> value;
+        };
+    }
+}
+
