@@ -1,263 +1,72 @@
-@ExtendWith(MockitoExtension.class)
-class OTPServiceAdapterTest {
-
-    @Mock
-    private XmlApiClient xmlApiClient;
-
-    @Mock
-    private JsonApiClient jsonApiClient;
-
-    @Mock
-    private OtpRepository repository;
-
-    @InjectMocks
-    private OTPServiceAdapter adapter;
-
-    @Test
-    void validCode_shouldReturnProcessed_whenOtpIsValid() {
-        String otp = "1234";
-
-        OtpEntity entity = new OtpEntity("uuid-1", otp);
-        when(repository.getBySortKey(otp)).thenReturn(Optional.of(entity));
-        when(jsonApiClient.validOTP(any())).thenReturn("OK");
-
-        WrapperClassifyEmail response = adapter.validCode(otp, new WrapperRequestClassifyEmails());
-
-        assertEquals(StatusInfo.StatusCodeEnum.PROCESSED,
-                response.getEmail().getStatus().getStatusCode());
-    }
-
-    @Test
-    void validCode_shouldReturnError_whenOtpIsInvalid() {
-        String otp = "1234";
-
-        OtpEntity entity = new OtpEntity("uuid-1", otp);
-        when(repository.getBySortKey(otp)).thenReturn(Optional.of(entity));
-        when(jsonApiClient.validOTP(any())).thenReturn(null);
-
-        WrapperClassifyEmail response = adapter.validCode(otp, new WrapperRequestClassifyEmails());
-
-        assertEquals(StatusInfo.StatusCodeEnum.ERROR,
-                response.getEmail().getStatus().getStatusCode());
-    }
-
-    @Test
-    void sendMailing_shouldGenerateOtpAndSendEmail() {
-        RequestOTP request = buildRequest();
-
-        when(jsonApiClient.generarOTP(any())).thenReturn("9999");
-        when(xmlApiClient.sendXml(any())).thenReturn(new ResponseOTP());
-
-        ResponseOTP response = adapter.sendMailing(request);
-
-        assertNotNull(response);
-        verify(repository).putIfAbsent(any(OtpEntity.class));
-        verify(xmlApiClient).sendXml(any());
-    }
-
-    private RequestOTP buildRequest() {
-        // arma un objeto mínimo válido según tu modelo
-        RequestOTP request = new RequestOTP();
-        // mockea estructura interna si es necesario
-        return request;
-    }
-}
-
-
-
-
-@ExtendWith(MockitoExtension.class)
-class JsonApiClientTest {
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private TokenProvider tokenProvider;
-
-    @InjectMocks
-    private JsonApiClient client;
-
-    @Test
-    void generarOTP_shouldReturnOtpCode() {
-        when(tokenProvider.getToken()).thenReturn("token");
-
-        OtpResponse response = new OtpResponse();
-        response.setData(new OtpResponse.Data("1234"));
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(OtpResponse.class)))
-                .thenReturn(ResponseEntity.ok(response));
-
-        String otp = client.generarOTP("uuid");
-
-        assertEquals("1234", otp);
-    }
-
-    @Test
-    void validOTP_shouldReturnMessage() {
-        when(tokenProvider.getToken()).thenReturn("token");
-
-        ValidateOtpResponse response = new ValidateOtpResponse();
-        response.setMessage("VALID");
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(ValidateOtpResponse.class)))
-                .thenReturn(ResponseEntity.ok(response));
-
-        String result = client.validOTP(new ValidateOtpRequest("id", "1234"));
-
-        assertEquals("VALID", result);
-    }
-}
-
-
-
-
-@ExtendWith(MockitoExtension.class)
-class XmlApiClientTest {
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private TokenProvider tokenProvider;
-
-    @InjectMocks
-    private XmlApiClient client;
-
-    @Test
-    void sendXml_shouldReturnResponse() throws Exception {
-        when(tokenProvider.getToken()).thenReturn("token");
-
-        String xmlResponse = "<ResponseOTP></ResponseOTP>";
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
-                .thenReturn(ResponseEntity.ok(xmlResponse));
-
-        ResponseOTP response = client.sendXml(new RequestOTP());
-
-        assertNotNull(response);
-    }
-
-    @Test
-    void sendXml_shouldHandleException() {
-        when(tokenProvider.getToken()).thenReturn("token");
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
-                .thenThrow(new RuntimeException());
-
-        ResponseOTP response = client.sendXml(new RequestOTP());
-
-        assertNotNull(response); // retorna vacío
-    }
-}
-
-
-
-
-
-@ExtendWith(MockitoExtension.class)
-class XmlApiClientTest {
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private TokenProvider tokenProvider;
-
-    @InjectMocks
-    private XmlApiClient client;
-
-    @Test
-    void sendXml_shouldReturnResponse() throws Exception {
-        when(tokenProvider.getToken()).thenReturn("token");
-
-        String xmlResponse = "<ResponseOTP></ResponseOTP>";
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
-                .thenReturn(ResponseEntity.ok(xmlResponse));
-
-        ResponseOTP response = client.sendXml(new RequestOTP());
-
-        assertNotNull(response);
-    }
-
-    @Test
-    void sendXml_shouldHandleException() {
-        when(tokenProvider.getToken()).thenReturn("token");
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
-                .thenThrow(new RuntimeException());
-
-        ResponseOTP response = client.sendXml(new RequestOTP());
-
-        assertNotNull(response); // retorna vacío
-    }
-}
-
-
-
-
-
-@ExtendWith(MockitoExtension.class)
-class JsonTokenProviderTest {
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @InjectMocks
-    private JsonTokenProvider provider;
-
-    @Test
-    void getToken_shouldFetchNewToken_whenExpired() {
-        OTPTokenResponse response = new OTPTokenResponse();
-        response.setData(new OTPTokenResponse.Data("token123", 3600));
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(OTPTokenResponse.class)))
-                .thenReturn(ResponseEntity.ok(response));
-
-        String token = provider.getToken();
-
-        assertEquals("token123", token);
-    }
-
-    @Test
-    void getToken_shouldUseCache_whenValid() {
-        // primera llamada
-        getToken_shouldFetchNewToken_whenExpired();
-
-        // segunda llamada no debe pegarle al restTemplate
-        String token = provider.getToken();
-
-        verify(restTemplate, times(1))
-                .postForEntity(anyString(), any(), eq(OTPTokenResponse.class));
-
-        assertNotNull(token);
-    }
-}
-
-
-
-
-@ExtendWith(MockitoExtension.class)
-class XmlTokenProviderTest {
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @InjectMocks
-    private XmlTokenProvider provider;
-
-    @Test
-    void getToken_shouldReturnToken() {
-        TokenResponse response = new TokenResponse();
-        response.setAccessToken("xml-token");
-        response.setExpiresIn(3600);
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(TokenResponse.class)))
-                .thenReturn(ResponseEntity.ok(response));
-
-        String token = provider.getToken();
-
-        assertEquals("xml-token", token);
-    }
-}
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.3:test (default-test) @ cpe-nxhbsc-beemailboxes ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.794 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.957 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.038 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.041 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.generarOTP_shouldReturnOtpCode -- Time elapsed: 0.012 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.generarOTP_shouldReturnOtpCode(JsonApiClientTest.java:31)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.validOTP_shouldReturnMessage -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.validOTP_shouldReturnMessage(JsonApiClientTest.java:46)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.066 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
+[ERROR] Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.277 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.sendMailing_shouldGenerateOtpAndSendEmail -- Time elapsed: 0.032 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Recipient.getPersonalization()" because the return value of "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP.getRecipient()" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.setearOtp(OTPServiceAdapter.java:79)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapter.sendMailing(OTPServiceAdapter.java:72)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest.sendMailing_shouldGenerateOtpAndSendEmail(OTPServiceAdapterTest.java:82)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.093 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.657 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.021 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:44)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse(XmlApiClientTest.java:30)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   JsonApiClientTest.generarOTP_shouldReturnOtpCode:31 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+[ERROR]   JsonApiClientTest.validOTP_shouldReturnMessage:46 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+[ERROR]   OTPServiceAdapterTest.sendMailing_shouldGenerateOtpAndSendEmail:82 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.Recipient.getPersonalization()" because the return value of "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP.getRecipient()" is null
+[ERROR]   XmlApiClientTest.sendXml_shouldHandleException:44 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+[ERROR]   XmlApiClientTest.sendXml_shouldReturnResponse:30 NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider.getToken()" because "this.tokenProvider" is null
+[INFO] 
+[ERROR] Tests run: 26, Failures: 0, Errors: 5, Skipped: 0
+[INFO] 
