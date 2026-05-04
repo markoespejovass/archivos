@@ -1,1 +1,35 @@
 
+public List<T> findBySortKey(String sortKeyValue) {
+
+    if (sortKeyAttr == null || sortKeyAttr.isBlank()) {
+        throw new IllegalStateException("Sort key no configurado");
+    }
+
+    String expressionStr = "#sk = :val";
+
+    Map<String, String> expressionNames = Map.of(
+            "#sk", sortKeyAttr
+    );
+
+    Map<String, AttributeValue> expressionValues = Map.of(
+            ":val", AttributeValue.builder().s(sortKeyValue).build()
+    );
+
+    Expression expression = Expression.builder()
+            .expression(expressionStr)
+            .expressionNames(expressionNames)
+            .expressionValues(expressionValues)
+            .build();
+
+    ScanEnhancedRequest request = ScanEnhancedRequest.builder()
+            .filterExpression(expression)
+            .build();
+
+    List<T> results = new ArrayList<>();
+
+    table.scan(request)
+            .items()
+            .forEach(results::add);
+
+    return results;
+}
