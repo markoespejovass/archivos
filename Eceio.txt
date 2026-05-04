@@ -1,35 +1,293 @@
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa;
 
-public List<T> findBySortKey(String sortKeyValue) {
 
-    if (sortKeyAttr == null || sortKeyAttr.isBlank()) {
-        throw new IllegalStateException("Sort key no configurado");
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.output.KnowYourCustomerRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain.model.WeightRule;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.WeightMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.ValueRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.WeightRepository;
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * The class representative Adappter
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@RequiredArgsConstructor
+public class KnowYourCustomerAdapter implements KnowYourCustomerRepositoryPort {
+
+  private final KnokYourCustomerRepository repository;
+  private final WeightRepository weightRepository;
+  private final KYCEntityMapper mapper;
+  private final WeightMapper mapperWeight;
+  private final ValueRepository valueRepository;
+  private final InputDefinitionRepository inputDefinitionRepository;
+
+
+  @Value("${apparsenal.backing-services.aws.dynamodb.tables.party-detail.name}")
+  private String tableName;
+
+  @Override
+  public WrapperPostKycResolutionResponse createProcesstKyc(
+      WrapperPostKycResolutionRequest criteria) {
+
+    Kyc kyc = repository.putIfAbsent(
+            mapper.WrapperPostKycResolutionRequestToKycEntity(criteria));
+    if (Strings.isBlank(kyc.getId()) ){
+      return new WrapperPostKycResolutionResponse();
+    }
+    String id = kyc.getDocumentNumber();
+    return mapper.toDto(id);
+
+  }
+
+  @Override
+  public Kyc getKyc(String documento){
+    // Retrieve the DynamoDB table for party details
+    return repository.getBySortKey(documento+"01").get();
+  }
+
+  @Override
+  public List<ValueMapping> getValues() {
+    return valueRepository.findAll();
+  }
+
+  @Override
+  public List<InputDefinition> getAllInputs() {
+    return inputDefinitionRepository.findAll();
+  }
+
+  @Override
+  public List<WeightRule> getRulesByFactor(String factor) {
+    return mapperWeight.toDTOList(weightRepository.findBySortKey(factor));
+  }
+}
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain.model.WeightRule;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.Party;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.KnowYourCustomerAdapter;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.WeightMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.ValueRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.WeightRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class KnowYourCustomerAdapterTest {
+
+    @Mock
+    private WeightRepository weightRepository;
+    @Mock
+    private KYCEntityMapper mapper;
+    @Mock
+    private WeightMapper mapperWeight;
+    @Mock
+    private ValueRepository valueRepository;
+    @Mock
+    private InputDefinitionRepository inputDefinitionRepository;
+    @Mock
+    private DynamoDbEnhancedClient dynamoDbEnhancedClient;
+
+    @Mock
+    private DynamoDbTable<Kyc> dynamoDbTable;
+
+    @InjectMocks
+    private KnowYourCustomerAdapter adapter;
+
+    @BeforeEach
+    void setup() {
+        // inyectar nombre de tabla manualmente
+        ReflectionTestUtils.setField(adapter, "tableName", "test-table");
     }
 
-    String expressionStr = "#sk = :val";
+    // DYnamo test
 
-    Map<String, String> expressionNames = Map.of(
-            "#sk", sortKeyAttr
-    );
+    private WrapperPostKycResolutionRequest buildRequest() {
+        WrapperPostKycResolutionRequest request = mock(WrapperPostKycResolutionRequest.class);
+        var party = mock(Party.class);
 
-    Map<String, AttributeValue> expressionValues = Map.of(
-            ":val", AttributeValue.builder().s(sortKeyValue).build()
-    );
+        when(request.getParty()).thenReturn(party);
+        when(party.getPartyId()).thenReturn("123");
 
-    Expression expression = Expression.builder()
-            .expression(expressionStr)
-            .expressionNames(expressionNames)
-            .expressionValues(expressionValues)
-            .build();
+        return request;
+    }
 
-    ScanEnhancedRequest request = ScanEnhancedRequest.builder()
-            .filterExpression(expression)
-            .build();
+    @Test
+    void shouldCreateKycSuccessfully() {
+        var request = buildRequest();
+        Kyc newEntity = new Kyc();
 
-    List<T> results = new ArrayList<>();
+        when(dynamoDbEnhancedClient.table(anyString(), any(TableSchema.class)))
+                .thenReturn(dynamoDbTable);
 
-    table.scan(request)
-            .items()
-            .forEach(results::add);
+        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request))
+                .thenReturn(newEntity);
 
-    return results;
+        when(mapper.toDto(anyString()))
+                .thenReturn(new WrapperPostKycResolutionResponse());
+
+        var response = adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+        verify(dynamoDbTable).putItem(any(PutItemEnhancedRequest.class));
+    }
+
+
+    @Test
+    void shouldGetKyc() {
+        when(dynamoDbEnhancedClient.table(anyString(), any(TableSchema.class)))
+                .thenReturn(dynamoDbTable);
+
+        Kyc kyc = new Kyc();
+
+        when(dynamoDbTable.getItem(any(Key.class)))
+                .thenReturn(kyc);
+
+        var result = adapter.getKyc("123");
+
+        assertEquals(kyc, result);
+    }
+
+
+    //
+
+    @Test
+    void shouldGetValues() {
+        when(valueRepository.findAll()).thenReturn(List.of(new ValueMapping()));
+
+        assertFalse(adapter.getValues().isEmpty());
+    }
+
+    @Test
+    void shouldGetInputs() {
+        when(inputDefinitionRepository.findAll()).thenReturn(List.of(new InputDefinition()));
+
+        assertFalse(adapter.getAllInputs().isEmpty());
+    }
+
+    @Test
+    void shouldGetRulesByFactor() {
+        when(weightRepository.findBySortKey("F1")).thenReturn(List.of());
+        when(mapperWeight.toDTOList(any())).thenReturn(List.of(new WeightRule()));
+
+        assertFalse(adapter.getRulesByFactor("F1").isEmpty());
+    }
 }
+
+
+
+
+
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.3:test (default-test) @ cpe-nxhbsc-beknowyocustomer ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.313 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.749 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.843 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.SecurityConfigTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.821 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.SecurityConfigTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
+[ERROR] Tests run: 5, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 1.154 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldGetKyc -- Time elapsed: 0.504 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository.getBySortKey(String)" because "this.repository" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.KnowYourCustomerAdapter.getKyc(KnowYourCustomerAdapter.java:67)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldGetKyc(KnowYourCustomerAdapterTest.java:107)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully -- Time elapsed: 0.545 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository.putIfAbsent(Object)" because "this.repository" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.KnowYourCustomerAdapter.createProcesstKyc(KnowYourCustomerAdapter.java:54)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully(KnowYourCustomerAdapterTest.java:90)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.544 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.093 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully:90 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository.putIfAbsent(Object)" because "this.repository" is null
+[ERROR]   KnowYourCustomerAdapterTest.shouldGetKyc:107 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository.getBySortKey(String)" because "this.repository" is null
+[INFO] 
+[ERROR] Tests run: 33, Failures: 0, Errors: 2, Skipped: 0
+[INFO] 
