@@ -1,1 +1,263 @@
+@ExtendWith(MockitoExtension.class)
+class OTPServiceAdapterTest {
 
+    @Mock
+    private XmlApiClient xmlApiClient;
+
+    @Mock
+    private JsonApiClient jsonApiClient;
+
+    @Mock
+    private OtpRepository repository;
+
+    @InjectMocks
+    private OTPServiceAdapter adapter;
+
+    @Test
+    void validCode_shouldReturnProcessed_whenOtpIsValid() {
+        String otp = "1234";
+
+        OtpEntity entity = new OtpEntity("uuid-1", otp);
+        when(repository.getBySortKey(otp)).thenReturn(Optional.of(entity));
+        when(jsonApiClient.validOTP(any())).thenReturn("OK");
+
+        WrapperClassifyEmail response = adapter.validCode(otp, new WrapperRequestClassifyEmails());
+
+        assertEquals(StatusInfo.StatusCodeEnum.PROCESSED,
+                response.getEmail().getStatus().getStatusCode());
+    }
+
+    @Test
+    void validCode_shouldReturnError_whenOtpIsInvalid() {
+        String otp = "1234";
+
+        OtpEntity entity = new OtpEntity("uuid-1", otp);
+        when(repository.getBySortKey(otp)).thenReturn(Optional.of(entity));
+        when(jsonApiClient.validOTP(any())).thenReturn(null);
+
+        WrapperClassifyEmail response = adapter.validCode(otp, new WrapperRequestClassifyEmails());
+
+        assertEquals(StatusInfo.StatusCodeEnum.ERROR,
+                response.getEmail().getStatus().getStatusCode());
+    }
+
+    @Test
+    void sendMailing_shouldGenerateOtpAndSendEmail() {
+        RequestOTP request = buildRequest();
+
+        when(jsonApiClient.generarOTP(any())).thenReturn("9999");
+        when(xmlApiClient.sendXml(any())).thenReturn(new ResponseOTP());
+
+        ResponseOTP response = adapter.sendMailing(request);
+
+        assertNotNull(response);
+        verify(repository).putIfAbsent(any(OtpEntity.class));
+        verify(xmlApiClient).sendXml(any());
+    }
+
+    private RequestOTP buildRequest() {
+        // arma un objeto mínimo válido según tu modelo
+        RequestOTP request = new RequestOTP();
+        // mockea estructura interna si es necesario
+        return request;
+    }
+}
+
+
+
+
+@ExtendWith(MockitoExtension.class)
+class JsonApiClientTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private TokenProvider tokenProvider;
+
+    @InjectMocks
+    private JsonApiClient client;
+
+    @Test
+    void generarOTP_shouldReturnOtpCode() {
+        when(tokenProvider.getToken()).thenReturn("token");
+
+        OtpResponse response = new OtpResponse();
+        response.setData(new OtpResponse.Data("1234"));
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(OtpResponse.class)))
+                .thenReturn(ResponseEntity.ok(response));
+
+        String otp = client.generarOTP("uuid");
+
+        assertEquals("1234", otp);
+    }
+
+    @Test
+    void validOTP_shouldReturnMessage() {
+        when(tokenProvider.getToken()).thenReturn("token");
+
+        ValidateOtpResponse response = new ValidateOtpResponse();
+        response.setMessage("VALID");
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(ValidateOtpResponse.class)))
+                .thenReturn(ResponseEntity.ok(response));
+
+        String result = client.validOTP(new ValidateOtpRequest("id", "1234"));
+
+        assertEquals("VALID", result);
+    }
+}
+
+
+
+
+@ExtendWith(MockitoExtension.class)
+class XmlApiClientTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private TokenProvider tokenProvider;
+
+    @InjectMocks
+    private XmlApiClient client;
+
+    @Test
+    void sendXml_shouldReturnResponse() throws Exception {
+        when(tokenProvider.getToken()).thenReturn("token");
+
+        String xmlResponse = "<ResponseOTP></ResponseOTP>";
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok(xmlResponse));
+
+        ResponseOTP response = client.sendXml(new RequestOTP());
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void sendXml_shouldHandleException() {
+        when(tokenProvider.getToken()).thenReturn("token");
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenThrow(new RuntimeException());
+
+        ResponseOTP response = client.sendXml(new RequestOTP());
+
+        assertNotNull(response); // retorna vacío
+    }
+}
+
+
+
+
+
+@ExtendWith(MockitoExtension.class)
+class XmlApiClientTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private TokenProvider tokenProvider;
+
+    @InjectMocks
+    private XmlApiClient client;
+
+    @Test
+    void sendXml_shouldReturnResponse() throws Exception {
+        when(tokenProvider.getToken()).thenReturn("token");
+
+        String xmlResponse = "<ResponseOTP></ResponseOTP>";
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenReturn(ResponseEntity.ok(xmlResponse));
+
+        ResponseOTP response = client.sendXml(new RequestOTP());
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void sendXml_shouldHandleException() {
+        when(tokenProvider.getToken()).thenReturn("token");
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenThrow(new RuntimeException());
+
+        ResponseOTP response = client.sendXml(new RequestOTP());
+
+        assertNotNull(response); // retorna vacío
+    }
+}
+
+
+
+
+
+@ExtendWith(MockitoExtension.class)
+class JsonTokenProviderTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @InjectMocks
+    private JsonTokenProvider provider;
+
+    @Test
+    void getToken_shouldFetchNewToken_whenExpired() {
+        OTPTokenResponse response = new OTPTokenResponse();
+        response.setData(new OTPTokenResponse.Data("token123", 3600));
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(OTPTokenResponse.class)))
+                .thenReturn(ResponseEntity.ok(response));
+
+        String token = provider.getToken();
+
+        assertEquals("token123", token);
+    }
+
+    @Test
+    void getToken_shouldUseCache_whenValid() {
+        // primera llamada
+        getToken_shouldFetchNewToken_whenExpired();
+
+        // segunda llamada no debe pegarle al restTemplate
+        String token = provider.getToken();
+
+        verify(restTemplate, times(1))
+                .postForEntity(anyString(), any(), eq(OTPTokenResponse.class));
+
+        assertNotNull(token);
+    }
+}
+
+
+
+
+@ExtendWith(MockitoExtension.class)
+class XmlTokenProviderTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @InjectMocks
+    private XmlTokenProvider provider;
+
+    @Test
+    void getToken_shouldReturnToken() {
+        TokenResponse response = new TokenResponse();
+        response.setAccessToken("xml-token");
+        response.setExpiresIn(3600);
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(TokenResponse.class)))
+                .thenReturn(ResponseEntity.ok(response));
+
+        String token = provider.getToken();
+
+        assertEquals("xml-token", token);
+    }
+}
