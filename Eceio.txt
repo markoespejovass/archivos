@@ -1,1 +1,184 @@
 
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.domain.model.WeightRule;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.Party;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.data.WrapperPostKycResolutionResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.KnowYourCustomerAdapter;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.KYCEntityMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.mapper.WeightMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.ValueRepository;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.WeightRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class KnowYourCustomerAdapterTest {
+
+    @Mock
+    private KnokYourCustomerRepository repository;
+
+    @Mock
+    private WeightRepository weightRepository;
+
+    @Mock
+    private KYCEntityMapper mapper;
+
+    @Mock
+    private WeightMapper mapperWeight;
+
+    @Mock
+    private ValueRepository valueRepository;
+
+    @Mock
+    private InputDefinitionRepository inputDefinitionRepository;
+
+    @InjectMocks
+    private KnowYourCustomerAdapter adapter;
+
+    @BeforeEach
+    void setup() {
+        ReflectionTestUtils.setField(adapter, "tableName", "test-table");
+    }
+
+    private WrapperPostKycResolutionRequest buildRequest() {
+        WrapperPostKycResolutionRequest request = mock(WrapperPostKycResolutionRequest.class);
+        Party party = mock(Party.class);
+
+        when(request.getParty()).thenReturn(party);
+        when(party.getPartyId()).thenReturn("123");
+
+        return request;
+    }
+
+    // =========================
+    // createProcesstKyc
+    // =========================
+
+    @Test
+    void shouldCreateKycSuccessfully() {
+        var request = buildRequest();
+
+        Kyc entity = new Kyc();
+        entity.setId("1");
+        entity.setDocumentNumber("123");
+
+        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request))
+                .thenReturn(entity);
+
+        when(repository.putIfAbsent(entity))
+                .thenReturn(entity);
+
+        when(mapper.toDto("123"))
+                .thenReturn(new WrapperPostKycResolutionResponse());
+
+        var response = adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+
+        verify(repository).putIfAbsent(entity);
+        verify(mapper).toDto("123");
+    }
+
+    @Test
+    void shouldReturnEmptyResponse_whenIdIsBlank() {
+        var request = buildRequest();
+
+        Kyc entity = new Kyc();
+        entity.setId(""); // blank
+
+        when(mapper.WrapperPostKycResolutionRequestToKycEntity(request))
+                .thenReturn(entity);
+
+        when(repository.putIfAbsent(entity))
+                .thenReturn(entity);
+
+        var response = adapter.createProcesstKyc(request);
+
+        assertNotNull(response);
+        verify(mapper, never()).toDto(anyString());
+    }
+
+    // =========================
+    // getKyc
+    // =========================
+
+    @Test
+    void shouldGetKyc() {
+        Kyc kyc = new Kyc();
+
+        when(repository.getBySortKey("12301"))
+                .thenReturn(Optional.of(kyc));
+
+        var result = adapter.getKyc("123");
+
+        assertEquals(kyc, result);
+        verify(repository).getBySortKey("12301");
+    }
+
+    // =========================
+    // getValues
+    // =========================
+
+    @Test
+    void shouldGetValues() {
+        when(valueRepository.findAll())
+                .thenReturn(List.of(new ValueMapping()));
+
+        var result = adapter.getValues();
+
+        assertFalse(result.isEmpty());
+        verify(valueRepository).findAll();
+    }
+
+    // =========================
+    // getAllInputs
+    // =========================
+
+    @Test
+    void shouldGetInputs() {
+        when(inputDefinitionRepository.findAll())
+                .thenReturn(List.of(new InputDefinition()));
+
+        var result = adapter.getAllInputs();
+
+        assertFalse(result.isEmpty());
+        verify(inputDefinitionRepository).findAll();
+    }
+
+    // =========================
+    // getRulesByFactor
+    // =========================
+
+    @Test
+    void shouldGetRulesByFactor() {
+        when(weightRepository.findBySortKey("F1"))
+                .thenReturn(List.of());
+
+        when(mapperWeight.toDTOList(any()))
+                .thenReturn(List.of(new WeightRule()));
+
+        var result = adapter.getRulesByFactor("F1");
+
+        assertFalse(result.isEmpty());
+        verify(weightRepository).findBySortKey("F1");
+        verify(mapperWeight).toDTOList(any());
+    }
+}
