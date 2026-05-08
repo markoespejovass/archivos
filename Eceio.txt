@@ -15,17 +15,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ConsentEntityMapper {
 
-    @Mapping(target = "statusCode", source = "statusCode")
-    @Mapping(target = "statusDescription", source = "statusDescription")
-    WrapperConsentDetailsStatusInfo convertStatusInfoGet(StatusInfos statusInfos);
-
-    @Mapping(target = "startDate", source = "startDate", qualifiedByName = "stringToDate")
-    @Mapping(target = "endDate", source = "endDate",  qualifiedByName = "stringToDate")
-    Period convertValidityPeriodGet(ValidPeriod validPeriod);
 
     @Mapping(target = "consentId", source = "id")
-    @Mapping(target = "statusInfo", source = "statusInfos" )
-    @Mapping(target = "validityPeriod", source = "validityValidPeriod" )
+    @Mapping(target = "statusInfo", expression = "java(ConsentEntityMapper.setStatusInfos(consentEntity))" )
+    @Mapping(target = "validityPeriod", expression = "java(ConsentEntityMapper.setValidityValidPeriod(consentEntity))" )
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "legitimateCode", source = "legitimateCode" )
     @Mapping(target = "treatmentCode", source = "treatmentCode" )
@@ -34,19 +27,13 @@ public interface ConsentEntityMapper {
 
     List<WrapperConsentDetails> toDTOGets(List<ConsentEntity> consentEntity);
 
-    @Mapping(target = "statusCode", source = "statusCode")
-    StatusInfos convertStatusInfoPost(StatusInfo statusInfo);
-
-    @Mapping(target = "startDate", source = "startDate", qualifiedByName = "stringToDate")
-    @Mapping(target = "endDate", source = "endDate",  qualifiedByName = "stringToDate")
-    ValidPeriod convertValidityPeriodPost(Period validPeriod);
-
 
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "partyId", source = "partyId")
-    @Mapping(target = "statusInfos", source = "request.statusInfo" )
-    @Mapping(target = "validityValidPeriod", source = "request.validityPeriod" )
-    @Mapping(target = "bank", ignore = true )
+    @Mapping(target = "statusCode", source = "request.statusInfo.statusCode" )
+    @Mapping(target = "startDate", source = "request.validityPeriod.startDate",  qualifiedByName = "dateToString" )
+    @Mapping(target = "endDate", source = "request.validityPeriod.endDate",  qualifiedByName = "dateToString" )
+    @Mapping(target = "bankId", ignore = true )
     @Mapping(target = "legitimateCode", source = "request.legitimateCode" )
     @Mapping(target = "treatmentCode", source = "request.treatmentCode" )
     @Mapping(target = "purposeCode", source = "request.purposeCode" )
@@ -57,8 +44,9 @@ public interface ConsentEntityMapper {
 
     @Mapping(target = "id", source = "consentId")
     @Mapping(target = "partyId", source = "partyId")
-    @Mapping(target = "statusInfos", source = "request.statusInfo"   )
-    @Mapping(target = "validityValidPeriod", source = "request.validityPeriod")
+    @Mapping(target = "statusCode", source = "request.statusInfo.statusCode" )
+    @Mapping(target = "startDate", source = "request.validityPeriod.startDate",  qualifiedByName = "dateToString" )
+    @Mapping(target = "endDate", source = "request.validityPeriod.endDate",  qualifiedByName = "dateToString" )
     ConsentEntity toEntityUpdate(WrapperPatchConsentRequestBody request, String partyId, String consentId);
 
     @Named("dateToString")
@@ -82,5 +70,20 @@ public interface ConsentEntityMapper {
         }
     }
 
+    @Named("setStatusInfos")
+    public static WrapperConsentDetailsStatusInfo setStatusInfos(ConsentEntity entity){
+        WrapperConsentDetailsStatusInfo response = new WrapperConsentDetailsStatusInfo();
+        response.setStatusCode(entity.getStatusCode());
+        response.setStatusDescription(entity.getStatusDescription());
+        return response;
+    }
+
+    @Named("setValidityValidPeriod")
+    public static Period setValidityValidPeriod(ConsentEntity entity){
+        Period response = new Period();
+        response.setEndDate(stringToDate(entity.getEndDate()));
+        response.setStartDate(stringToDate(entity.getStartDate()));
+        return response;
+    }
 
 }
