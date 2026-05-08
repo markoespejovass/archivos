@@ -1,11 +1,86 @@
-@Named("stringToDate")
-public static LocalDate stringToDate(String date) {
-    try {
-        return LocalDate.parse(
-                date,
-                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        );
-    } catch (Exception ex) {
-        return null;
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.mapper;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.StatusInfos;
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ValidPeriod;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface ConsentEntityMapper {
+
+    @Mapping(target = "statusCode", source = "statusCode")
+    @Mapping(target = "statusDescription", source = "statusDescription")
+    WrapperConsentDetailsStatusInfo convertStatusInfoGet(StatusInfos statusInfos);
+
+    @Mapping(target = "startDate", source = "startDate", qualifiedByName = "stringToDate")
+    @Mapping(target = "endDate", source = "endDate",  qualifiedByName = "stringToDate")
+    Period convertValidityPeriodGet(ValidPeriod validPeriod);
+
+    @Mapping(target = "consentId", source = "id")
+    @Mapping(target = "statusInfo", source = "statusInfos" )
+    @Mapping(target = "validityPeriod", source = "validityValidPeriod" )
+    @Mapping(target = "bank", ignore = true)
+    @Mapping(target = "legitimateCode", source = "legitimateCode" )
+    @Mapping(target = "treatmentCode", source = "treatmentCode" )
+    @Mapping(target = "purposeCode", source = "purposeCode" )
+    WrapperConsentDetails toDTOGet(ConsentEntity consentEntity);
+
+    List<WrapperConsentDetails> toDTOGets(List<ConsentEntity> consentEntity);
+
+    @Mapping(target = "statusCode", source = "statusCode")
+    StatusInfos convertStatusInfoPost(StatusInfo statusInfo);
+
+    @Mapping(target = "startDate", source = "startDate", qualifiedByName = "stringToDate")
+    @Mapping(target = "endDate", source = "endDate",  qualifiedByName = "stringToDate")
+    ValidPeriod convertValidityPeriodPost(Period validPeriod);
+
+
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "partyId", source = "partyId")
+    @Mapping(target = "statusInfos", source = "request.statusInfo" )
+    @Mapping(target = "validityValidPeriod", source = "request.validityPeriod" )
+    @Mapping(target = "bank", ignore = true )
+    @Mapping(target = "legitimateCode", source = "request.legitimateCode" )
+    @Mapping(target = "treatmentCode", source = "request.treatmentCode" )
+    @Mapping(target = "purposeCode", source = "request.purposeCode" )
+    ConsentEntity toEntityPost(WrapperPostConsentRequestBody request, String partyId, String uuid);
+
+    @Mapping(source = "consentEntity.id",  target= "consentId")
+    WrapperConsentId  toDTOPost(ConsentEntity consentEntity);
+
+    @Mapping(target = "id", source = "consentId")
+    @Mapping(target = "partyId", source = "partyId")
+    @Mapping(target = "statusInfos", source = "request.statusInfo"   )
+    @Mapping(target = "validityValidPeriod", source = "request.validityPeriod")
+    ConsentEntity toEntityUpdate(WrapperPatchConsentRequestBody request, String partyId, String consentId);
+
+    @Named("dateToString")
+    public static String dateToString(LocalDate date){
+        try {
+            return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (Exception ex){
+            return "";
+        }
     }
+
+    @Named("stringToDate")
+    public static LocalDate stringToDate(String date) {
+        try {
+            return LocalDate.parse(
+                    date,
+                    java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            );
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+
 }
