@@ -1,1 +1,180 @@
 
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.mapper;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ConsentEntityMapperTest {
+
+    private final ConsentEntityMapper mapper =
+            Mappers.getMapper(ConsentEntityMapper.class);
+
+    @Test
+    void shouldMapConsentEntityToDTOGet() {
+
+        ConsentEntity entity = new ConsentEntity();
+        entity.setId("123");
+        entity.setStatusCode("ACTIVE");
+        entity.setStatusDescription("Activo");
+        entity.setStartDate("01/05/2026");
+        entity.setEndDate("31/12/2026");
+        entity.setLegitimateCode("LEG01");
+        entity.setTreatmentCode("TRT01");
+        entity.setPurposeCode("PUR01");
+
+        WrapperConsentDetails response = mapper.toDTOGet(entity);
+
+        assertNotNull(response);
+        assertEquals("123", response.getConsentId());
+
+        assertNotNull(response.getStatusInfo());
+        assertEquals("ACTIVE", response.getStatusInfo().getStatusCode());
+        assertEquals("Activo", response.getStatusInfo().getStatusDescription());
+
+        assertNotNull(response.getValidityPeriod());
+        assertEquals(LocalDate.of(2026, 5, 1),
+                response.getValidityPeriod().getStartDate());
+        assertEquals(LocalDate.of(2026, 12, 31),
+                response.getValidityPeriod().getEndDate());
+
+        assertEquals("LEG01", response.getLegitimateCode());
+        assertEquals("TRT01", response.getTreatmentCode());
+        assertEquals("PUR01", response.getPurposeCode());
+    }
+
+    @Test
+    void shouldMapConsentEntityListToDTOList() {
+
+        ConsentEntity entity = new ConsentEntity();
+        entity.setId("123");
+
+        List<WrapperConsentDetails> response =
+                mapper.toDTOGets(List.of(entity));
+
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals("123", response.get(0).getConsentId());
+    }
+
+    @Test
+    void shouldMapPostRequestToEntity() {
+
+        StatusInfo statusInfo = new StatusInfo();
+        statusInfo.setStatusCode("ACTIVE");
+
+        Period period = new Period();
+        period.setStartDate(LocalDate.of(2026, 5, 1));
+        period.setEndDate(LocalDate.of(2026, 12, 31));
+
+        WrapperPostConsentRequestBody request =
+                new WrapperPostConsentRequestBody();
+
+        request.setStatusInfo(statusInfo);
+        request.setValidityPeriod(period);
+        request.setLegitimateCode("LEG01");
+        request.setTreatmentCode("TRT01");
+        request.setPurposeCode("PUR01");
+
+        ConsentEntity entity =
+                mapper.toEntityPost(request, "PARTY01", "UUID01");
+
+        assertNotNull(entity);
+
+        assertEquals("UUID01", entity.getId());
+        assertEquals("PARTY01", entity.getPartyId());
+        assertEquals("ACTIVE", entity.getStatusCode());
+
+        assertEquals("01/05/2026", entity.getStartDate());
+        assertEquals("31/12/2026", entity.getEndDate());
+
+        assertEquals("LEG01", entity.getLegitimateCode());
+        assertEquals("TRT01", entity.getTreatmentCode());
+        assertEquals("PUR01", entity.getPurposeCode());
+    }
+
+    @Test
+    void shouldMapEntityToPostResponse() {
+
+        ConsentEntity entity = new ConsentEntity();
+        entity.setId("CONSENT01");
+
+        WrapperConsentId response = mapper.toDTOPost(entity);
+
+        assertNotNull(response);
+        assertEquals("CONSENT01", response.getConsentId());
+    }
+
+    @Test
+    void shouldMapPatchRequestToEntity() {
+
+        StatusInfo statusInfo = new StatusInfo();
+        statusInfo.setStatusCode("INACTIVE");
+
+        Period period = new Period();
+        period.setStartDate(LocalDate.of(2026, 1, 1));
+        period.setEndDate(LocalDate.of(2026, 6, 30));
+
+        WrapperPatchConsentRequestBody request =
+                new WrapperPatchConsentRequestBody();
+
+        request.setStatusInfo(statusInfo);
+        request.setValidityPeriod(period);
+
+        ConsentEntity entity =
+                mapper.toEntityUpdate(request, "PARTY01", "CONSENT01");
+
+        assertNotNull(entity);
+
+        assertEquals("CONSENT01", entity.getId());
+        assertEquals("PARTY01", entity.getPartyId());
+
+        assertEquals("INACTIVE", entity.getStatusCode());
+
+        assertEquals("01/01/2026", entity.getStartDate());
+        assertEquals("30/06/2026", entity.getEndDate());
+    }
+
+    @Test
+    void shouldConvertDateToString() {
+
+        String response = ConsentEntityMapper.dateToString(
+                LocalDate.of(2026, 5, 8)
+        );
+
+        assertEquals("08/05/2026", response);
+    }
+
+    @Test
+    void shouldConvertStringToDate() {
+
+        LocalDate response =
+                ConsentEntityMapper.stringToDate("08/05/2026");
+
+        assertEquals(LocalDate.of(2026, 5, 8), response);
+    }
+
+    @Test
+    void shouldReturnNullWhenDateIsInvalid() {
+
+        LocalDate response =
+                ConsentEntityMapper.stringToDate("INVALID");
+
+        assertNull(response);
+    }
+
+    @Test
+    void shouldReturnEmptyWhenDateToStringFails() {
+
+        String response =
+                ConsentEntityMapper.dateToString(null);
+
+        assertEquals("", response);
+    }
+}
