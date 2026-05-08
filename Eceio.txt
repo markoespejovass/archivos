@@ -1,9 +1,11 @@
- @Named("stringToDate")
-    public static LocalDate stringToDate(String date){
-        try {
-            List<Integer> dateCom = Arrays.stream(date.split("/")).mapToInt();
-            return LocalDate.of(dateCom[2],dateCom[1],dateCom[0]);
-        } catch (Exception ex){
-            return "";
-        }
+@Named("stringToDate")
+public static LocalDate stringToDate(String date) {
+    try {
+        return LocalDate.parse(
+                date,
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        );
+    } catch (Exception ex) {
+        return null;
     }
+}
