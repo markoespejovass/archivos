@@ -1,0 +1,23 @@
+curl --location 'http://localhost:8080/v7/data_consents_management/parties/75371362/consent_agreements' \
+--header 'x-santander-client-id: a1b30a84-7bf3-442e-84a0-e935d8163b5a'
+
+
+
+curl --location 'http://localhost:8080/v7/data_consents_management/parties/75371362/consent_agreements' \
+--header 'x-santander-client-id: a1b30a84-7bf3-442e-84a0-e935d8163b5a' \
+--header 'Content-Type: application/json' \
+--data '{
+  "statusInfo": {
+    "statusCode": "01"
+  },
+  "validityPeriod": {
+    "startDate": "2025-05-01",
+    "endDate": "2025-08-01"
+  },
+  "bank": {
+    "bankId": "AAOZ"
+  },
+  "legitimateCode": "02",
+  "treatmentCode": "002",
+  "purposeCode": "001"
+}'
