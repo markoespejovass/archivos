@@ -21,3 +21,10 @@ curl --location 'http://localhost:8080/v7/data_consents_management/parties/75371
   "treatmentCode": "002",
   "purposeCode": "001"
 }'
+
+
+
+
+curl -X POST https://us-east-1iyroebvdu.auth.us-east-1.amazoncognito.com/oauth2/token \ 
+ -H "Content-Type: application/x-www-form-urlencoded" \ 
+ -d "grant_type=client_credentials&client_id=5es37jdbmn002fps0n3c3bsf6q&client_secret=16ubrgoaoek8nfjtdptv7ea3aiaovue28j81pb1u78jur4o9vbm0&scope=default-m2m-resource-server-6vc-79/read"
