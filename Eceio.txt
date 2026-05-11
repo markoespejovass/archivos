@@ -1,2 +1,9 @@
-
-{"keys":[{"alg":"RS256","e":"AQAB","kid":"gO42K/VsZt3dywNnxRKvNiO5w9yPxa6XfCp0AxW98hE=","kty":"RSA","n":"vBTa9wlnHsmVBm1osa5N9sojDSHQhcPEEE4dN_kxnJoYOV7oeyrxzYmBTH6uv_7X-3ENj_jv7OHIsxoP6I39os2XWLrJcyOocPeQojCbjuj04QZ8Wl9SyXMz6Q3Z8MTpU5ASnKN2v8FiFAlI88Z94HnrdD42fWDz8Of-TIS63sVzmorumaahsyN0_HOqi1xzVSucuAjM9w7ucSOk212Qqjw1CigWmZtRt3TTYlbPz-MnrdAoYMk1VvgxtVhrjhjvpN_w5rifwNgXnsFAaldd_j85l1Or2-2Hu8eLSoCIUgy7HaRmVWyQng5NRiTTz5Z9guqX5fwgRzyM4Alki-bUJw","use":"sig"},{"alg":"RS256","e":"AQAB","kid":"FgjDW3766NUOiXUbnw73FYXuK6M0fEHvf9eWIIzFOIQ=","kty":"RSA","n":"y-8IIzf9DYUeOl9VanTSCDq7osqHP8Uj-4vx5d8tznfBBjuWzQmLEcIzVTW7Re5SQ12Y3ba6fVc_IE8t7wSPlU-Yhmc-_A80NB3N4vNgLpawpfmENJYJYIxS-nLskaYPDb3CKCCdOledOPxZTW5FiGive2lIovLaduG-LNrzIu981-ghQPouemDKSVjXeASI5uKkHWGyazPWrNTFgTU4RHihitNxPvaQHHy2xbRCnVEFaUtBea-6JyEqGG4aNq6U5NaNkzECYpfnhUjNigAFT2RGgIR6f7gsZ56SlAtmFvTLcWNZwxxwP40AJxpyZTB1bouiivL6MekU5u2vzqducQ","use":"sig"}]}
+curl --location 'https://dev-api.skyairline.com/partners/v1/user' \
+--header 'Ocp-Apim-Subscription-Key: 5cfc7d2fea014ede83c5bd0086d81d2c' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0bmVySWQiOiJCU1BFIiwiaWF0IjoxNzA5NjU0MDQ2LCJleHAiOjIwMDk2NTc2NDZ9.XSUWCBkgxKirAnA9GCsfzprdHvRSfhmCOOJFeiUcaFU' \
+--header 'Cookie: __cf_bm=lQS7r9_OZWTkEsEhz40f38w4QihEMQfIu4hWEdgwJsI-1778528794.2228992-1.0.1.1-XhJAJTPWb.NP5_.HKsxdxev.7TXYY.D5ssyjAPbwxN4zDvt5sGBKfgKS3rYSKeNO4pxw8LZ24pgMlIlEMa1wErkEE8RJ7T5RMDYwU.1_Km_ySTMwl620ekfA3u_k0LDK' \
+--data '{
+    "partnerId": "BSPE",
+    "data": "ff4d048c1b64480756a54135f71b87c4e20c6fae13051ebfc7c8734b05a5a916edee701ec73e4fc222b32f41139d63951abd660ad8012aad62b926cbde070091f758de9652c5e50c984c03eb3cb412bd6740d03775a150a1fe30196048b776d53a348d9d7d79a184eaa282c96a6238684334f915d6eecc3f988d796096690e66c6b2e86295234fa4f1e24a13f2d0a422e345778e964795ed933aad4e54e53b212a32942b63ed41e113535ff203ec6780c490ca37efc16e66545c1a3810579a0ad0156e94d4da71a355fa4d25b709a6bc1c24cab2e07d32898c3c99d51cef35d4d7a6bb6ea86ea2422bef96fe267d77502e6d3c819ed66ded3edcc41d94e2a65e61341f7d3693d1f9b6f88c570f8efaf9"
+}'
