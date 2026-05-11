@@ -1,3 +1,1 @@
-io.netty:netty-codec-http:jar:4.1.133.Final failed to transfer from https://gluonlatam.jfrog.io/artifactory/per-maven-public during a previous attempt. This failure was cached in the local repository and resolution is not reattempted until the update interval of central has elapsed or updates are forced. Original error: Could not transfer artifact io.netty:netty-codec-http:jar:4.1.133.Final from/to snapshots (https://gluonlatam.jfrog.io/artifactory/per-maven-public): PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-
-Try to run Maven import with -U flag (force update snapshots)
+https://cognito-idp.us-east-1.amazonaws.com/us-east-1_IYROeBVDU/.well-know/jwks.json
