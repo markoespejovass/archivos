@@ -1,2 +1,78 @@
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.config;
 
-set MAVEN_OPTS=-Djavax.net.ssl.trustStoreType=Windows-ROOT
+
+import com.nimbusds.jose.jwk.JWKSet;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.stereotype.Component;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import java.security.interfaces.RSAPublicKey;
+
+import java.security.interfaces.RSAPublicKey;
+
+/**
+ * The Security Config class.
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    /**
+     * Bean configuration for security filter chain.
+     *
+     * @param http the http.
+     * @return {@link SecurityFilterChain}
+     * @throws Exception the exception.
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/error",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(jwtDecoder())));
+
+        return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        ClassPathResource resource = new ClassPathResource("jwks.json");
+        try {
+            String jwks = new String(resource.getInputStream().readAllBytes());
+            JWKSet jwkSet = JWKSet.parse(jwks);
+
+            RSAPublicKey publicKey = (RSAPublicKey) jwkSet.getKeys()
+                    .get(1)
+                    .toRSAKey()
+                    .toPublicKey();
+            return NimbusJwtDecoder.withPublicKey(publicKey).build();
+
+        }catch (Exception e){
+            throw new RuntimeException("Error cagando JWKS local", e);
+        }
+    }
+}
