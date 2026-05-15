@@ -1,14 +1,92 @@
-2026-05-15T16:27:26.286-05:00  WARN 26752 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.input.DocumentManagementInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-bedocmanagement\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbedocmanagement\application\ports\input\DocumentManagementInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter' defined in file [C:\workspace\Q1\cpe-nxhbsc-bedocmanagement\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbedocmanagement\infrastructure\adapters\output\DocumentManagementAdapter.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 's3Presigner' defined in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.class]: Failed to instantiate [software.amazon.awssdk.services.s3.presigner.S3Presigner]: Factory method 's3Presigner' threw exception with message: Unable to load region from any of the providers in the chain software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain@485996f7: [software.amazon.awssdk.regions.providers.SystemSettingsRegionProvider@7b3b0896: Unable to load region from system settings. Region must be specified either via environment variable (AWS_REGION) or  system property (aws.region)., software.amazon.awssdk.regions.providers.AwsProfileRegionProvider@6967cdee: No region provided in profile: default, software.amazon.awssdk.regions.providers.InstanceProfileRegionProvider@46a6b8d6: Unable to contact EC2 metadata service.]
-2026-05-15T16:27:26.377-05:00 ERROR 26752 --- [cpe-nxhbsc-bedocmanagement] [           main] [                                                 ] o.s.b.SpringApplication                  : Application run failed
-
-org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.input.DocumentManagementInputPort' defined in file [C:\workspace\Q1\cpe-nxhbsc-bedocmanagement\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbedocmanagement\application\ports\input\DocumentManagementInputPort.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.DocumentManagementAdapter' defined in file [C:\workspace\Q1\cpe-nxhbsc-bedocmanagement\target\classes\com\santander\cpe\nxhbsc\cpenxhbscbedocmanagement\infrastructure\adapters\output\DocumentManagementAdapter.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 's3Presigner' defined in class path resource [com/santander/cpe/nxhbsc/cpenxhbscbedocmanagement/infrastructure/config/S3Config.class]: Failed to instantiate [software.amazon.awssdk.services.s3.presigner.S3Presigner]: Factory method 's3Presigner' threw exception with message: Unable to load region from any of the providers in the chain software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain@485996f7: [software.amazon.awssdk.regions.providers.SystemSettingsRegionProvider@7b3b0896: Unable to load region from system settings. Region must be specified either via environment variable (AWS_REGION) or  system property (aws.region)., software.amazon.awssdk.regions.providers.AwsProfileRegionProvider@6967cdee: No region provided in profile: default, software.amazon.awssdk.regions.providers.InstanceProfileRegionProvider@46a6b8d6: Unable to contact EC2 metadata service.]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.17.jar:6.2.17]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.17.jar:6.2.17]
+v1/customer_benefit_programs/register_customer - POST method test results
+Request
+/v1/customer_benefit_programs/register_customer
+Latency ms
+29004
+Status
+504
+Response body
+{"message": "Endpoint request timed out"}
+Response headers
+{
+  "x-amzn-ErrorType": "InternalServerErrorException"
+}
+Logs
+Execution log for request 5490f5a9-5391-47a9-b706-8b13119c3611
+Fri May 15 22:36:07 UTC 2026 : Starting execution for request: 5490f5a9-5391-47a9-b706-8b13119c3611
+Fri May 15 22:36:07 UTC 2026 : HTTP Method: POST, Resource Path: /v1/customer_benefit_programs/register_customer
+Fri May 15 22:36:07 UTC 2026 : Method request path: {}
+Fri May 15 22:36:07 UTC 2026 : Method request query string: {}
+Fri May 15 22:36:07 UTC 2026 : Method request headers: {society=society, channel=channel, x-santander-client-id=x-santander-client-id}
+Fri May 15 22:36:07 UTC 2026 : Method request body before transformations: {
+    "benefitProgramCode": "SKY",
+    "activationProperties": [
+        {
+            "key": "name",
+            "value": "Marko"
+        },
+        {
+            "key": "lastname",
+            "value": "Espejo"
+        },
+        {
+            "key": "birthdate",
+            "value": "15-07-1983"
+        },
+        {
+            "key": "email",
+            "value": "mark@gmail.com"
+        },
+        {
+            "key": "country",
+            "value": "CL"
+        },
+        {
+            "key": "type",
+            "value": "RUT"
+        },
+        {
+            "key": "number",
+            "value": "84834858"
+        }
+    ]
+}
+Fri May 15 22:36:07 UTC 2026 : Endpoint request URI: http://af4c37582cd52426a89be22591289082-7a1c4af039dac23e.elb.us-east-1.amazonaws.com/v1/customer_benefit_programs/register_customer
+Fri May 15 22:36:07 UTC 2026 : Endpoint request headers: {society=society, x-amzn-apigateway-api-id=borf7wjxma, channel=channel, User-Agent=AmazonAPIGateway_borf7wjxma, x-santander-client-id=x-santander-client-id, Host=af4c37582cd52426a89be22591289082-7a1c4af039dac23e.elb.us-east-1.amazonaws.com, X-API-Gateway-Host=testPrefix.testDomainName, X-API-Gateway-Schema=HTTP/1.1}
+Fri May 15 22:36:07 UTC 2026 : Endpoint request body after transformations: {
+    "benefitProgramCode": "SKY",
+    "activationProperties": [
+        {
+            "key": "name",
+            "value": "Marko"
+        },
+        {
+            "key": "lastname",
+            "value": "Espejo"
+        },
+        {
+            "key": "birthdate",
+            "value": "15-07-1983"
+        },
+        {
+            "key": "email",
+            "value": "mark@gmail.com"
+        },
+        {
+            "key": "country",
+            "value": "CL"
+        },
+        {
+            "key": "type",
+            "value": "RUT"
+        },
+        {
+            "key": "number",
+            "value": "84834858"
+        }
+    ]
+}
+Fri May 15 22:36:07 UTC 2026 : Sending request to http://af4c37582cd52426a89be22591289082-7a1c4af039dac23e.elb.us-east-1.amazonaws.com/v1/customer_benefit_programs/register_customer
+Fri May 15 22:36:36 UTC 2026 : Execution failed due to a timeout error
+Fri May 15 22:36:36 UTC 2026 : Method completed with status: 504
+ 
