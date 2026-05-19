@@ -1,128 +1,8 @@
-[INFO] 
-[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beemailboxes ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.757 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.623 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.066 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.650 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.generarOTP_shouldReturnOtpCode -- Time elapsed: 0.614 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getGenerateUrl()" because "this.otpProperties" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.JsonApiClient.generarOTP(JsonApiClient.java:46)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.generarOTP_shouldReturnOtpCode(JsonApiClientTest.java:42)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.validOTP_shouldReturnMessage -- Time elapsed: 0.018 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getValidateUrl()" because "this.otpProperties" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.JsonApiClient.validOTP(JsonApiClient.java:62)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest.validOTP_shouldReturnMessage(JsonApiClientTest.java:57)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.080 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldUseCache_whenValid -- Time elapsed: 0.027 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.refreshToken(JsonTokenProvider.java:44)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.getToken(JsonTokenProvider.java:35)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:37)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldUseCache_whenValid(JsonTokenProviderTest.java:45)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired -- Time elapsed: 0.010 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.refreshToken(JsonTokenProvider.java:44)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.getToken(JsonTokenProvider.java:35)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:37)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.251 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
-[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.124 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.574 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
-21:28:30.913 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient - ocurrio un error en OTPServiceAdapter : java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getUrlSendMail()" because "<local3>.emailProperties" is null
-21:28:31.022 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient - ocurrio un error en OTPServiceAdapter : java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getUrlSendMail()" because "<local3>.emailProperties" is null
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 1.283 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException -- Time elapsed: 1.247 s <<< ERROR!
-org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:49)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
-	at java.base/java.util.Optional.ifPresent(Optional.java:178)
-	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse -- Time elapsed: 0.026 s <<< ERROR!
-org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse(XmlApiClientTest.java:37)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
-	at java.base/java.util.Optional.ifPresent(Optional.java:178)
-	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
-[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.060 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest.getToken_shouldReturnToken -- Time elapsed: 0.055 s <<< ERROR!
-java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getClientId()" because "this.properties" is null
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.XmlTokenProvider.refreshToken(XmlTokenProvider.java:44)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.XmlTokenProvider.getToken(XmlTokenProvider.java:33)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest.getToken_shouldReturnToken(XmlTokenProviderTest.java:35)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   JsonApiClientTest.generarOTP_shouldReturnOtpCode:42 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getGenerateUrl()" because "this.otpProperties" is null
-[ERROR]   JsonApiClientTest.validOTP_shouldReturnMessage:57 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getValidateUrl()" because "this.otpProperties" is null
-[ERROR]   JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired:37 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
-[ERROR]   JsonTokenProviderTest.getToken_shouldUseCache_whenValid:45->getToken_shouldFetchNewToken_whenExpired:37 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
-[ERROR]   XmlApiClientTest.sendXml_shouldHandleException » UnnecessaryStubbing 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:49)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-[ERROR]   XmlApiClientTest.sendXml_shouldReturnResponse » UnnecessaryStubbing 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldReturnResponse(XmlApiClientTest.java:37)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-[ERROR]   XmlTokenProviderTest.getToken_shouldReturnToken:35 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getClientId()" because "this.properties" is null
-[INFO] 
-[ERROR] Tests run: 26, Failures: 0, Errors: 7, Skipped: 0
-[INFO] 
-
-
-
-
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
 
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.token.OTPToken;
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.token.OTPTokenResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties;
 import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -140,6 +20,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class JsonTokenProviderTest {
 
+    @Mock
+    private OtpProperties otpProperties;
 
     @Mock
     private RestTemplate restTemplate;
@@ -154,7 +36,9 @@ public class JsonTokenProviderTest {
 
         when(restTemplate.postForEntity(anyString(), any(), eq(OTPTokenResponse.class)))
                 .thenReturn(ResponseEntity.ok(response));
-
+        when(otpProperties.getClientId()).thenReturn("client");
+        when(otpProperties.getClientSecret()).thenReturn("client");
+        when(otpProperties.getScope()).thenReturn("client");
         String token = provider.getToken();
 
         assertEquals("token123", token);
@@ -176,14 +60,14 @@ public class JsonTokenProviderTest {
 }
 
 
+
+
+
 package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.Otp;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.OtpResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.ValidateOtpRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.ValidateOtpResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.JsonApiClient;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.token.TokenResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.XmlTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -197,43 +81,118 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class JsonApiClientTest {
+public class XmlTokenProviderTest {
+
+    @Mock
+    private EmailProperties properties;
+
     @Mock
     private RestTemplate restTemplate;
 
-    @Mock
-    private TokenProvider jsonTokenProvider;
-
     @InjectMocks
-    private JsonApiClient client;
+    private XmlTokenProvider provider;
 
     @Test
-    void generarOTP_shouldReturnOtpCode() {
-        when(jsonTokenProvider.getToken()).thenReturn("token");
+    void getToken_shouldReturnToken() {
+        TokenResponse response = new TokenResponse();
+        response.setAccessToken("xml-token");
+        response.setExpiresIn(3600);
 
-        OtpResponse response = new OtpResponse();
-        response.setData(new Otp("1234","","1234",1,1));
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(OtpResponse.class)))
+        when(restTemplate.postForEntity(anyString(), any(), eq(TokenResponse.class)))
                 .thenReturn(ResponseEntity.ok(response));
+        when(properties.getClientId()).thenReturn("client");
+        when(properties.getClientSecret()).thenReturn("client");
+        when(properties.getUriApiToken()).thenReturn("client");
+        String token = provider.getToken();
 
-        String otp = client.generarOTP("uuid");
-
-        assertEquals("1234", otp);
-    }
-
-    @Test
-    void validOTP_shouldReturnMessage() {
-        when(jsonTokenProvider.getToken()).thenReturn("token");
-
-        ValidateOtpResponse response = new ValidateOtpResponse();
-        response.setMessage("VALID");
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(ValidateOtpResponse.class)))
-                .thenReturn(ResponseEntity.ok(response));
-
-        String result = client.validOTP(new ValidateOtpRequest("id", "1234"));
-
-        assertEquals("VALID", result);
+        assertEquals("xml-token", token);
     }
 }
+
+
+
+
+
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beemailboxes ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.492 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.849 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.083 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.776 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.075 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldUseCache_whenValid -- Time elapsed: 0.051 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.refreshToken(JsonTokenProvider.java:44)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.getToken(JsonTokenProvider.java:35)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:42)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldUseCache_whenValid(JsonTokenProviderTest.java:50)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired -- Time elapsed: 0.007 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.refreshToken(JsonTokenProvider.java:44)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider.getToken(JsonTokenProvider.java:35)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.303 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.235 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.694 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
+21:48:54.136 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient - ocurrio un error en OTPServiceAdapter : org.mockito.exceptions.misusing.PotentialStubbingProblem: 
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'postForEntity' method:
+    restTemplate.postForEntity(
+    null,
+    <<XTMAILING/>,[Content-Type:"text/xml", Authorization:"Bearer token"]>,
+    class java.lang.String
+);
+    -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient.sendXml(XmlApiClient.java:43)
+ - has following stubbing(s) with different arguments:
+    1. restTemplate.postForEntity("", null, null);
+      -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:53)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.020 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.018 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest.getToken_shouldReturnToken -- Time elapsed: 0.014 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getClientId()" because "this.properties" is null
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.XmlTokenProvider.refreshToken(XmlTokenProvider.java:44)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.XmlTokenProvider.getToken(XmlTokenProvider.java:33)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest.getToken_shouldReturnToken(XmlTokenProviderTest.java:41)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired:42 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
+[ERROR]   JsonTokenProviderTest.getToken_shouldUseCache_whenValid:50->getToken_shouldFetchNewToken_whenExpired:42 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
+[ERROR]   XmlTokenProviderTest.getToken_shouldReturnToken:41 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getClientId()" because "this.properties" is null
+[INFO] 
+[ERROR] Tests run: 26, Failures: 0, Errors: 3, Skipped: 0
+[INFO] 
