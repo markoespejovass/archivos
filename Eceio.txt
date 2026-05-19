@@ -1,1 +1,7 @@
 
+String credentials = properties.getClientId() + ":" + properties.getClientSecret();
+
+String encodedCredentials = Base64.getEncoder()
+        .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+
+headers.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedCredentials);
