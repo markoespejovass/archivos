@@ -1,91 +1,123 @@
-[INFO] 
-[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beemailboxes ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.082 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.752 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.050 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.657 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.207 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldUseCache_whenValid -- Time elapsed: 0.148 s <<< ERROR!
-org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
-	at java.base/java.util.Optional.ifPresent(Optional.java:178)
-	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired -- Time elapsed: 0.029 s <<< ERROR!
-org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
-	at java.base/java.util.Optional.ifPresent(Optional.java:178)
-	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.420 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
-[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.086 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.698 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
-09:07:39.599 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient - ocurrio un error en OTPServiceAdapter : org.mockito.exceptions.misusing.PotentialStubbingProblem: 
-Strict stubbing argument mismatch. Please check:
- - this invocation of 'postForEntity' method:
-    restTemplate.postForEntity(
-    null,
-    <<XTMAILING/>,[Content-Type:"text/xml", Authorization:"Bearer token"]>,
-    class java.lang.String
-);
-    -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient.sendXml(XmlApiClient.java:43)
- - has following stubbing(s) with different arguments:
-    1. restTemplate.postForEntity("", null, null);
-      -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:53)
-Typically, stubbing argument mismatch indicates user mistake when writing tests.
-Mockito fails early so that you can debug potential problem easily.
-However, there are legit scenarios when this exception generates false negative signal:
-  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
-    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
-  - stubbed method is intentionally invoked with different arguments by code under test
-    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
-For more information see javadoc for PotentialStubbingProblem class.
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.200 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired » UnnecessaryStubbing 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-[ERROR]   JsonTokenProviderTest.getToken_shouldUseCache_whenValid » UnnecessaryStubbing 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-[INFO] 
-[ERROR] Tests run: 26, Failures: 0, Errors: 2, Skipped: 0
-[INFO] 
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+
+/**
+ * Configuration class for setting up DynamoDB clients.
+ * <p>
+ * This class provides beans for the DynamoDbClient and DynamoDbEnhancedClient, using AWS region and
+ * credentials from environment variables. It is used to enable integration with AWS DynamoDB in the
+ * application context.
+ */
+@Configuration
+public class DynamoDBConfig {
+
+
+    /**
+     * Creates and configures a DynamoDbClient bean.
+     *
+     * @return a configured DynamoDbClient instance
+     */
+    @Bean(name = "dynamoDbClient")
+    public DynamoDbClient dynamoDbClient() {
+        return DynamoDbClient.builder()
+                .region(Region.of("us-east-1"))
+                .build();
+    }
+
+    /**
+     * Creates a DynamoDbEnhancedClient bean using the provided DynamoDbClient.
+     *
+     * @param dynamoDbClient the DynamoDbClient to use
+     * @return a configured DynamoDbEnhancedClient instance
+     */
+    @Bean
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient(
+            @Qualifier("dynamoDbClient") DynamoDbClient dynamoDbClient) {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
+                .build();
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public abstract class BaseDynamoRepository<T> {
+
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
+    }
+
+    public T putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
+        return request.item();
+    }
+
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T result = table.getItem(r->r.key(key));
+        return Optional.of(result);
+    }
+
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
+    }
+
+}
