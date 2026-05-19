@@ -1,136 +1,91 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.token.OTPToken;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.token.OTPTokenResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.JsonTokenProvider;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
-public class JsonTokenProviderTest {
-
-    @Mock
-    private OtpProperties properties;
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @InjectMocks
-    private JsonTokenProvider provider;
-
-    @Test
-    void getToken_shouldFetchNewToken_whenExpired() {
-        OTPTokenResponse response = new OTPTokenResponse();
-        response.setData(new OTPToken("token123", 3600,"",""));
-
-        when(restTemplate.postForEntity(anyString(), any(), eq(OTPTokenResponse.class)))
-                .thenReturn(ResponseEntity.ok(response));
-        when(properties.getClientId()).thenReturn("client");
-        when(properties.getClientSecret()).thenReturn("client");
-        when(properties.getScope()).thenReturn("client");
-        String token = provider.getToken();
-
-        assertEquals("token123", token);
-    }
-
-    @Test
-    void getToken_shouldUseCache_whenValid() {
-        // primera llamada
-        getToken_shouldFetchNewToken_whenExpired();
-
-        // segunda llamada no debe pegarle al restTemplate
-        String token = provider.getToken();
-
-        verify(restTemplate, times(1))
-                .postForEntity(anyString(), any(), eq(OTPTokenResponse.class));
-
-        assertNotNull(token);
-    }
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.token.OTPTokenResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties;
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants.Constant;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Base64;
-
-import static com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants.Constant.URI_API_OTP_TOKEN;
-
-@Service("jsonTokenProvider")
-@RequiredArgsConstructor
-public class JsonTokenProvider implements TokenProvider{
-
-    private final RestTemplate restTemplate;
-    private String cachedToken;
-    private LocalDateTime expiry;
-    private OtpProperties properties;
-
-    @Override
-    public String getToken() {
-
-        if(cachedToken == null || LocalDateTime.now().isAfter(expiry)){
-            refreshToken();
-        }
-        return cachedToken;
-    }
-
-    private void refreshToken(){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        String auth = properties.getClientId()+":"+properties.getClientSecret();
-        String authEncoded = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
-        headers.set("Authorization", "Basic "+authEncoded);
-        MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
-        body.add(Constant.GRANT_TYPE,Constant.GRANT_TYPE_OTP_VALUE);
-        body.add(Constant.SCOPE,Constant.SCOPE_VALUE);
-
-        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(body,headers);
-        ResponseEntity<OTPTokenResponse> response = restTemplate.postForEntity(
-                URI_API_OTP_TOKEN,request, OTPTokenResponse.class);
-        OTPTokenResponse data = response.getBody();
-
-        assert data != null;
-        cachedToken = data.getData().getAccessToken();
-        expiry = LocalDateTime.now().plusSeconds(data.getData().getExpiresIn());
-    }
-
-}
-
-
-
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beemailboxes ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.082 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.application.ports.input.EmailboxIdInputPortTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.752 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.input.rest.EmailboxIdApiDelegateImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.050 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.BaseDynamoRepositoryTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.657 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonApiClientTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.207 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldUseCache_whenValid -- Time elapsed: 0.148 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+	at java.base/java.util.Optional.ifPresent(Optional.java:178)
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired -- Time elapsed: 0.029 s <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
+	at java.base/java.util.Optional.ifPresent(Optional.java:178)
+	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.420 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceAdapterTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.086 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.OTPServiceMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.698 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.SecurityConfigTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
+09:07:39.599 [main] ERROR com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient - ocurrio un error en OTPServiceAdapter : org.mockito.exceptions.misusing.PotentialStubbingProblem: 
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'postForEntity' method:
+    restTemplate.postForEntity(
+    null,
+    <<XTMAILING/>,[Content-Type:"text/xml", Authorization:"Bearer token"]>,
+    class java.lang.String
+);
+    -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client.XmlApiClient.sendXml(XmlApiClient.java:43)
+ - has following stubbing(s) with different arguments:
+    1. restTemplate.postForEntity("", null, null);
+      -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest.sendXml_shouldHandleException(XmlApiClientTest.java:53)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.200 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlApiClientTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.XmlTokenProviderTest
+[INFO] 
 [INFO] Results:
 [INFO] 
 [ERROR] Errors: 
-[ERROR]   JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired:42 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
-[ERROR]   JsonTokenProviderTest.getToken_shouldUseCache_whenValid:50->getToken_shouldFetchNewToken_whenExpired:42 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties.getClientId()" because "this.properties" is null
-[ERROR]   XmlTokenProviderTest.getToken_shouldReturnToken:41 » NullPointer Cannot invoke "com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties.getClientId()" because "this.properties" is null
+[ERROR]   JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired » UnnecessaryStubbing 
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+[ERROR]   JsonTokenProviderTest.getToken_shouldUseCache_whenValid » UnnecessaryStubbing 
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.JsonTokenProviderTest.getToken_shouldFetchNewToken_whenExpired(JsonTokenProviderTest.java:41)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
 [INFO] 
-[ERROR] Tests run: 26, Failures: 0, Errors: 3, Skipped: 0
+[ERROR] Tests run: 26, Failures: 0, Errors: 2, Skipped: 0
 [INFO] 
