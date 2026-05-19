@@ -1,1 +1,152 @@
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
 
+import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class DynamoDBConfigTest {
+
+    private final DynamoDBConfig config = new DynamoDBConfig();
+
+    @Test
+    void dynamoDbClient_shouldCreateClient() {
+
+        DynamoDbClient client = config.dynamoDbClient();
+
+        assertNotNull(client);
+    }
+
+    @Test
+    void dynamoDbEnhancedClient_shouldCreateEnhancedClient() {
+
+        DynamoDbClient client = config.dynamoDbClient();
+
+        DynamoDbEnhancedClient enhancedClient =
+                config.dynamoDbEnhancedClient(client);
+
+        assertNotNull(enhancedClient);
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.BaseDynamoRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class BaseDynamoRepositoryTest {
+
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    private DynamoDbTable<TestEntity> table;
+
+    @Mock
+    private PageIterable<TestEntity> pageIterable;
+
+    private TestRepository repository;
+
+    @BeforeEach
+    void setUp() {
+
+        when(enhancedClient.table(anyString(), any(TableSchema.class)))
+                .thenReturn(table);
+
+        repository = new TestRepository(enhancedClient);
+    }
+
+    @Test
+    void putIfAbsent_shouldSaveItem() {
+
+        TestEntity entity = new TestEntity();
+        entity.setId("1");
+
+        TestEntity result = repository.putIfAbsent(entity);
+
+        verify(table).putItem(any(PutItemEnhancedRequest.class));
+        assertEquals(entity, result);
+    }
+
+    @Test
+    void getByKey_shouldReturnItem() {
+
+        TestEntity entity = new TestEntity();
+        entity.setId("1");
+
+        when(table.getItem(any(java.util.function.Consumer.class)))
+                .thenReturn(entity);
+
+        Optional<TestEntity> result = repository.getByKey("1", null);
+
+        assertTrue(result.isPresent());
+        assertEquals(entity, result.get());
+    }
+
+    @Test
+    void findAll_shouldReturnItems() {
+
+        TestEntity entity1 = new TestEntity();
+        entity1.setId("1");
+
+        TestEntity entity2 = new TestEntity();
+        entity2.setId("2");
+
+        when(table.scan(any(ScanEnhancedRequest.class)))
+                .thenReturn(pageIterable);
+
+        when(pageIterable.items())
+                .thenReturn(() -> List.of(entity1, entity2).iterator());
+
+        List<TestEntity> results = repository.findAll();
+
+        assertEquals(2, results.size());
+    }
+
+    static class TestRepository extends BaseDynamoRepository<TestEntity> {
+
+        TestRepository(DynamoDbEnhancedClient enhancedClient) {
+            super(
+                    enhancedClient,
+                    "table",
+                    TableSchema.fromBean(TestEntity.class),
+                    TestEntity.class,
+                    "id",
+                    null
+            );
+        }
+    }
+
+    public static class TestEntity {
+
+        private String id;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+    }
+}
