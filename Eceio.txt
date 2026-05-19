@@ -1,12 +1,42 @@
+private void refreshToken(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+
+
+        headers.set(HttpHeaders.AUTHORIZATION,  buildAuthorization());
+        MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
+        body.add(Constant.GRANT_TYPE,Constant.GRANT_TYPE_OTP_VALUE);
+        body.add(Constant.SCOPE,Constant.SCOPE_VALUE);
+
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(body,headers);
+        ResponseEntity<OTPTokenResponse> response = restTemplate.postForEntity(
+                URI_API_OTP_TOKEN,request, OTPTokenResponse.class);
+        OTPTokenResponse data = response.getBody();
+
+        assert data != null;
+        cachedToken = data.getData().getAccessToken();
+        expiry = LocalDateTime.now().plusSeconds(data.getData().getExpiresIn());
+    }
+
+    private String buildAuthorization(){
+        String credentials = properties.getClientId() + ":" + properties.getClientSecret();
+        return "Basic " + Base64.getEncoder()
+                .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+
+
 Privacy violations occur when:
 
 1. Private user information enters the program.
 
-In this case, the data comes from getClientSecret() in JsonTokenProvider.java on line 44.
+In this case, the data comes from getClientSecret() in JsonTokenProvider.java on line 62.
 
 2. The data is written to an external location, such as the console, file system, or network.
 
-In this case, the data is passed to set() in JsonTokenProvider.java on line 49.
+In this case, the data is passed to set() in JsonTokenProvider.java on line 46.
 
 
 Example 1: The following code contains a logging statement that tracks the records added to a database by storing the contents in a log file.
