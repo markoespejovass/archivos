@@ -1,41 +1,51 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.constants;
+acoustic:
+  client-id: ${ACOUSTIC_CLIENT_ID}
+  client-secret: ${ACOUSTIC_CLIENT_SECRET}
+  refresh-token: ${ACOUSTIC_REFRESH_TOKEN}
+  url-send-mail: http://transact-campaign-us-2.goacoustic.com/XTMail
+  uri-api-token: https://api-campaign-us-2.goacoustic.com/oauth/token
 
-/**
- * The class representative Constant
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-public final class Constant {
-
-  public static final String URI_API_TOKEN = "https://api-campaign-us-2.goacoustic.com/oauth/token";
-  public static final String URI_API_OTP_TOKEN = "https://otpsantander.celmediamobile.pe/api/v1/otp/generate";
-  public static final int TEMP_2 = 2;
-  public static final int ZERO = 0;
-  public static final int MAX_NUMBER = 99_999_999;
-  public static final int LIMIT1 = 10_000_000;
-  public static final int LIMIT2 = 100_000_000;
-  public static final int TIMEOUT = 500;
-  public static final String NUMERO_PAR = "^[1-9]\\d{7}$";
-  public static final String URL_SEND_MAIL = "http://transact-campaign-us-2.goacoustic.com/XTMail";
-  public static final String URL_GENERATE_OTP = "https://otpsantander.celmediamobile.pe/api/v1/otp/generate";
-  public static final String URL_VALIDATE_OTP = "https://otpsantander.celmediamobile.pe/api/v1/otp/validate";
-  public static final String GRANT_TYPE = "grant_type";
-  public static final String CLIENT_ID = "client_id";
-  public static final String CLIENTE_SECRET = "client_secret";
-  public static final String REFRESH_TOKEN = "refresh_token";
-  public static final String SCOPE = "scope";
-  public static final String SCOPE_VALUE = "otp:generate otp:validate";
-  public static final String GRANT_TYPE_OTP_VALUE = "client_credentials";
-  public static final String GRANT_TYPE_VALUE = "refresh_token";
-  public static final String CLIENT_ID_VALUE = "da3996aa-0271-4ecb-a820-a7a784a0883e";
-  public static final String CLIENTE_SECRET_VALUE = "86ecd30c-e681-4947-a54b-3faaf8a46e8c";
-  public static final String REFRESH_TOKEN_VALUE = "rMu4uG24_82eu-qGi-kGWSWx4V_4mQIETk67nckzvOXsS1";
-
-  public static final String CLIENT_VALUE = "cli_2663de149361412aa83d8118f4427c7d";
-  public static final String CLIENT_SECRET = "sec_c66e98c86ffb7a69a415085ee4dace0200f7970c3cd393f56662126b8e16d8c7";
-  public static final int MINUTES = 30;
+otp:
+  client-id: ${OTP_CLIENT_ID}
+  client-secret: ${OTP_CLIENT_SECRET}
+  scope: otp:generate otp:validate
+  generate-url: https://otpsantander.celmediamobile.pe/api/v1/otp/generate
+  validate-url: https://otpsantander.celmediamobile.pe/api/v1/otp/validate
 
 
-  private Constant(){}
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+@Getter
+@Setter
+@Component
+@ConfigurationProperties(prefix = "acoustic")
+public class AcousticProperties {
+
+    private String clientId;
+    private String clientSecret;
+    private String refreshToken;
+    private String urlSendMail;
+    private String uriApiToken;
+}
+
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Getter
+@Setter
+@Component
+@ConfigurationProperties(prefix = "otp")
+public class OtpProperties {
+
+    private String clientId;
+    private String clientSecret;
+    private String scope;
+    private String generateUrl;
+    private String validateUrl;
 }
