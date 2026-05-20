@@ -1,1 +1,8 @@
-
+private SdkIterable<TestEntity> iterableOf(TestEntity... items) {
+    return new SdkIterable<TestEntity>() {
+        @Override
+        public java.util.Iterator<TestEntity> iterator() {
+            return Arrays.asList(items).iterator();
+        }
+    };
+}
