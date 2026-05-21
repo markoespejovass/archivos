@@ -1,8 +1,131 @@
-private SdkIterable<TestEntity> iterableOf(TestEntity... items) {
-    return new SdkIterable<TestEntity>() {
-        @Override
-        public java.util.Iterator<TestEntity> iterator() {
-            return Arrays.asList(items).iterator();
-        }
-    };
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+
+import jakarta.annotation.Generated;
+import java.io.Serializable;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+/** Kyc is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "kyc")
+@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
+public class Kyc {
+
+    
+    private Integer id;
+
+    
+    private String partyId;
+
+    @Column(name = "document_number")
+    private String documentNumber;
+
+    @Column(name = "type_customer")
+    private String typeCustomer;
+
+    @Column(name = "type_structure")
+    private String typeStructure;
+
+    @Column(name = "ownership_structure")
+    private String ownershipStructure;
+
+    @Column(name = "due_diligence_regime")
+    private String dueDiligenceRegime;
+
+    @Column(name = "background_of_blocking_list")
+    private String backgroundOfBlockingList;
+
+    @Column(name = "value_of_the_subject")
+    private String valueOfTheSubject;
+
+    @Column(name = "document_type_code")
+    private String documentTypeCode;
+
+    @Column(name = "document_country_code")
+    private String documentCountryCode;
+
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "given_name")
+    private String givenName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "birth_date")
+    private java.sql.Date birthDate;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "nationality_code")
+    private String nationalityCode;
+
+    @Column(name = "state_of_residence")
+    private String stateOfResidence;
+
+    @Column(name = "country_of_residence")
+    private String countryOfResidence;
+
+    @Column(name = "country_of_birth")
+    private String countryOfBirth;
+
+    @Column(name = "civil_status")
+    private String civilStatus;
+
+    @Column(name = "is_pep")
+    private Boolean isPep;
+
+    @Column(name = "pep_comments")
+    private String pepComments;
+
+    @Column(name = "occupation_code")
+    private String occupationCode;
+
+    @Column(name = "occupation_description")
+    private String occupationDescription;
+
+    @Column(name = "economic_activity_category")
+    private String economicActivityCategory;
+
+    @Column(name = "economic_activity_subcategory")
+    private String economicActivitySubcategory;
+
+    @Column(name = "transactionality")
+    private String transactionality;
+
+    @Column(name = "product_family_id")
+    private String productFamilyId;
+
+    
+    private String productName;
+
+    
+    private String productCode;
+
+    
+    private String productDescription;
+    
+    private String channelCode;
+    
+    private String channelDescription;
+
+    
+    private String presenceOfTheGroup;
+
+    
+    private String expCountryRoot;
+
+    
+    private java.sql.Time createdAt;
+
+
+
 }
