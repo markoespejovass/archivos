@@ -1,34 +1,67 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.config;
-
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
-
-@Component
-@EnableWebSecurity
-public class SecurityConfig {
-    @Bean
-    @ConditionalOnMissingBean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/**")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
-                        .anyRequest().permitAll()
-                )
-                .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers
-                        .contentSecurityPolicy(csp ->
-                                csp.policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
-                        )
-                );
-        return http.build();
-    }
-}
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beknowyocustomer ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.960 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.572 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.106 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.shouldCreateEnhancedClient -- Time elapsed: 0.072 s <<< ERROR!
+java.lang.IllegalArgumentException: Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@4cddc036] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
+	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:192)
+	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:108)
+	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:92)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.setUp(DynamoDBConfigTest.java:22)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.shouldCreateDynamoDbClient -- Time elapsed: 0.011 s <<< ERROR!
+java.lang.IllegalArgumentException: Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@560be8c0] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
+	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:192)
+	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:108)
+	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:92)
+	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.setUp(DynamoDBConfigTest.java:22)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.820 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.880 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.483 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.094 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.046 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
+[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   DynamoDBConfigTest.setUp:22 » IllegalArgument Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@560be8c0] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
+[ERROR]   DynamoDBConfigTest.setUp:22 » IllegalArgument Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@4cddc036] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
+[INFO] 
+[ERROR] Tests run: 35, Failures: 0, Errors: 2, Skipped: 0
+[INFO] 
