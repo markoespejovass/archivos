@@ -1,1 +1,180 @@
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.dynamodb.data;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+import java.sql.Date;
+import java.sql.Time;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@DynamoDbBean
+public class KycDynamoDbBean {
+
+    private String pk;
+    private String sk;
+
+    private String partyId;
+    private String documentNumber;
+    private String typeCustomer;
+    private String typeStructure;
+    private String ownershipStructure;
+    private String dueDiligenceRegime;
+    private String backgroundOfBlockingList;
+    private String valueOfTheSubject;
+    private String documentTypeCode;
+    private String documentCountryCode;
+    private String fullName;
+    private String givenName;
+    private String lastName;
+    private Date birthDate;
+    private String gender;
+    private String nationalityCode;
+    private String stateOfResidence;
+    private String countryOfResidence;
+    private String countryOfBirth;
+    private String civilStatus;
+    private Boolean isPep;
+    private String pepComments;
+    private String occupationCode;
+    private String occupationDescription;
+    private String economicActivityCategory;
+    private String economicActivitySubcategory;
+    private String transactionality;
+    private String productFamilyId;
+    private String productName;
+    private String productCode;
+    private String productDescription;
+    private String channelCode;
+    private String channelDescription;
+    private String presenceOfTheGroup;
+    private String expCountryRoot;
+    private Time createdAt;
+
+    @DynamoDbPartitionKey
+    public String getPk() {
+        return pk;
+    }
+
+    @DynamoDbSortKey
+    public String getSk() {
+        return sk;
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.dynamodb.data;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@DynamoDbBean
+public class InputDefinitionDynamoDbBean {
+
+    private String pk;
+    private String sk;
+
+    private String inputCode;
+    private String kycField;
+    private String description;
+
+    @DynamoDbPartitionKey
+    public String getPk() {
+        return pk;
+    }
+
+    @DynamoDbSortKey
+    public String getSk() {
+        return sk;
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.dynamodb.data;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@DynamoDbBean
+public class FactorRuleDynamoDbBean {
+
+    private String pk;
+    private String sk;
+
+    private String factorCode;
+    private String inputCode;
+    private BigDecimal weight;
+
+    @DynamoDbPartitionKey
+    public String getPk() {
+        return pk;
+    }
+
+    @DynamoDbSortKey
+    public String getSk() {
+        return sk;
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.dynamodb.data;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@DynamoDbBean
+public class ValueMappingDynamoDbBean {
+
+    private String pk;
+    private String sk;
+
+    private String inputCode;
+    private String valueText;
+    private BigDecimal valueNumeric;
+
+    @DynamoDbPartitionKey
+    public String getPk() {
+        return pk;
+    }
+
+    @DynamoDbSortKey
+    public String getSk() {
+        return sk;
+    }
+}
+
 
