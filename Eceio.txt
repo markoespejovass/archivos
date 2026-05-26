@@ -1,67 +1,259 @@
-[INFO] 
-[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beknowyocustomer ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.960 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.572 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
-[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.106 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.shouldCreateEnhancedClient -- Time elapsed: 0.072 s <<< ERROR!
-java.lang.IllegalArgumentException: Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@4cddc036] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
-	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:192)
-	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:108)
-	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:92)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.setUp(DynamoDBConfigTest.java:22)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.shouldCreateDynamoDbClient -- Time elapsed: 0.011 s <<< ERROR!
-java.lang.IllegalArgumentException: Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@560be8c0] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
-	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:192)
-	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:108)
-	at org.springframework.test.util.ReflectionTestUtils.setField(ReflectionTestUtils.java:92)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest.setUp(DynamoDBConfigTest.java:22)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.820 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.880 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.483 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.094 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.046 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   DynamoDBConfigTest.setUp:22 » IllegalArgument Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@560be8c0] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
-[ERROR]   DynamoDBConfigTest.setUp:22 » IllegalArgument Could not find field 'awsRegion' of type [null] on target object [com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig@4cddc036] or target class [class com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.DynamoDBConfig]
-[INFO] 
-[ERROR] Tests run: 35, Failures: 0, Errors: 2, Skipped: 0
-[INFO] 
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+
+import jakarta.annotation.Generated;
+import java.io.Serializable;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+/** Kyc is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "kyc")
+@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
+public class Kyc {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "party_id")
+    private String partyId;
+
+    @Column(name = "document_number")
+    private String documentNumber;
+
+    @Column(name = "type_customer")
+    private String typeCustomer;
+
+    @Column(name = "type_structure")
+    private String typeStructure;
+
+    @Column(name = "ownership_structure")
+    private String ownershipStructure;
+
+    @Column(name = "due_diligence_regime")
+    private String dueDiligenceRegime;
+
+    @Column(name = "background_of_blocking_list")
+    private String backgroundOfBlockingList;
+
+    @Column(name = "value_of_the_subject")
+    private String valueOfTheSubject;
+
+    @Column(name = "document_type_code")
+    private String documentTypeCode;
+
+    @Column(name = "document_country_code")
+    private String documentCountryCode;
+
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "given_name")
+    private String givenName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "birth_date")
+    private java.sql.Date birthDate;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @Column(name = "nationality_code")
+    private String nationalityCode;
+
+    @Column(name = "state_of_residence")
+    private String stateOfResidence;
+
+    @Column(name = "country_of_residence")
+    private String countryOfResidence;
+
+    @Column(name = "country_of_birth")
+    private String countryOfBirth;
+
+    @Column(name = "civil_status")
+    private String civilStatus;
+
+    @Column(name = "is_pep")
+    private Boolean isPep;
+
+    @Column(name = "pep_comments")
+    private String pepComments;
+
+    @Column(name = "occupation_code")
+    private String occupationCode;
+
+    @Column(name = "occupation_description")
+    private String occupationDescription;
+
+    @Column(name = "economic_activity_category")
+    private String economicActivityCategory;
+
+    @Column(name = "economic_activity_subcategory")
+    private String economicActivitySubcategory;
+
+    @Column(name = "transactionality")
+    private String transactionality;
+
+    @Column(name = "product_family_id")
+    private String productFamilyId;
+
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "product_code")
+    private String productCode;
+
+    @Column(name = "product_description")
+    private String productDescription;
+
+    @Column(name = "channel_code")
+    private String channelCode;
+
+    @Column(name = "channel_description")
+    private String channelDescription;
+
+    @Column(name = "presence_of_the_group")
+    private String presenceOfTheGroup;
+
+    @Column(name ="exp_country_root")
+    private String expCountryRoot;
+
+    @Column(name = "created_at")
+    private java.sql.Time createdAt;
+
+
+
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+
+import jakarta.annotation.Generated;
+import java.io.Serializable;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+/** InputDefinition is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "input_definition")
+@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
+public class InputDefinition {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "input_code")
+    private String inputCode;
+
+    @Column(name = "kyc_field")
+    private String kycField;
+
+    @Column(name = "description")
+    private String description;
+
+
+
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+
+import jakarta.annotation.Generated;
+import java.io.Serializable;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+/** FactorRule is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "factor_rule")
+@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
+public class FactorRule {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "factor_code")
+    private String factorCode;//SCORE
+
+    @Column(name = "input_code")
+    private String inputCode;//Factor canal
+
+    @Column(name = "weight")
+    private java.math.BigDecimal weight;//0.6
+
+
+
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+
+import jakarta.annotation.Generated;
+import java.io.Serializable;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+/** ValueMapping is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "value_mapping")
+@Generated(value = "com.santander.ars.core.generator.JpaEntityCogeGenerator")
+public class ValueMapping {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "input_code")
+    private String inputCode;
+
+    @Column(name = "value_text")
+    private String valueText;
+
+    @Column(name = "value_numeric")
+    private java.math.BigDecimal valueNumeric;
+
+
+
+}
