@@ -1,65 +1,21 @@
-[INFO] 
-[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beknowyocustomer ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.526 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.139 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.832 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.852 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
-[ERROR] Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.803 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully -- Time elapsed: 0.104 s <<< ERROR!
-org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully(KnowYourCustomerAdapterTest.java:58)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-	at org.mockito.junit.jupiter.MockitoExtension.lambda$afterEach$2(MockitoExtension.java:200)
-	at java.base/java.util.Optional.ifPresent(Optional.java:178)
-	at org.mockito.junit.jupiter.MockitoExtension.afterEach(MockitoExtension.java:198)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.373 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.160 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.018 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully » UnnecessaryStubbing 
-Unnecessary stubbings detected.
-Clean & maintainable test code requires zero unnecessary code.
-Following stubbings are unnecessary (click to navigate to relevant line of code):
-  1. -> at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest.shouldCreateKycSuccessfully(KnowYourCustomerAdapterTest.java:58)
-Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
-[INFO] 
-[ERROR] Tests run: 35, Failures: 0, Errors: 1, Skipped: 0
-[INFO] 
+curl --location 'https://dev-api.skyairline.com/partners/v1/user' \
+--header 'Ocp-Apim-Subscription-Key: 5cfc7d2fea014ede83c5bd0086d81d2c' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: __cf_bm=p4ewcCqCyZ5vaEepE.eW47WkFlaWoRsqfiUTvTwvSm4-1771966697-1.0.1.1-K3iprpLMLWi1Xusp7PV2EKDW4GtTNv.npYJ2pmVUyL65j5h9gY3ZmEyiinNdNrr7.3hQb3hqiF2s4JtgsJsHlE3l2gxVelYNkaioFnsBays; __cf_bm=DUo1bCZ.h.0rAKm9V8k0AG7ol8CyC.OOB0uxxnx1K4Q-1779914609.769904-1.0.1.1-OMdBAOA_jP7a89dOzTVYhqbyEe5uB42sb6I698B269Q4qRBtuGrnFnldy2OCbldyX_3Sth9dnDNEg0drnfD73cvOAUxCeHXMgXgmcuK638J4hP9nR1bh7wnNVkqzNDX1' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCtBRVMifQ.eyJwYXJ0bmVySWQiOiJCU1BFIiwiaWF0IjoxNzcyMTE2MTM4LCJleHAiOjE3NzIxMDE4MDB9.z0rZuMkko5g-q7Y0H-vKbPb-xVnh8pexilCGU5VCBWw' \
+--data '{
+    "partnerId": "BSPE",
+    "data": "{{encryptedData}}"
+}'
+
+
+
+curl --location 'https://development.api.sky-data-exchange.qurable.io/partners/v1/user' \
+--header 'Ocp-Apim-Subscription-Key: 5cfc7d2fea014ede83c5bd0086d81d2c' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: __cf_bm=p4ewcCqCyZ5vaEepE.eW47WkFlaWoRsqfiUTvTwvSm4-1771966697-1.0.1.1-K3iprpLMLWi1Xusp7PV2EKDW4GtTNv.npYJ2pmVUyL65j5h9gY3ZmEyiinNdNrr7.3hQb3hqiF2s4JtgsJsHlE3l2gxVelYNkaioFnsBays' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCtBRVMifQ.eyJwYXJ0bmVySWQiOiJCU1BFIiwiaWF0IjoxNzcyMTE2MTM4LCJleHAiOjE3NzIxMDE4MDB9.z0rZuMkko5g-q7Y0H-vKbPb-xVnh8pexilCGU5VCBWw' \
+--data '{
+    "partnerId": "BSPE",
+    "data": "{{encryptedData}}"
+}'
