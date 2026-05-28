@@ -1,57 +1,74 @@
 @Override
-    public Void updateTier(WrapperUpdateBenefitProgramDetails criteria, String action) {
-        TierRequest tierRequest = convertToTierRequest(criteria);
-        if (action.equals("UP")){
-             webClient
-                    .patch()
-                    .uri(Constant.URI_API_SKY_TIER)
-                    .header("Ocp-Apim-Subscription-Key", "5cfc7d2fea014ede83c5bd0086d81d2c")
-                    .header("Content-Type", "application/json")
-                    .bodyValue(tierRequest)
-                    .retrieve()
-                    .onStatus(
-                            HttpStatusCode::is4xxClientError,
-                            response -> response.bodyToMono(String.class).map(body ->{
-                                log.error("error: {}", body);
-                                throw new RuntimeException("error: "+ body);
+public Void updateTier(WrapperUpdateBenefitProgramDetails criteria, String action) {
+
+    TierRequest tierRequest = convertToTierRequest(criteria);
+
+    HttpMethod method = resolveHttpMethod(action);
+
+    webClient
+            .method(method)
+            .uri(Constant.URI_API_SKY_TIER)
+            .headers(headers -> {
+                headers.set("Ocp-Apim-Subscription-Key",
+                        "5cfc7d2fea014ede83c5bd0086d81d2c");
+                headers.setContentType(MediaType.APPLICATION_JSON);
+            })
+            .bodyValue(tierRequest)
+            .retrieve()
+            .onStatus(
+                    HttpStatusCode::is4xxClientError,
+                    response -> response.bodyToMono(String.class)
+                            .flatMap(body -> {
+                                log.error("Error consumiendo SKY API: {}", body);
+                                return Mono.error(
+                                        new RuntimeException("Error SKY API: " + body)
+                                );
                             })
-                    )
-                    .bodyToMono(CreateUserResponse.class)
-                    .block();
-        }
-        if (action.equals("DOWN")){
-             webClient
-                    .delete()
-                    .uri(Constant.URI_API_SKY_TIER)
-                    .header("Ocp-Apim-Subscription-Key", "5cfc7d2fea014ede83c5bd0086d81d2c")
-                    .header("Content-Type", "application/json")
-                    .bodyValue(tierRequest)
-                    .retrieve()
-                    .onStatus(
-                            HttpStatusCode::is4xxClientError,
-                            response -> response.bodyToMono(String.class).map(body ->{
-                                log.error("error: {}", body);
-                                throw new RuntimeException("error: "+ body);
-                            })
-                    )
-                    .bodyToMono(CreateUserResponse.class)
-                    .block();
-        }
-        return null;
+            )
+            .bodyToMono(CreateUserResponse.class)
+            .block();
+
+    return null;
+}
+
+private HttpMethod resolveHttpMethod(String action) {
+
+    switch (action) {
+        case "UP":
+            return HttpMethod.PATCH;
+
+        case "DOWN":
+            return HttpMethod.DELETE;
+
+        default:
+            throw new IllegalArgumentException(
+                    "Acción inválida: " + action
+            );
     }
+}
 
-    private TierRequest convertToTierRequest(WrapperUpdateBenefitProgramDetails criteria){
-        TierRequest response = new TierRequest();
+private TierRequest convertToTierRequest(
+        WrapperUpdateBenefitProgramDetails criteria) {
 
-        assert criteria.getLogo() != null;
-        response.setKey(criteria.getLogo().getName());
-        assert Objects.requireNonNull(criteria.getStatus()).getStatusCode() != null;
-        response.setTier_id(Integer.parseInt(criteria.getStatus().getStatusCode()));
-        response.setEmail(criteria.getSummary());
-        response.setTx_id(criteria.getDescription());
+    Objects.requireNonNull(criteria.getLogo(), "Logo es requerido");
+    Objects.requireNonNull(criteria.getStatus(), "Status es requerido");
+    Objects.requireNonNull(
+            criteria.getStatus().getStatusCode(),
+            "StatusCode es requerido"
+    );
 
-        response.setCountry_id(Constant.PERU_ID);
-        response.setTier_expires_at(Constant.EXPIRES_TIME_TIER);
-        response.setUser_enabled(true);
-        return response;
-    }
+    TierRequest response = new TierRequest();
+
+    response.setKey(criteria.getLogo().getName());
+    response.setTier_id(
+            Integer.parseInt(criteria.getStatus().getStatusCode())
+    );
+    response.setEmail(criteria.getSummary());
+    response.setTx_id(criteria.getDescription());
+
+    response.setCountry_id(Constant.PERU_ID);
+    response.setTier_expires_at(Constant.EXPIRES_TIME_TIER);
+    response.setUser_enabled(true);
+
+    return response;
+}
