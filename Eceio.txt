@@ -1,204 +1,340 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
-
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-/**
- * The class representative Repository
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Repository
-public class InputDefinitionRepository extends BaseDynamoRepository<InputDefinition> {
-
-    public InputDefinitionRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableInputDefinition}") String table){
-        super(enhancedClient, table, TableSchema.fromBean(InputDefinition.class),InputDefinition.class,"id","inputCode");
-    }
-}
-
-
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
-
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-/**
- * The class representative Repository
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Repository
-public class KnokYourCustomerRepository extends BaseDynamoRepository<Kyc> {
-
-    public KnokYourCustomerRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableKyc}") String table){
-        super(enhancedClient, table, TableSchema.fromBean(Kyc.class),Kyc.class,"id","PartyID");
-    }
-
-    //Kyc findByDocumentNumber(String doc);
-
-}
-
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
-
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-
-/**
- * The class representative Repository
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Repository
-public class ValueRepository extends BaseDynamoRepository<ValueMapping> {
-
-    public ValueRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableValueMapping}") String table){
-        super(enhancedClient, table, TableSchema.fromBean(ValueMapping.class),ValueMapping.class,"id","inputCode");
-    }
-    //ValueMapping findByInputCode(String code);
-}
-
-
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
-
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRule;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
-import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-import java.util.List;
-
-/**
- * The class representative Repository
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Repository
-public class WeightRepository extends BaseDynamoRepository<FactorRule> {
-
-    public WeightRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableFactorRule}") String table){
-        super(enhancedClient, table, TableSchema.fromBean(FactorRule.class),FactorRule.class,"id","factorCode");
-    }
-    //List<FactorRule> findByFactorCode(String factor);
-}
-
-
-
-
-
-
 package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
 
-import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 
-
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseDynamoRepository<T> {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-    protected final DynamoDbEnhancedClient enhancedClient;
-    protected final DynamoDbTable<T> table;
-    private final String partitionKeyAttr;
-    @Nullable
-    private final String sortKeyAttr;
-    private final Class<T> itemClass;
+@ExtendWith(MockitoExtension.class)
+class BaseDynamoRepositoryTest {
 
-    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
-                                   String tableName,
-                                   TableSchema<T> schema,
-                                   Class<T> itemClass,
-                                   String partitionKeyAttr,
-                                   @Nullable String sortKeyAttr) {
-        this.enhancedClient = enhancedClient;
-        this.table = enhancedClient.table(tableName, schema);
-        this.itemClass = itemClass;
-        this.partitionKeyAttr = partitionKeyAttr;
-        this.sortKeyAttr = sortKeyAttr;
-    }
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
 
-    public T putIfAbsent(T item) {
-        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
-        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
-            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
-        }
-        Expression condition = Expression.builder()
-                .expression(expr)
-                .build();
-        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
-                .item(item)
-                .conditionExpression(condition)
-                .build();
-        table.putItem(request);
-        return request.item();
-    }
+    @Mock
+    private DynamoDbTable<TestEntity> table;
 
-    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
-        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
-                ? Key.builder().partitionValue(partitionKeyValue).build()
-                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+    private TestRepository repository;
 
-        T result = table.getItem(r->r.key(key));
-        return Optional.of(result);
-    }
+    @BeforeEach
+    void setUp() {
 
-    public List<T> getByKeyList(String partitionKeyValue) {
-        QueryConditional queryConditional = QueryConditional.keyEqualTo(
-                Key.builder().partitionValue(partitionKeyValue).build()
+        when(enhancedClient.table(
+                anyString(),
+                any(TableSchema.class)
+        )).thenReturn(table);
+
+        repository = new TestRepository(
+                enhancedClient,
+                "test-table"
         );
-        return table.query(queryConditional).stream().flatMap(page -> page.items().stream()).toList();
     }
 
-    public List<T> findAll() {
-        List<T> results = new ArrayList<>();
-        table.scan(ScanEnhancedRequest.builder().build())
-                .items()
-                .forEach(results::add);
-        return results;
+    @Test
+    void putIfAbsentShouldCallPutItem() {
+
+        TestEntity entity = new TestEntity();
+        entity.setId("1");
+        entity.setCode("ABC");
+
+        repository.putIfAbsent(entity);
+
+        verify(table, times(1))
+                .putItem(any(PutItemEnhancedRequest.class));
     }
 
+    @Test
+    void getByKeyShouldReturnEntity() {
+
+        TestEntity entity = new TestEntity();
+        entity.setId("1");
+        entity.setCode("ABC");
+
+        when(table.getItem(any(java.util.function.Consumer.class)))
+                .thenReturn(entity);
+
+        Optional<TestEntity> result =
+                repository.getByKey("1", "ABC");
+
+        assertTrue(result.isPresent());
+        assertEquals("1", result.get().getId());
+    }
+
+    @Test
+    void getByKeyShouldReturnEmptyWhenNotFound() {
+
+        when(table.getItem(any(java.util.function.Consumer.class)))
+                .thenReturn(null);
+
+        Optional<TestEntity> result =
+                repository.getByKey("1", "ABC");
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void findAllShouldReturnItems() {
+
+        TestEntity item1 = new TestEntity();
+        item1.setId("1");
+
+        TestEntity item2 = new TestEntity();
+        item2.setId("2");
+
+        Page<TestEntity> page =
+                Page.create(Arrays.asList(item1, item2));
+
+        PageIterable pageIterable = mock(PageIterable.class);
+
+        when(table.scan(any(ScanEnhancedRequest.class)))
+                .thenReturn(pageIterable);
+
+        when(pageIterable.items())
+                .thenReturn(Arrays.asList(item1, item2));
+
+        List<TestEntity> result =
+                repository.findAll();
+
+        assertEquals(2, result.size());
+    }
+
+    private static class TestRepository
+            extends BaseDynamoRepository<TestEntity> {
+
+        protected TestRepository(
+                DynamoDbEnhancedClient enhancedClient,
+                String tableName) {
+
+            super(
+                    enhancedClient,
+                    tableName,
+                    TableSchema.fromBean(TestEntity.class),
+                    TestEntity.class,
+                    "id",
+                    "code"
+            );
+        }
+    }
+
+    @DynamoDbBean
+    public static class TestEntity {
+
+        private String id;
+        private String code;
+
+        @DynamoDbPartitionKey
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        @DynamoDbSortKey
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+    }
 }
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class InputDefinitionRepositoryTest {
+
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    private DynamoDbTable<InputDefinition> table;
+
+    @Test
+    void shouldCreateRepository() {
+
+        when(enhancedClient.table(
+                anyString(),
+                any(TableSchema.class)))
+                .thenReturn(table);
+
+        InputDefinitionRepository repository =
+                new InputDefinitionRepository(
+                        enhancedClient,
+                        "input-definition"
+                );
+
+        assertNotNull(repository);
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class KnokYourCustomerRepositoryTest {
+
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    private DynamoDbTable<Kyc> table;
+
+    @Test
+    void shouldCreateRepository() {
+
+        when(enhancedClient.table(
+                anyString(),
+                any(TableSchema.class)))
+                .thenReturn(table);
+
+        KnokYourCustomerRepository repository =
+                new KnokYourCustomerRepository(
+                        enhancedClient,
+                        "kyc-table"
+                );
+
+        assertNotNull(repository);
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ValueRepositoryTest {
+
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    private DynamoDbTable<ValueMapping> table;
+
+    @Test
+    void shouldCreateRepository() {
+
+        when(enhancedClient.table(
+                anyString(),
+                any(TableSchema.class)))
+                .thenReturn(table);
+
+        ValueRepository repository =
+                new ValueRepository(
+                        enhancedClient,
+                        "value-table"
+                );
+
+        assertNotNull(repository);
+    }
+}
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class WeightRepositoryTest {
+
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    private DynamoDbTable<FactorRule> table;
+
+    @Test
+    void shouldCreateRepository() {
+
+        when(enhancedClient.table(
+                anyString(),
+                any(TableSchema.class)))
+                .thenReturn(table);
+
+        WeightRepository repository =
+                new WeightRepository(
+                        enhancedClient,
+                        "weight-table"
+                );
+
+        assertNotNull(repository);
+    }
+}
+
+
+
+
+
