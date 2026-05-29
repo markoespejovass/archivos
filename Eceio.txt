@@ -1,74 +1,204 @@
-@Override
-public Void updateTier(WrapperUpdateBenefitProgramDetails criteria, String action) {
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
 
-    TierRequest tierRequest = convertToTierRequest(criteria);
 
-    HttpMethod method = resolveHttpMethod(action);
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
-    webClient
-            .method(method)
-            .uri(Constant.URI_API_SKY_TIER)
-            .headers(headers -> {
-                headers.set("Ocp-Apim-Subscription-Key",
-                        "5cfc7d2fea014ede83c5bd0086d81d2c");
-                headers.setContentType(MediaType.APPLICATION_JSON);
-            })
-            .bodyValue(tierRequest)
-            .retrieve()
-            .onStatus(
-                    HttpStatusCode::is4xxClientError,
-                    response -> response.bodyToMono(String.class)
-                            .flatMap(body -> {
-                                log.error("Error consumiendo SKY API: {}", body);
-                                return Mono.error(
-                                        new RuntimeException("Error SKY API: " + body)
-                                );
-                            })
-            )
-            .bodyToMono(CreateUserResponse.class)
-            .block();
+/**
+ * The class representative Repository
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Repository
+public class InputDefinitionRepository extends BaseDynamoRepository<InputDefinition> {
 
-    return null;
-}
-
-private HttpMethod resolveHttpMethod(String action) {
-
-    switch (action) {
-        case "UP":
-            return HttpMethod.PATCH;
-
-        case "DOWN":
-            return HttpMethod.DELETE;
-
-        default:
-            throw new IllegalArgumentException(
-                    "Acción inválida: " + action
-            );
+    public InputDefinitionRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableInputDefinition}") String table){
+        super(enhancedClient, table, TableSchema.fromBean(InputDefinition.class),InputDefinition.class,"id","inputCode");
     }
 }
 
-private TierRequest convertToTierRequest(
-        WrapperUpdateBenefitProgramDetails criteria) {
 
-    Objects.requireNonNull(criteria.getLogo(), "Logo es requerido");
-    Objects.requireNonNull(criteria.getStatus(), "Status es requerido");
-    Objects.requireNonNull(
-            criteria.getStatus().getStatusCode(),
-            "StatusCode es requerido"
-    );
 
-    TierRequest response = new TierRequest();
 
-    response.setKey(criteria.getLogo().getName());
-    response.setTier_id(
-            Integer.parseInt(criteria.getStatus().getStatusCode())
-    );
-    response.setEmail(criteria.getSummary());
-    response.setTx_id(criteria.getDescription());
 
-    response.setCountry_id(Constant.PERU_ID);
-    response.setTier_expires_at(Constant.EXPIRES_TIME_TIER);
-    response.setUser_enabled(true);
 
-    return response;
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.Kyc;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+/**
+ * The class representative Repository
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Repository
+public class KnokYourCustomerRepository extends BaseDynamoRepository<Kyc> {
+
+    public KnokYourCustomerRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableKyc}") String table){
+        super(enhancedClient, table, TableSchema.fromBean(Kyc.class),Kyc.class,"id","PartyID");
+    }
+
+    //Kyc findByDocumentNumber(String doc);
+
+}
+
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinition;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+
+/**
+ * The class representative Repository
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Repository
+public class ValueRepository extends BaseDynamoRepository<ValueMapping> {
+
+    public ValueRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableValueMapping}") String table){
+        super(enhancedClient, table, TableSchema.fromBean(ValueMapping.class),ValueMapping.class,"id","inputCode");
+    }
+    //ValueMapping findByInputCode(String code);
+}
+
+
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository;
+
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRule;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMapping;
+import com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config.BaseDynamoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import java.util.List;
+
+/**
+ * The class representative Repository
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Repository
+public class WeightRepository extends BaseDynamoRepository<FactorRule> {
+
+    public WeightRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.tableFactorRule}") String table){
+        super(enhancedClient, table, TableSchema.fromBean(FactorRule.class),FactorRule.class,"id","factorCode");
+    }
+    //List<FactorRule> findByFactorCode(String factor);
+}
+
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
+
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public abstract class BaseDynamoRepository<T> {
+
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
+    }
+
+    public T putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
+        return request.item();
+    }
+
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T result = table.getItem(r->r.key(key));
+        return Optional.of(result);
+    }
+
+    public List<T> getByKeyList(String partitionKeyValue) {
+        QueryConditional queryConditional = QueryConditional.keyEqualTo(
+                Key.builder().partitionValue(partitionKeyValue).build()
+        );
+        return table.query(queryConditional).stream().flatMap(page -> page.items().stream()).toList();
+    }
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
+    }
+
 }
