@@ -1,76 +1,77 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
 
-import jakarta.annotation.Generated;
-import java.io.Serializable;
-
-import jakarta.persistence.*;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
-
-/** Kyc is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
-@Getter
-@Setter
-@NoArgsConstructor
-@DynamoDbBean
-public class Kyc {
-
-    private String id;
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 
 
-    private String partyId;
-    private String documentNumber;
-    private String typeCustomer;
-    private String typeStructure;
-    private String ownershipStructure;
-    private String dueDiligenceRegime;
-    private String backgroundOfBlockingList;
-    private String valueOfTheSubject;
-    private String documentTypeCode;
-    private String documentCountryCode;
-    private String fullName;
-    private String givenName;
-    private String lastName;
-    private String birthDate;
-    private String gender;
-    private String nationalityCode;
-    private String stateOfResidence;
-    private String countryOfResidence;
-    private String countryOfBirth;
-    private String civilStatus;
-    private Boolean isPep;
-    private String pepComments;
-    private String occupationCode;
-    private String occupationDescription;
-    private String economicActivityCategory;
-    private String economicActivitySubcategory;
-    private String transactionality;
-    private String productFamilyId;
-    private String productName;
-    private String productCode;
-    private String productDescription;
-    private String channelCode;
-    private String channelDescription;
-    private String presenceOfTheGroup;
-    private String expCountryRoot;
-    private String createdAt;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-    @DynamoDbPartitionKey
-    @DynamoDbAttribute("id")
-    public String getPartyId() {
-        return partyId;
+public abstract class BaseDynamoRepository<T> {
+
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
     }
 
-    @DynamoDbSortKey
-    @DynamoDbAttribute("PartyID")
-    public String getiId() {
-        return id;
+    public T putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
+        return request.item();
     }
 
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T result = table.getItem(r->r.key(key));
+        return Optional.ofNullable(result);
+    }
+
+    public List<T> getByKeyList(String partitionKeyValue) {
+        QueryConditional queryConditional = QueryConditional.keyEqualTo(
+                Key.builder().partitionValue(partitionKeyValue).build()
+        );
+        return table.query(queryConditional).stream().flatMap(page -> page.items().stream()).toList();
+    }
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
+    }
 
 }
+, si necesito hace el unit test de findAll y getByKeyList para poder llegar a la cobertura
