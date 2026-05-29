@@ -1,54 +1,23 @@
-
-@Test
-void findAllShouldReturnItems() {
-
-    TestEntity item1 = new TestEntity();
-    item1.setId("1");
-
-    TestEntity item2 = new TestEntity();
-    item2.setId("2");
-
-    PageIterable<TestEntity> pageIterable = mock(PageIterable.class);
-
-    SdkIterable<TestEntity> sdkIterable =
-            () -> Arrays.asList(item1, item2).iterator();
-
-    when(table.scan(any(ScanEnhancedRequest.class)))
-            .thenReturn(pageIterable);
-
-    when(pageIterable.items())
-            .thenReturn(sdkIterable);
-
-    List<TestEntity> result = repository.findAll();
-
-    assertEquals(2, result.size());
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "execute-api:Invoke",
+      "Resource": "arn:aws:execute-api:us-east-1:458284369113:*"
+    },
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "execute-api:Invoke",
+      "Resource": "arn:aws:execute-api:us-east-1:458284369113:*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:SourceVpce": "vpce-093a82734f6418af6"
+        }
+      }
+    }
+  ]
 }
-
-
-
-@Test
-void getByKeyListShouldReturnItems() {
-
-    TestEntity item1 = new TestEntity();
-    item1.setId("1");
-
-    TestEntity item2 = new TestEntity();
-    item2.setId("1");
-
-    Page<TestEntity> page =
-            Page.create(Arrays.asList(item1, item2));
-
-    PageIterable<TestEntity> pageIterable =
-            mock(PageIterable.class);
-
-    when(table.query(any(QueryConditional.class)))
-            .thenReturn(pageIterable);
-
-    when(pageIterable.stream())
-            .thenReturn(java.util.stream.Stream.of(page));
-
-    List<TestEntity> result =
-            repository.getByKeyList("1");
-
-    assertEquals(2, result.size());
-}
+ 
