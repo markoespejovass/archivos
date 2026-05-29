@@ -72,3 +72,33 @@ java.lang.IllegalArgumentException: A DynamoDb bean class must be annotated with
 [INFO] 
 [ERROR] Tests run: 42, Failures: 0, Errors: 1, Skipped: 0
 [INFO] 
+
+
+
+/*
+    @Test
+    void findAllShouldReturnItems() {
+
+        TestEntity item1 = new TestEntity();
+        item1.setId("1");
+
+        TestEntity item2 = new TestEntity();
+        item2.setId("2");
+
+        Page<TestEntity> page =
+                Page.create(Arrays.asList(item1, item2));
+
+        PageIterable pageIterable = mock(PageIterable.class);
+
+        when(table.scan(any(ScanEnhancedRequest.class)))
+                .thenReturn(pageIterable);
+
+        when(pageIterable.items())
+                .thenReturn(Arrays.asList(item1, item2));
+
+        List<TestEntity> result =
+                repository.findAll();
+
+        assertEquals(2, result.size());
+    }
+*/
