@@ -1,88 +1,76 @@
-[INFO] 
-[INFO] --- surefire:3.5.4:test (default-test) @ cpe-nxhbsc-beknowyocustomer ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
-OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.042 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.application.ports.input.InputPortTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.226 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.input.rest.ApiDelegateImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.052 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.BaseDynamoRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.245 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.DynamoDBConfigTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.805 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.OTPServiceMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepositoryTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.074 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.InputDefinitionRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepositoryTest
-[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.070 s <<< FAILURE! -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepositoryTest
-[ERROR] com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepositoryTest.shouldCreateRepository -- Time elapsed: 0.062 s <<< ERROR!
-java.lang.IllegalArgumentException: Attempt to add an attribute to a mapper that already has one with the same name. [Attribute name: id]
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticImmutableTableSchema.lambda$new$1(StaticImmutableTableSchema.java:218)
-	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
-	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
-	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
-	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
-	at java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
-	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
-	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticImmutableTableSchema.<init>(StaticImmutableTableSchema.java:213)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticImmutableTableSchema.<init>(StaticImmutableTableSchema.java:80)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticImmutableTableSchema$Builder.build(StaticImmutableTableSchema.java:508)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema.<init>(StaticTableSchema.java:71)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema.<init>(StaticTableSchema.java:69)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema$Builder.build(StaticTableSchema.java:289)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema.createStaticTableSchema(BeanTableSchema.java:290)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema.create(BeanTableSchema.java:190)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema.lambda$create$0(BeanTableSchema.java:175)
-	at java.base/java.util.Map.computeIfAbsent(Map.java:1054)
-	at java.base/java.util.Collections$SynchronizedMap.computeIfAbsent(Collections.java:2761)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema.create(BeanTableSchema.java:174)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema.create(BeanTableSchema.java:148)
-	at software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema.create(BeanTableSchema.java:143)
-	at software.amazon.awssdk.enhanced.dynamodb.TableSchema.fromBean(TableSchema.java:118)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepository.<init>(KnokYourCustomerRepository.java:20)
-	at com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.KnokYourCustomerRepositoryTest.shouldCreateRepository(KnokYourCustomerRepositoryTest.java:33)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.ValueRepositoryTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.ValueRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.WeightRepositoryTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.repository.WeightRepositoryTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.474 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerAdapterTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.195 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KnowYourCustomerUseCaseImplTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.072 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.KYCEntityMapperTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.ScoreCalculatorTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.FactorRuleTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.InputDefinitionTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycAnswerValuesTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionnaireTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycQuestionTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.KycTest
-[INFO] Running com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data.ValueMappingTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[ERROR] Errors: 
-[ERROR]   KnokYourCustomerRepositoryTest.shouldCreateRepository:33 » IllegalArgument Attempt to add an attribute to a mapper that already has one with the same name. [Attribute name: id]
-[INFO] 
-[ERROR] Tests run: 42, Failures: 0, Errors: 1, Skipped: 0
-[INFO] 
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.adapters.output.jpa.data;
+
+import jakarta.annotation.Generated;
+import java.io.Serializable;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+/** Kyc is a POJO class that represents a JPA entity and maps the table structure mentioned in the annotation @Table. */
+@Getter
+@Setter
+@NoArgsConstructor
+@DynamoDbBean
+public class Kyc {
+
+    private String id;
+
+
+    private String partyId;
+    private String documentNumber;
+    private String typeCustomer;
+    private String typeStructure;
+    private String ownershipStructure;
+    private String dueDiligenceRegime;
+    private String backgroundOfBlockingList;
+    private String valueOfTheSubject;
+    private String documentTypeCode;
+    private String documentCountryCode;
+    private String fullName;
+    private String givenName;
+    private String lastName;
+    private String birthDate;
+    private String gender;
+    private String nationalityCode;
+    private String stateOfResidence;
+    private String countryOfResidence;
+    private String countryOfBirth;
+    private String civilStatus;
+    private Boolean isPep;
+    private String pepComments;
+    private String occupationCode;
+    private String occupationDescription;
+    private String economicActivityCategory;
+    private String economicActivitySubcategory;
+    private String transactionality;
+    private String productFamilyId;
+    private String productName;
+    private String productCode;
+    private String productDescription;
+    private String channelCode;
+    private String channelDescription;
+    private String presenceOfTheGroup;
+    private String expCountryRoot;
+    private String createdAt;
+
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("id")
+    public String getPartyId() {
+        return partyId;
+    }
+
+    @DynamoDbSortKey
+    @DynamoDbAttribute("PartyID")
+    public String getiId() {
+        return id;
+    }
+
+
+}
