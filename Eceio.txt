@@ -1,75 +1,60 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.regions.Region;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
-import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 
-/**
- * Configuration class for setting up DynamoDB clients.
- * <p>
- * This class provides beans for the DynamoDbClient and DynamoDbEnhancedClient, using AWS region and
- * credentials from environment variables. It is used to enable integration with AWS DynamoDB in the
- * application context.
- */
-@Configuration
-public class DynamoDBConfig {
+import static org.junit.jupiter.api.Assertions.*;
 
+class DynamoDBConfigTest {
 
-    @Value("${aws.region}")
-    private String awsRegion;
+    private DynamoDBConfig dynamoDBConfig;
 
-    @Value("${aws.dynamodb.role-arn}")
-    private String dynamoRoleArn;
+    @BeforeEach
+    void setUp() {
+        dynamoDBConfig = new DynamoDBConfig();
 
-    @Bean
-    public StsClient stsClient() {
-        return StsClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
+        ReflectionTestUtils.setField(
+                dynamoDBConfig,
+                "awsRegion",
+                "us-east-1");
+
+        ReflectionTestUtils.setField(
+                dynamoDBConfig,
+                "dynamoRoleArn",
+                "arn:aws:iam::123456789012:role/test-role");
     }
 
-    /**
-     * Creates and configures a DynamoDbClient bean.
-     *
-     * @return a configured DynamoDbClient instance
-     */
-    @Bean(name = "dynamoDbClient")
-    public DynamoDbClient dynamoDbClient(StsClient stsClient) {
-        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
-                StsAssumeRoleCredentialsProvider.builder()
-                        .stsClient(stsClient)
-                        .refreshRequest(AssumeRoleRequest.builder()
-                                .roleArn(dynamoRoleArn)
-                                .roleSessionName("dynamodb-cross-account-session")
-                                .build())
-                        .build();
+    @Test
+    void shouldCreateStsClient() {
+        StsClient stsClient = dynamoDBConfig.stsClient();
 
-        return DynamoDbClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(assumeRoleCredentialsProvider)
-                .build();
+        assertNotNull(stsClient);
     }
 
-    /**
-     * Creates a DynamoDbEnhancedClient bean using the provided DynamoDbClient.
-     *
-     * @param dynamoDbClient the DynamoDbClient to use
-     * @return a configured DynamoDbEnhancedClient instance
-     */
-    @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient(
-            @Qualifier("dynamoDbClient") DynamoDbClient dynamoDbClient) {
-        return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(dynamoDbClient)
-                .build();
+    @Test
+    void shouldCreateDynamoDbClient() {
+        StsClient stsClient = dynamoDBConfig.stsClient();
+
+        DynamoDbClient dynamoDbClient =
+                dynamoDBConfig.dynamoDbClient(stsClient);
+
+        assertNotNull(dynamoDbClient);
+    }
+
+    @Test
+    void shouldCreateDynamoDbEnhancedClient() {
+        StsClient stsClient = dynamoDBConfig.stsClient();
+
+        DynamoDbClient dynamoDbClient =
+                dynamoDBConfig.dynamoDbClient(stsClient);
+
+        DynamoDbEnhancedClient enhancedClient =
+                dynamoDBConfig.dynamoDbEnhancedClient(dynamoDbClient);
+
+        assertNotNull(enhancedClient);
     }
 }
