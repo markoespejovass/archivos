@@ -1,23 +1,75 @@
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "execute-api:Invoke",
-      "Resource": "arn:aws:execute-api:us-east-1:458284369113:*"
-    },
-    {
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "execute-api:Invoke",
-      "Resource": "arn:aws:execute-api:us-east-1:458284369113:*",
-      "Condition": {
-        "StringNotEquals": {
-          "aws:SourceVpce": "vpce-093a82734f6418af6"
-        }
-      }
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
+import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
+
+/**
+ * Configuration class for setting up DynamoDB clients.
+ * <p>
+ * This class provides beans for the DynamoDbClient and DynamoDbEnhancedClient, using AWS region and
+ * credentials from environment variables. It is used to enable integration with AWS DynamoDB in the
+ * application context.
+ */
+@Configuration
+public class DynamoDBConfig {
+
+
+    @Value("${aws.region}")
+    private String awsRegion;
+
+    @Value("${aws.dynamodb.role-arn}")
+    private String dynamoRoleArn;
+
+    @Bean
+    public StsClient stsClient() {
+        return StsClient.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
     }
-  ]
+
+    /**
+     * Creates and configures a DynamoDbClient bean.
+     *
+     * @return a configured DynamoDbClient instance
+     */
+    @Bean(name = "dynamoDbClient")
+    public DynamoDbClient dynamoDbClient(StsClient stsClient) {
+        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
+                StsAssumeRoleCredentialsProvider.builder()
+                        .stsClient(stsClient)
+                        .refreshRequest(AssumeRoleRequest.builder()
+                                .roleArn(dynamoRoleArn)
+                                .roleSessionName("dynamodb-cross-account-session")
+                                .build())
+                        .build();
+
+        return DynamoDbClient.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(assumeRoleCredentialsProvider)
+                .build();
+    }
+
+    /**
+     * Creates a DynamoDbEnhancedClient bean using the provided DynamoDbClient.
+     *
+     * @param dynamoDbClient the DynamoDbClient to use
+     * @return a configured DynamoDbEnhancedClient instance
+     */
+    @Bean
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient(
+            @Qualifier("dynamoDbClient") DynamoDbClient dynamoDbClient) {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
+                .build();
+    }
 }
- 
