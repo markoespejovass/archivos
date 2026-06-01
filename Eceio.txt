@@ -1,60 +1,122 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.services.sts.StsClient;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.application.ports.output.SKYServiceRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperUpdateBenefitProgramDetails;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.dto.TierRequest;
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Objects;
 
-class DynamoDBConfigTest {
 
-    private DynamoDBConfig dynamoDBConfig;
+/**
+ * The class representative Sky service adapter
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Slf4j
+@Component
+@AllArgsConstructor
+public class SKYServiceAdapter implements SKYServiceRepositoryPort {
 
-    @BeforeEach
-    void setUp() {
-        dynamoDBConfig = new DynamoDBConfig();
+    private final WebClient webClient;
 
-        ReflectionTestUtils.setField(
-                dynamoDBConfig,
-                "awsRegion",
-                "us-east-1");
-
-        ReflectionTestUtils.setField(
-                dynamoDBConfig,
-                "dynamoRoleArn",
-                "arn:aws:iam::123456789012:role/test-role");
+    @Override
+    public CreateUserResponse createUser(CreateUserRequest criteria) {
+        return webClient
+                .post()
+                .uri(Constant.URI_API_SKY)
+                .header("Ocp-Apim-Subscription-Key", "5cfc7d2fea014ede83c5bd0086d81d2c")
+                .header("Content-Type", "application/json")
+                .bodyValue(criteria)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        response -> response.bodyToMono(String.class).map(body ->{
+                            log.error("error: {}", body);
+                            throw new RuntimeException("error: "+ body);
+                        })
+                )
+                .bodyToMono(CreateUserResponse.class)
+                .block();
     }
 
-    @Test
-    void shouldCreateStsClient() {
-        StsClient stsClient = dynamoDBConfig.stsClient();
+    @Override
+    public Void updateTier(WrapperUpdateBenefitProgramDetails criteria, String action) {
 
-        assertNotNull(stsClient);
+        TierRequest tierRequest = convertToTierRequest(criteria);
+
+        HttpMethod method = resolveHttpMethod(action);
+
+        webClient
+                .method(method)
+                .uri(Constant.URI_API_SKY_TIER)
+                .headers(headers -> {
+                    headers.set("Ocp-Apim-Subscription-Key",
+                            "5cfc7d2fea014ede83c5bd0086d81d2c");
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue(tierRequest)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        response -> response.bodyToMono(String.class)
+                                .flatMap(body -> {
+                                    log.error("Error consumiendo SKY API: {}", body);
+                                    return Mono.error(
+                                            new RuntimeException("Error SKY API: " + body)
+                                    );
+                                })
+                )
+                .bodyToMono(CreateUserResponse.class)
+                .block();
+
+        return null;
     }
 
-    @Test
-    void shouldCreateDynamoDbClient() {
-        StsClient stsClient = dynamoDBConfig.stsClient();
+    private HttpMethod resolveHttpMethod(String action) {
 
-        DynamoDbClient dynamoDbClient =
-                dynamoDBConfig.dynamoDbClient(stsClient);
-
-        assertNotNull(dynamoDbClient);
+        return switch (action) {
+            case "UP" -> HttpMethod.PATCH;
+            case "DOWN" -> HttpMethod.DELETE;
+            default -> throw new IllegalArgumentException(
+                    "Acción inválida: " + action
+            );
+        };
     }
 
-    @Test
-    void shouldCreateDynamoDbEnhancedClient() {
-        StsClient stsClient = dynamoDBConfig.stsClient();
+    private TierRequest convertToTierRequest(
+            WrapperUpdateBenefitProgramDetails criteria) {
 
-        DynamoDbClient dynamoDbClient =
-                dynamoDBConfig.dynamoDbClient(stsClient);
+        Objects.requireNonNull(criteria.getLogo(), "Logo es requerido");
+        Objects.requireNonNull(criteria.getStatus(), "Status es requerido");
+        Objects.requireNonNull(
+                criteria.getStatus().getStatusCode(),
+                "StatusCode es requerido"
+        );
 
-        DynamoDbEnhancedClient enhancedClient =
-                dynamoDBConfig.dynamoDbEnhancedClient(dynamoDbClient);
+        TierRequest response = new TierRequest();
 
-        assertNotNull(enhancedClient);
+        response.setKey(criteria.getLogo().getName());
+        response.setTier_id(
+                Integer.parseInt(criteria.getStatus().getStatusCode())
+        );
+        response.setEmail(criteria.getSummary());
+        response.setTx_id(criteria.getDescription());
+
+        response.setCountry_id(Constant.PERU_ID);
+        response.setTier_expires_at(Constant.EXPIRES_TIME_TIER);
+        response.setUser_enabled(true);
+
+        return response;
     }
 }
