@@ -1,124 +1,122 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external;
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.application.ports.output.SKYServiceRepositoryPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.domain.model.CreateUserResponse;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.input.rest.data.WrapperUpdateBenefitProgramDetails;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.dto.TierRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.constants.Constant;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
-import java.util.Objects;
-
-
-/**
- * The class representative Sky service adapter
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Slf4j
-@Component
+@DynamoDbBean
+@Setter
 @AllArgsConstructor
-public class SKYServiceAdapter implements SKYServiceRepositoryPort {
+@NoArgsConstructor
+public class ConsentEntity {
 
-    private final WebClient webClient;
 
-    @Override
-    public CreateUserResponse createUser(CreateUserRequest criteria) {
-        return webClient
-                .post()
-                .uri(Constant.URI_API_SKY)
-                .header("Ocp-Apim-Subscription-Key", "5cfc7d2fea014ede83c5bd0086d81d2c")
-                .header("Content-Type", "application/json")
-                .bodyValue(criteria)
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::is4xxClientError,
-                        response -> response.bodyToMono(String.class).map(body ->{
-                            log.error("error: {}", body);
-                            throw new RuntimeException("error: "+ body);
-                        })
-                )
-                .bodyToMono(CreateUserResponse.class)
-                .block();
+    private String id;
+
+    private String partyId;
+
+    private String statusCode;
+    private String statusDescription;
+
+    private  String bankId;
+
+    private  String legitimateCode;
+
+    private  String legitimateDescription;
+
+    private  String treatmentCode;
+
+    private  String treatmentDescription;
+
+    private  String purposeCode;
+
+    private  String purposeDescription;
+
+    private String startDate;
+    private String endDate;
+
+
+    @DynamoDbSortKey
+    @DynamoDbAttribute("PartyID")
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public Void updateTier(WrapperUpdateBenefitProgramDetails criteria, String action) {
-
-        TierRequest tierRequest = convertToTierRequest(criteria);
-
-        HttpMethod method = resolveHttpMethod(action);
-
-        webClient
-                .method(method)
-                .uri(Constant.URI_API_SKY_TIER)
-                .headers(headers -> {
-                    headers.set("Ocp-Apim-Subscription-Key",
-                            "5cfc7d2fea014ede83c5bd0086d81d2c");
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                })
-                .bodyValue(tierRequest)
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::is4xxClientError,
-                        response -> response.bodyToMono(String.class)
-                                .flatMap(body -> {
-                                    log.error("Error consumiendo SKY API: {}", body);
-                                    return Mono.error(
-                                            new RuntimeException("Error SKY API: " + body)
-                                    );
-                                })
-                )
-                .bodyToMono(CreateUserResponse.class)
-                .block();
-
-        return null;
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("Id")
+    public String getPartyId() {
+        return partyId;
     }
 
-    private HttpMethod resolveHttpMethod(String action) {
-
-        return switch (action) {
-            case "UP" -> HttpMethod.PATCH;
-            case "DOWN" -> HttpMethod.DELETE;
-            default -> throw new IllegalArgumentException(
-                    "Acción inválida: " + action
-            );
-        };
+    public String getLegitimateCode() {
+        return legitimateCode;
     }
 
-    private TierRequest convertToTierRequest(
-            WrapperUpdateBenefitProgramDetails criteria) {
+    public String getTreatmentCode() {
+        return treatmentCode;
+    }
 
-        Objects.requireNonNull(criteria.getLogo(), "Logo es requerido");
-        Objects.requireNonNull(criteria.getStatus(), "Status es requerido");
-        Objects.requireNonNull(
-                criteria.getStatus().getStatusCode(),
-                "StatusCode es requerido"
-        );
+    public String getPurposeCode() {
+        return purposeCode;
+    }
 
-        TierRequest response = new TierRequest();
+    public String getStatusCode() {
+        return statusCode;
+    }
 
-        response.setKey(criteria.getLogo().getName());
-        response.setTier_id(
-                Integer.parseInt(criteria.getStatus().getStatusCode())
-        );
-        response.setEmail(criteria.getSummary());
-        response.setTx_id(criteria.getDescription());
+    public String getStatusDescription() {
+        return statusDescription;
+    }
 
-        response.setCountry_id(Constant.PERU_ID);
-        response.setTier_expires_at(Constant.EXPIRES_TIME_TIER);
-        response.setUser_enabled(true);
+    public String getBankId() {
+        return bankId;
+    }
 
-        return response;
+    public String getLegitimateDescription() {
+        return legitimateDescription;
+    }
+
+    public String getTreatmentDescription() {
+        return treatmentDescription;
+    }
+
+    public String getPurposeDescription() {
+        return purposeDescription;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
     }
 }
 
 
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.config.BaseDynamoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public class ConsentRepository extends BaseDynamoRepository<ConsentEntity> {
+
+
+    public ConsentRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.table}") String table){
+        super(enhancedClient, table, TableSchema.fromBean(ConsentEntity.class),ConsentEntity.class,"Id","PartyID");
+    }
+
+}
