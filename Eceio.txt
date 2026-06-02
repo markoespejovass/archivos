@@ -1,1 +1,9 @@
-https://darling-compound-suitcase.ngrok-free.dev/_ministack/health
+
+docker run -d \
+  --name ministack \
+  -p 4566:4566 \
+  -e PERSIST_STATE=1 \
+  -e S3_PERSIST=1 \
+  -v ministack-state:/tmp/ministack-state \
+  -v ministack-s3:/tmp/ministack-data/s3 \
+  ministackorg/ministack
