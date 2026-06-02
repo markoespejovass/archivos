@@ -1,1 +1,1 @@
-https://darling-compound-suitcase.ngrok-free.dev 
+https://darling-compound-suitcase.ngrok-free.dev/_ministack/health
