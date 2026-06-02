@@ -1,2 +1,9 @@
-aws s3 mb s3://test-bucket \
-  --endpoint-url=http://localhost:4566
+if (!s3Client.listBuckets().buckets()
+        .stream()
+        .anyMatch(b -> b.name().equals("test-bucket"))) {
+
+    s3Client.createBucket(
+        CreateBucketRequest.builder()
+            .bucket("test-bucket")
+            .build());
+}
