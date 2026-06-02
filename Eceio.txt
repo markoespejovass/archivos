@@ -1,1 +1,276 @@
 
+@ExtendWith(MockitoExtension.class)
+class SKYServiceAdapterTest {
+
+    @Mock
+    private WebClient webClient;
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+    @Mock
+    private WebClient.RequestBodySpec requestBodySpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
+    @InjectMocks
+    private SKYServiceAdapter adapter;
+
+    @Test
+    void createUser_ok() {
+
+        CreateUserRequest request = new CreateUserRequest();
+        request.setPartnerId("partner");
+        request.setData("data");
+
+        CreateUserResponse expected = new CreateUserResponse();
+
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+
+        when(requestBodyUriSpec.uri(Constant.URI_API_SKY))
+                .thenReturn(requestBodySpec);
+
+        when(requestBodySpec.header(anyString(), anyString()))
+                .thenReturn(requestBodySpec);
+
+        when(requestBodySpec.bodyValue(request))
+                .thenReturn(requestHeadersSpec);
+
+        when(requestHeadersSpec.retrieve())
+                .thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any()))
+                .thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(CreateUserResponse.class))
+                .thenReturn(Mono.just(expected));
+
+        CreateUserResponse response = adapter.createUser(request);
+
+        assertNotNull(response);
+        assertSame(expected, response);
+    }
+
+    @Test
+    void updateTier_up_ok() {
+
+        WrapperUpdateBenefitProgramDetails wrapper = buildWrapper();
+
+        when(webClient.method(HttpMethod.PATCH))
+                .thenReturn(requestBodyUriSpec);
+
+        when(requestBodyUriSpec.uri(Constant.URI_API_SKY_TIER))
+                .thenReturn(requestBodySpec);
+
+        when(requestBodySpec.headers(any()))
+                .thenReturn(requestBodySpec);
+
+        when(requestBodySpec.bodyValue(any(TierRequest.class)))
+                .thenReturn(requestHeadersSpec);
+
+        when(requestHeadersSpec.retrieve())
+                .thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any()))
+                .thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(CreateUserResponse.class))
+                .thenReturn(Mono.just(new CreateUserResponse()));
+
+        Void response = adapter.updateTier(wrapper, "UP");
+
+        assertNull(response);
+
+        verify(webClient).method(HttpMethod.PATCH);
+    }
+
+    @Test
+    void updateTier_down_ok() {
+
+        WrapperUpdateBenefitProgramDetails wrapper = buildWrapper();
+
+        when(webClient.method(HttpMethod.DELETE))
+                .thenReturn(requestBodyUriSpec);
+
+        when(requestBodyUriSpec.uri(Constant.URI_API_SKY_TIER))
+                .thenReturn(requestBodySpec);
+
+        when(requestBodySpec.headers(any()))
+                .thenReturn(requestBodySpec);
+
+        when(requestBodySpec.bodyValue(any(TierRequest.class)))
+                .thenReturn(requestHeadersSpec);
+
+        when(requestHeadersSpec.retrieve())
+                .thenReturn(responseSpec);
+
+        when(responseSpec.onStatus(any(), any()))
+                .thenReturn(responseSpec);
+
+        when(responseSpec.bodyToMono(CreateUserResponse.class))
+                .thenReturn(Mono.just(new CreateUserResponse()));
+
+        adapter.updateTier(wrapper, "DOWN");
+
+        verify(webClient).method(HttpMethod.DELETE);
+    }
+
+    @Test
+    void updateTier_invalidAction() {
+
+        WrapperUpdateBenefitProgramDetails wrapper = buildWrapper();
+
+        IllegalArgumentException exception =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> adapter.updateTier(wrapper, "XXX")
+                );
+
+        assertEquals(
+                "Acción inválida: XXX",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void updateTier_logoNull() {
+
+        WrapperUpdateBenefitProgramDetails wrapper =
+                new WrapperUpdateBenefitProgramDetails();
+
+        WrapperUpdateBenefitProgramDetailsStatus status =
+                new WrapperUpdateBenefitProgramDetailsStatus();
+
+        status.setStatusCode("1");
+
+        wrapper.setStatus(status);
+
+        NullPointerException exception =
+                assertThrows(
+                        NullPointerException.class,
+                        () -> adapter.updateTier(wrapper, "UP")
+                );
+
+        assertEquals(
+                "Logo es requerido",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void updateTier_statusNull() {
+
+        WrapperUpdateBenefitProgramDetails wrapper =
+                new WrapperUpdateBenefitProgramDetails();
+
+        Logo logo = new Logo();
+        logo.setName("IBERIA");
+
+        wrapper.setLogo(logo);
+
+        NullPointerException exception =
+                assertThrows(
+                        NullPointerException.class,
+                        () -> adapter.updateTier(wrapper, "UP")
+                );
+
+        assertEquals(
+                "Status es requerido",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void updateTier_statusCodeNull() {
+
+        WrapperUpdateBenefitProgramDetails wrapper =
+                new WrapperUpdateBenefitProgramDetails();
+
+        Logo logo = new Logo();
+        logo.setName("IBERIA");
+
+        WrapperUpdateBenefitProgramDetailsStatus status =
+                new WrapperUpdateBenefitProgramDetailsStatus();
+
+        wrapper.setLogo(logo);
+        wrapper.setStatus(status);
+
+        NullPointerException exception =
+                assertThrows(
+                        NullPointerException.class,
+                        () -> adapter.updateTier(wrapper, "UP")
+                );
+
+        assertEquals(
+                "StatusCode es requerido",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void updateTier_statusCodeNotNumeric() {
+
+        WrapperUpdateBenefitProgramDetails wrapper =
+                new WrapperUpdateBenefitProgramDetails();
+
+        Logo logo = new Logo();
+        logo.setName("IBERIA");
+
+        WrapperUpdateBenefitProgramDetailsStatus status =
+                new WrapperUpdateBenefitProgramDetailsStatus();
+
+        status.setStatusCode("ABC");
+
+        wrapper.setLogo(logo);
+        wrapper.setStatus(status);
+
+        assertThrows(
+                NumberFormatException.class,
+                () -> adapter.updateTier(wrapper, "UP")
+        );
+    }
+
+    private WrapperUpdateBenefitProgramDetails buildWrapper() {
+
+        Logo logo = new Logo();
+        logo.setName("IBERIA");
+
+        WrapperUpdateBenefitProgramDetailsStatus status =
+                new WrapperUpdateBenefitProgramDetailsStatus();
+
+        status.setStatusCode("1");
+
+        WrapperUpdateBenefitProgramDetails wrapper =
+                new WrapperUpdateBenefitProgramDetails();
+
+        wrapper.setLogo(logo);
+        wrapper.setStatus(status);
+        wrapper.setSummary("mail@test.com");
+        wrapper.setDescription("tx123");
+
+        return wrapper;
+    }
+}
+
+
+ArgumentCaptor<TierRequest> captor =
+        ArgumentCaptor.forClass(TierRequest.class);
+
+verify(requestBodySpec).bodyValue(captor.capture());
+
+TierRequest request = captor.getValue();
+
+assertEquals("IBERIA", request.getKey());
+assertEquals(1, request.getTier_id());
+assertEquals("mail@test.com", request.getEmail());
+assertEquals("tx123", request.getTx_id());
+assertTrue(request.isUser_enabled());
+assertEquals(Constant.PERU_ID, request.getCountry_id());
+assertEquals(
+        Constant.EXPIRES_TIME_TIER,
+        request.getTier_expires_at()
+);
