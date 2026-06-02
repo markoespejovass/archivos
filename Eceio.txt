@@ -110,7 +110,6 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
 import java.util.List;
 import java.util.Optional;
-
 @Repository
 public class ConsentRepository extends BaseDynamoRepository<ConsentEntity> {
 
