@@ -1,1 +1,103 @@
 
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class ConsentEntityTest {
+
+    @Test
+    void shouldCreateEntityUsingAllArgsConstructor() {
+
+        ConsentEntity entity = new ConsentEntity(
+                "id",
+                "partyId",
+                "statusCode",
+                "statusDescription",
+                "bankId",
+                "legitimateCode",
+                "legitimateDescription",
+                "treatmentCode",
+                "treatmentDescription",
+                "purposeCode",
+                "purposeDescription",
+                "2025-01-01",
+                "2025-12-31"
+        );
+
+        assertEquals("id", entity.getId());
+        assertEquals("partyId", entity.getPartyId());
+        assertEquals("statusCode", entity.getStatusCode());
+        assertEquals("statusDescription", entity.getStatusDescription());
+        assertEquals("bankId", entity.getBankId());
+        assertEquals("legitimateCode", entity.getLegitimateCode());
+        assertEquals("legitimateDescription", entity.getLegitimateDescription());
+        assertEquals("treatmentCode", entity.getTreatmentCode());
+        assertEquals("treatmentDescription", entity.getTreatmentDescription());
+        assertEquals("purposeCode", entity.getPurposeCode());
+        assertEquals("purposeDescription", entity.getPurposeDescription());
+        assertEquals("2025-01-01", entity.getStartDate());
+        assertEquals("2025-12-31", entity.getEndDate());
+    }
+
+    @Test
+    void shouldSetValuesUsingSetters() {
+
+        ConsentEntity entity = new ConsentEntity();
+
+        entity.setId("id");
+        entity.setPartyId("partyId");
+        entity.setStatusCode("statusCode");
+        entity.setStatusDescription("statusDescription");
+        entity.setBankId("bankId");
+        entity.setLegitimateCode("legitimateCode");
+        entity.setLegitimateDescription("legitimateDescription");
+        entity.setTreatmentCode("treatmentCode");
+        entity.setTreatmentDescription("treatmentDescription");
+        entity.setPurposeCode("purposeCode");
+        entity.setPurposeDescription("purposeDescription");
+        entity.setStartDate("2025-01-01");
+        entity.setEndDate("2025-12-31");
+
+        assertEquals("id", entity.getId());
+        assertEquals("partyId", entity.getPartyId());
+        assertEquals("statusCode", entity.getStatusCode());
+        assertEquals("statusDescription", entity.getStatusDescription());
+        assertEquals("bankId", entity.getBankId());
+        assertEquals("legitimateCode", entity.getLegitimateCode());
+        assertEquals("legitimateDescription", entity.getLegitimateDescription());
+        assertEquals("treatmentCode", entity.getTreatmentCode());
+        assertEquals("treatmentDescription", entity.getTreatmentDescription());
+        assertEquals("purposeCode", entity.getPurposeCode());
+        assertEquals("purposeDescription", entity.getPurposeDescription());
+        assertEquals("2025-01-01", entity.getStartDate());
+        assertEquals("2025-12-31", entity.getEndDate());
+    }
+}
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.repository;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ExtendWith(MockitoExtension.class)
+class ConsentRepositoryTest {
+
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Test
+    void shouldCreateRepository() {
+
+        ConsentRepository repository =
+                new ConsentRepository(enhancedClient, "CONSENT_TABLE");
+
+        assertNotNull(repository);
+    }
+}
