@@ -1,9 +1,7 @@
-if (!s3Client.listBuckets().buckets()
-        .stream()
-        .anyMatch(b -> b.name().equals("test-bucket"))) {
-
-    s3Client.createBucket(
-        CreateBucketRequest.builder()
-            .bucket("test-bucket")
-            .build());
-}
+curl --location --request POST 'https://nexhub.auth.us-east-1.amazoncognito.com/oauth2/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Cookie: XSRF-TOKEN=1b2412dc-296a-4439-b156-7446f729b80a' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'client_id=4hlsjm1crciv3t1n46jfnr4n3t' \
+--data-urlencode 'client_secret=1sgkjctd02orfvifflhuins6vq9hckssfhggna7iba58elncm5go' \
+--data-urlencode 'scope=external-api/read'
