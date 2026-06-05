@@ -1,248 +1,45 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
 
+             %%
+             %%%
+          %   %%%                    %%%%                                                                   %%%%
+          %%   %%%%               %%     %%                                                                   %%
+          %%%%   %%%              %%      %                              %                                    %%
+       %%   %%%   %%%%%           %%%%           %%%        %  %%      %%%       %%%        %  %%         %%% %%       %%%       %  %%
+   %%%%%%%   %%%% %%%%%%%%          %%%%%%     %%  %%%    %%%   %%%   %%%%%    %%   %%    %%%   %%%    %%%    %%    %%    %%  %%%%%  %
+ %%%%%%%%%%%  %%%%%%%%%%%%%            %%%%         %%    %%%    %%    %%%          %%    %%%    %%   %%%     %%   %%%%%%%%%%   %%
+ %%%%%%%%%%%%  %%%%%%%%%%%%      %       %%%   %%%%%%%    %%%    %%    %%%     %%%%%%%    %%%    %%   %%%     %%   %%%          %%
+  %%%%%%%%%%%%%%%%%%%%%%%%       %%      %%   %%    %%    %%%    %%    %%%    %%    %%    %%%    %%   %%%     %%    %%%         %%
+     %%%%%%%%%%%%%%%%%%           %%%%%%%%     %%%% %%%  %%%%% %%%%%%   %%%%   %%%% %%%  %%%%% %%%%%%   %%%%% %%%    %%%%%%   %%%%%%
 
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSearchMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.*;
+:: Spring Boot  (v3.5.14) ::                                                                  :: Santander Spring Boot (v1.5.2) ::
 
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
-
-import java.io.ByteArrayInputStream;
-import java.time.Duration;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
-
-
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSpecificationBuilder.build;
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
-
-
-/**
- * The class representative Otp adaptarer
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
-
-  private final S3Client s3Client;
-
-  private final S3Presigner s3Presigner;
-
-  private final DocumentMapper mapper;
-
-  private final FileEntityRepository repository;
-
-  @Value("${aws.bucket}")
-  public String bucketName;
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param criteria valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
-    String documentId;
-    String url;
-    WrapperMyDocumentResponse documentResponse;
-    if(criteria.getDocument() == null){
-      return new WrapperGetDocumentsResponse();
-    }
-    documentResponse = criteria.getDocument();
-    if(documentResponse.getDocumentId() == null){
-      return new WrapperGetDocumentsResponse();
-    }
-    documentId = documentResponse.getDocumentId();
-    Optional<FileEntity> fileEntity = repository.findById(documentId);
-
-    if(fileEntity.isEmpty()){
-      return new WrapperGetDocumentsResponse();
-    }
-    url = generateDownloadUrl(fileEntity.get().getId());
-
-    return mapper.donwloadMapper(url);
-  }
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param criteria valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperPostSearchDocumentsResponse searchDocuments(
-      WrapperPostSearchDocumentsRequest criteria) {
-    var paramters = criteria.getSearchParameters();
-    if (paramters == null){
-      return new WrapperPostSearchDocumentsResponse();
-    }
-    if(paramters.getSearchProperties() == null || paramters.getSearchProperties().isEmpty()){
-      return new WrapperPostSearchDocumentsResponse();
-    }
-    if(paramters.getDiscriminator() == null){
-      return new WrapperPostSearchDocumentsResponse();
-    }
-
-    FileSearch search = FileSearchMapper.toSearch(paramters);
-    var objectListing = repository.findAll();
-    return mapper.searchMapper(objectListing);
-  }
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param criteria valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
-
-
-    String userFolder = validateRequestAndGetFolderReference(criteria);
-    String documentId = UUID.randomUUID().toString();
-
-
-    try {
-      var document = criteria.getDocument();
-      if(document == null){
-        return new WrapperPostDocumentsResponse();
-      }
-      if (document.getFolderReference()==null){
-        return new WrapperPostDocumentsResponse();
-      }
-      if (document.getAclReference()==null){
-        return new WrapperPostDocumentsResponse();
-      }
-      byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
-      String key = generateKey(documentId, document.getAclReference());
-      PutObjectRequest request = PutObjectRequest.builder()
-              .bucket(bucketName)
-              .key(key)
-              .contentType(document.getMimeType())
-              .build();
-
-      s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
-
-      // ✅ mapear entity
-      FileEntity entity = mapper.toEntity(criteria, documentId);
-
-      // guardar
-      entity = repository.save(entity);
-
-      return mapper.toDTOUpload(entity);
-
-    } catch (Exception ex) {
-      log.error("Error uploading document", ex);
-      log.error(String.valueOf(ex));
-      throw new RuntimeException("Error uploading document to S3", ex);
-    }
-  }
-
-  private String validateRequestAndGetFolderReference(WrapperPostDocumentsRequest criteria) {
-
-    if (criteria == null || criteria.getDocument() == null) {
-      throw new IllegalArgumentException("Document is required");
-    }
-
-    var doc = criteria.getDocument();
-    if (doc == null){
-      throw new IllegalArgumentException("File (base64) is required");
-    }
-    String folder = doc.getFolderReference();
-    if (folder == null ) {
-      throw new IllegalArgumentException("File (base64) is required");
-    }
-
-    if (folder.isEmpty()) {
-      throw new IllegalArgumentException("File (base64) is required");
-    }
-    String name = doc.getName();
-    if (name == null) {
-      throw new IllegalArgumentException("File name is required");
-    }
-
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("File name is required");
-    }
-    return folder;
-  }
-
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param documentId valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperMySearchDocumentResponse getDocument(String documentId) {
-    var objectMetadataOptional =repository.findById(documentId);
-    if(objectMetadataOptional.isEmpty()){
-      return new WrapperMySearchDocumentResponse();
-    }
-    var objectMetadata = objectMetadataOptional.get();
-    return mapper.getMapper(objectMetadata);
-  }
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param documentId valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public Void deleteDocument(String documentId) {
-    Optional<FileEntity> fileEntityOptional = repository.findById(documentId);
-    if (fileEntityOptional.isEmpty()){
-      return null;
-    }
-    FileEntity fileEntity = fileEntityOptional.get();
-    String userFolder = fileEntity.getCustomerId();
-    String filename = generateKey(fileEntity.getName(), userFolder);
-    DeleteObjectRequest request = DeleteObjectRequest.builder()
-            .bucket(bucketName)
-            .key(filename)
-            .build();
-
-    s3Client.deleteObject(request);
-    repository.delete(fileEntity);
-    return null;
-  }
-
-  private String generateDownloadUrl(String key) {
-
-    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-            .bucket(bucketName)
-            .key(key)
-            .build();
-
-    GetObjectPresignRequest presignRequest =
-            GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
-                    .getObjectRequest(getObjectRequest)
-                    .build();
-
-    PresignedGetObjectRequest presignedRequest =
-            s3Presigner.presignGetObject(presignRequest);
-
-    return presignedRequest.url().toString();
-  }
-
-}
+2026-06-05T06:06:14.079+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : Starting OpenApiGeneratorApplication v1.0.1-SNAPSHOT using Java 17.0.19 with PID 1 (/opt/app/BOOT-INF/classes started by java in /opt/app)
+2026-06-05T06:06:14.085+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.c.n.c.OpenApiGeneratorApplication    : The following 1 profile is active: "cert"
+2026-06-05T06:06:17.392+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.c.c.s.GenericScope                   : BeanFactory id=5bc50514-b57a-3ec6-b1a6-905878a0175c
+2026-06-05T06:06:18.588+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.s.b.w.e.t.TomcatWebServer              : Tomcat initialized with port 8080 (http)
+2026-06-05T06:06:18.599+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.StandardService                  : Starting service [Tomcat]
+2026-06-05T06:06:18.599+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.StandardEngine                   : Starting Servlet engine: [Apache Tomcat/10.1.55]
+2026-06-05T06:06:18.687+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] o.a.c.c.C.[.[.[/]                        : Initializing Spring embedded WebApplicationContext
+2026-06-05T06:06:18.688+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4499 ms
+2026-06-05T06:06:18.704+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.c.c.CoreServletAutoConfig        : Initializing SERVLET configuration for Santander Spring Boot Core library...
+2026-06-05T06:06:18.797+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelServletAutoConfig : Initializing SERVLET configuration for Santander spring Boot  OmniChannel library...
+2026-06-05T06:06:18.799+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Initializing BASE configuration for Santander spring Boot OmniChannel library...
+2026-06-05T06:06:18.975+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.o.c.OmniChannelAutoConfig        : Santander Spring Boot OmniChannel config = {ALL={PUB=ContactPoint.ContactPointBuilder(originChannel=PUB, marcoChannel=INT, environment=INTERNET, logicalChannel=0080, physicalChannel=0101, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), PLR=ContactPoint.ContactPointBuilder(originChannel=PLR, marcoChannel=PLR, environment=INTERNET, logicalChannel=5017, physicalChannel=0060, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), CIC=ContactPoint.ContactPointBuilder(originChannel=CIC, marcoChannel=CIC, environment=CONTACTCENTER, logicalChannel=0029, physicalChannel=0018, commercialChannel=020, operationalChannel=020, application=, device=, operatingSystem=, medium=, userType=), EMP=ContactPoint.ContactPointBuilder(originChannel=EMP, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0022, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), INT=ContactPoint.ContactPointBuilder(originChannel=INT, marcoChannel=INT, environment=INTERNET, logicalChannel=0001, physicalChannel=0022, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), EMP_MOV=ContactPoint.ContactPointBuilder(originChannel=EMP_MOV, marcoChannel=EMP, environment=EMPRESAS, logicalChannel=0033, physicalChannel=0018, commercialChannel=014, operationalChannel=014, application=, device=, operatingSystem=, medium=, userType=), OBD=ContactPoint.ContactPointBuilder(originChannel=OBD, marcoChannel=INT, environment=INTERNET, logicalChannel=0079, physicalChannel=0099, commercialChannel=002, operationalChannel=002, application=, device=, operatingSystem=, medium=, userType=), RML=ContactPoint.ContactPointBuilder(originChannel=RML, marcoChannel=RML, environment=INTERNET, logicalChannel=0031, physicalChannel=0019, commercialChannel=BML, operationalChannel=BML, application=, device=, operatingSystem=, medium=, userType=), RCA=ContactPoint.ContactPointBuilder(originChannel=RCA, marcoChannel=RCA, environment=INTRANET, logicalChannel=0001, physicalChannel=0018, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=), OFI=ContactPoint.ContactPointBuilder(originChannel=OFI, marcoChannel=OFI, environment=INTRANET, logicalChannel=0007, physicalChannel=0019, commercialChannel=RED, operationalChannel=RED, application=, device=, operatingSystem=, medium=, userType=)}}
+2026-06-05T06:06:19.370+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Initializing BASE configuration for Logging library...
+2026-06-05T06:06:19.403+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingProperties            : Gluonlog Log format configured
+2026-06-05T06:06:19.588+02:00  INFO 1 --- [cpe-nxhbsc-beknowyocustomer] [           main] [                                                 ] c.s.f.s.l.c.LoggingAutoConfig            : Using santander.logging.observability.filter.black-list: [spring.security.authorizations, spring.security.filterchains, spring.security.http.secured.requests, spring.security.http.unsecured.requests]
+{"timestamp":"2026-06-05T04:06:22.177Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Configuring HttpClientsAutoConfig  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.HttpClientsAutoConfig","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:22.294Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Configuring LoggerAutoConfig  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.logging.logger.LoggerAutoConfig","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:22.373Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Create hints for dependencies  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.HintsForGlobalDependenciesConfig","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:22.373Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing BASE configuration for Spring Boot config Core library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.core.config.CoreAutoConfig","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:22.679Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing SERVLET BASE configuration for Santander Spring Boot Authentication library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.security.authentication.config.AuthenticationServletAndBaseAutoConfig","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:22.686Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing SERVLET WebApp configuration for Santander Spring Boot Authentication library...  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"com.santander.framework.springboot.security.authentication.config.AuthenticationServletAutoConfiguration","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:23.199Z","environment":"CERT","userId":"","logLevel":"WARN","log":"Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'tokenService' defined in class path resource [com/santander/framework/springboot/security/authentication/config/AuthenticationServletAndBaseAutoConfig.class]: Unsatisfied dependency expressed through method 'tokenService' parameter 1: No qualifying bean of type 'org.springframework.security.oauth2.jwt.JwtDecoder' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:23.272Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Stopping service [Tomcat]  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.apache.catalina.core.StandardService","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:23.289Z","environment":"CERT","userId":"","logLevel":"INFO","log":"\n\nError starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger","contactPoint":""},"logType":"technical"} 
+{"timestamp":"2026-06-05T04:06:23.300Z","environment":"CERT","userId":"","logLevel":"ERROR","log":"\n\n***************************\nAPPLICATION FAILED TO START\n***************************\n\nDescription:\n\nThere is not bean of type JwtDecoder or ReactiveJwtDecoder\n\nAction:\n\nConsider defining santander.security.connectors.pkm-connector.pkm-endpoint or spring.security.oauth2.resourceserver.jwt.jwk-set-uri in your configuration.\n  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beknowyocustomer","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beknowyocustomer","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-neg-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beknowyocustomer-micro-java-5dc66677b-rgx9q","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter","contactPoint":""},"logType":"technical"} 
+ 
