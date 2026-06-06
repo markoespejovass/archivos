@@ -1,31 +1,14 @@
+[java@cpe-nxhbsc-beproducoffering-micro-java-75dd98bd4b-7pp8j app]$ curl -v --location --request GET 'http://localhost:8080/v1/customer_card_position/' \
+> --header 'x-santander-client-id: a1b30a84-7bf3-4' \
+> --header 'channel: App-Conexa' \
+> --header 'society: scp' \
+> --header 'Content-Type: application/json'
 ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
 ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
+Note: Unnecessary use of -X or --request, GET is already inferred.
 *   Trying ::1...
 * TCP_NODELAY set
 * Connected to localhost (::1) port 8080 (#0)
-> GET /v1/customer_card_position HTTP/1.1
-> Host: localhost:8080
-> User-Agent: curl/7.61.1
-> Accept: */*
-> x-santander-client-id: a1b30a84-7bf3-4
-> channel: App-Conexa
-> society: scp
-> Content-Type: application/json
-> Content-Length: 0
-> 
-< HTTP/1.1 302 
-< Location: http://localhost:8080/v1/customer_card_position/
-< Transfer-Encoding: chunked
-< Date: Sat, 06 Jun 2026 05:52:05 GMT
-* HTTP error before end of send, stop sending
-< 
-* Closing connection 0
-* Issue another request to this URL: 'http://localhost:8080/v1/customer_card_position/'
-* Switch from POST to GET
-* Hostname localhost was found in DNS cache
-*   Trying ::1...
-* TCP_NODELAY set
-* Connected to localhost (::1) port 8080 (#1)
 > GET /v1/customer_card_position/ HTTP/1.1
 > Host: localhost:8080
 > User-Agent: curl/7.61.1
@@ -46,13 +29,13 @@ ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.s
 < Location: http://localhost:8080/v1/customer_card_position/swagger-ui.html
 < Content-Language: en
 < Content-Length: 0
-< Date: Sat, 06 Jun 2026 05:52:05 GMT
+< Date: Sat, 06 Jun 2026 05:58:47 GMT
 < 
-* Connection #1 to host localhost left intact
+* Connection #0 to host localhost left intact
 * Issue another request to this URL: 'http://localhost:8080/v1/customer_card_position/swagger-ui.html'
-* Found bundle for host localhost: 0x55a0519bfe40 [can pipeline]
-* Re-using existing connection! (#1) with host localhost
-* Connected to localhost (::1) port 8080 (#1)
+* Found bundle for host localhost: 0x55ad8aa4a040 [can pipeline]
+* Re-using existing connection! (#0) with host localhost
+* Connected to localhost (::1) port 8080 (#0)
 > GET /v1/customer_card_position/swagger-ui.html HTTP/1.1
 > Host: localhost:8080
 > User-Agent: curl/7.61.1
@@ -72,13 +55,13 @@ ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.s
 < X-Frame-Options: DENY
 < Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
 < Content-Length: 0
-< Date: Sat, 06 Jun 2026 05:52:05 GMT
+< Date: Sat, 06 Jun 2026 05:58:47 GMT
 < 
-* Connection #1 to host localhost left intact
+* Connection #0 to host localhost left intact
 * Issue another request to this URL: 'http://localhost:8080/v1/customer_card_position/swagger-ui/index.html'
-* Found bundle for host localhost: 0x55a0519bfe40 [can pipeline]
-* Re-using existing connection! (#1) with host localhost
-* Connected to localhost (::1) port 8080 (#1)
+* Found bundle for host localhost: 0x55ad8aa4a040 [can pipeline]
+* Re-using existing connection! (#0) with host localhost
+* Connected to localhost (::1) port 8080 (#0)
 > GET /v1/customer_card_position/swagger-ui/index.html HTTP/1.1
 > Host: localhost:8080
 > User-Agent: curl/7.61.1
@@ -103,7 +86,7 @@ ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.s
 < Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
 < Content-Type: text/html
 < Content-Length: 734
-< Date: Sat, 06 Jun 2026 05:52:05 GMT
+< Date: Sat, 06 Jun 2026 05:58:47 GMT
 < 
 <!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
@@ -124,5 +107,5 @@ ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.s
     <script src="./swagger-initializer.js" charset="UTF-8"> </script>
   </body>
 </html>
-* Connection #1 to host localhost left intact
-[java@cpe-nxhbsc-beproducoffering-micro-
+* Connection #0 to host localhost left intact
+[java@cpe-nxhbsc-beproducoffering-micro-java-75dd98bd4b-7pp8j app]$
