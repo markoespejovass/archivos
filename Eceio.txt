@@ -1,111 +1,33 @@
-[java@cpe-nxhbsc-beproducoffering-micro-java-75dd98bd4b-7pp8j app]$ curl -v --location --request GET 'http://localhost:8080/v1/customer_card_position/' \
-> --header 'x-santander-client-id: a1b30a84-7bf3-4' \
-> --header 'channel: App-Conexa' \
-> --header 'society: scp' \
-> --header 'Content-Type: application/json'
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
-ERROR: ld.so: object '/opt/dynatrace/oneagent-paas/agent/lib64/liboneagentproc.so' from /etc/ld.so.preload cannot be preloaded (cannot open shared object file): ignored.
-Note: Unnecessary use of -X or --request, GET is already inferred.
-*   Trying ::1...
-* TCP_NODELAY set
-* Connected to localhost (::1) port 8080 (#0)
-> GET /v1/customer_card_position/ HTTP/1.1
-> Host: localhost:8080
-> User-Agent: curl/7.61.1
-> Accept: */*
-> x-santander-client-id: a1b30a84-7bf3-4
-> channel: App-Conexa
-> society: scp
-> Content-Type: application/json
-> 
-< HTTP/1.1 302 
-< X-Content-Type-Options: nosniff
-< X-XSS-Protection: 0
-< Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-< Pragma: no-cache
-< Expires: 0
-< X-Frame-Options: DENY
-< Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
-< Location: http://localhost:8080/v1/customer_card_position/swagger-ui.html
-< Content-Language: en
-< Content-Length: 0
-< Date: Sat, 06 Jun 2026 05:58:47 GMT
-< 
-* Connection #0 to host localhost left intact
-* Issue another request to this URL: 'http://localhost:8080/v1/customer_card_position/swagger-ui.html'
-* Found bundle for host localhost: 0x55ad8aa4a040 [can pipeline]
-* Re-using existing connection! (#0) with host localhost
-* Connected to localhost (::1) port 8080 (#0)
-> GET /v1/customer_card_position/swagger-ui.html HTTP/1.1
-> Host: localhost:8080
-> User-Agent: curl/7.61.1
-> Accept: */*
-> x-santander-client-id: a1b30a84-7bf3-4
-> channel: App-Conexa
-> society: scp
-> Content-Type: application/json
-> 
-< HTTP/1.1 302 
-< Location: /v1/customer_card_position/swagger-ui/index.html
-< X-Content-Type-Options: nosniff
-< X-XSS-Protection: 0
-< Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-< Pragma: no-cache
-< Expires: 0
-< X-Frame-Options: DENY
-< Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
-< Content-Length: 0
-< Date: Sat, 06 Jun 2026 05:58:47 GMT
-< 
-* Connection #0 to host localhost left intact
-* Issue another request to this URL: 'http://localhost:8080/v1/customer_card_position/swagger-ui/index.html'
-* Found bundle for host localhost: 0x55ad8aa4a040 [can pipeline]
-* Re-using existing connection! (#0) with host localhost
-* Connected to localhost (::1) port 8080 (#0)
-> GET /v1/customer_card_position/swagger-ui/index.html HTTP/1.1
-> Host: localhost:8080
-> User-Agent: curl/7.61.1
-> Accept: */*
-> x-santander-client-id: a1b30a84-7bf3-4
-> channel: App-Conexa
-> society: scp
-> Content-Type: application/json
-> 
-< HTTP/1.1 200 
-< Vary: Origin
-< Vary: Access-Control-Request-Method
-< Vary: Access-Control-Request-Headers
-< Last-Modified: Fri, 27 Feb 2026 12:05:04 GMT
-< Accept-Ranges: bytes
-< X-Content-Type-Options: nosniff
-< X-XSS-Protection: 0
-< Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-< Pragma: no-cache
-< Expires: 0
-< X-Frame-Options: DENY
-< Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
-< Content-Type: text/html
-< Content-Length: 734
-< Date: Sat, 06 Jun 2026 05:58:47 GMT
-< 
-<!-- HTML for static distribution bundle build -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
-    <link rel="stylesheet" type="text/css" href="index.css" />
-    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
-  </head>
+package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
 
-  <body>
-    <div id="swagger-ui"></div>
-    <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
-    <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
-    <script src="./swagger-initializer.js" charset="UTF-8"> </script>
-  </body>
-</html>
-* Connection #0 to host localhost left intact
-[java@cpe-nxhbsc-beproducoffering-micro-java-75dd98bd4b-7pp8j app]$
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.stereotype.Component;
+
+@Component
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    @ConditionalOnMissingBean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+                        .anyRequest().permitAll()
+                )
+                .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp ->
+                                csp.policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")
+                        )
+                );
+        return http.build();
+    }
+}
