@@ -1,47 +1,28 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeknowyocustomer.infrastructure.config;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@SpringBootTest
-@AutoConfigureMockMvc
-class SecurityConfigTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @RestController
-    static class TestController {
-
-        @GetMapping("/test")
-        public ResponseEntity<String> test() {
-            return ResponseEntity.ok("ok");
-        }
-    }
-
-    @Test
-    void shouldAllowAnyRequest() throws Exception {
-        mockMvc.perform(get("/test"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("ok"));
-    }
-
-    @Test
-    void shouldAddContentSecurityPolicyHeader() throws Exception {
-        mockMvc.perform(get("/test"))
-                .andExpect(status().isOk())
-                .andExpect(header().string(
-                        "Content-Security-Policy",
-                        "default-src 'self'; script-src 'self'; object-src 'none';"
-                ));
-    }
-}
+Note: Unnecessary use of -X or --request, GET is already inferred.
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> GET /v1/customer_card_position/ HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.61.1
+> Accept: */*
+> x-santander-client-id: a1b30a84-7bf3-4
+> channel: App-Conexa
+> society: scp
+> Content-Type: application/json
+> 
+< HTTP/1.1 500 
+< X-Content-Type-Options: nosniff
+< X-XSS-Protection: 0
+< Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+< Pragma: no-cache
+< Expires: 0
+< X-Frame-Options: DENY
+< Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none';
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Sat, 06 Jun 2026 06:39:23 GMT
+< Connection: close
+< 
+* Closing connection 0
+{"errors":[{"code":"500","description":"Cannot invoke \"String.length()\" because \"customerId\" is null","level":"error","message":"1780727963751-cpe-nxhbsc-beproducoffering-java.lang.NullPointerException-Cannot invoke \"String.length()\" because \"customerId\" is null"}]}[java@cpe-nxhbsc-beproducoffering-micro-java-6575bb4874-pgrfm app]$
