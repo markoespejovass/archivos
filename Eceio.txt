@@ -1,115 +1,256 @@
-spring.profiles.active: ${SPRING_PROFILES_ACTIVE:local}
----
-santander:
-  region: boae
-  suffix:
-  app-name: nxhbsc
-  logging:
-    format: GLUONLOG
-    gluon-log:
-      company: cpe
-      componentName: bedocmanagement
-      componentId: CHANGEIT_CMPT_ID
-      componentType: microservice
-      appId: CHANGEIT_APP_ID
-    entity: ESP
-    paas-app-version: "1.3.0"
-  core:
-    exceptions:
-      error-format: GLUON
-  security:
-    enabled: false
-    white-list:
-      - /**
-
-spring:
-  application:
-    name: cpe-nxhbsc-bedocmanagement
-  session:
-    store-type: none
-  cache:
-    type: CAFFEINE #Activated cache caffeine by default (If you want to change the cache to JBoss DataGrid, check the documentacion in confluence)
-    caffeine:
-      spec: expireAfterWrite=10m #Specifies that each entry should be automatically removed from the cache once that duration has elapsed after the entry’s creation
-  lifecycle.timeout-per-shutdown-phase: 2m
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password: password
-    driver-class-name: org.h2.Driver
-    # Configuration of connection pool. Please configure it according to the needs of the microservice.
-    hikari:
-      minimum-idle: 1
-      maximum-pool-size: 2
-      idle-timeout: 36000
-      max-lifetime: 1800000
-      connection-timeout: 20000
-      leak-detection-threshold: 3000
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
-
-logging.level:
-  com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.OpenApiGeneratorApplication: INFO
-  root: WARN
-
-management:
-  endpoint.health:
-    show-details: ALWAYS
-
-health:
-  config:
-    enabled: false
-
-springdoc:
-  swagger-ui:
-    disable-swagger-default-url: true
-    path: /swagger-ui.html
-
-server:
-  max-http-request-header-size: 128KB
-  forward-headers-strategy: framework
-  shutdown: graceful
-
-
-
 package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import lombok.*;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config.BaseDynamoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+import java.util.Optional;
+import java.util.concurrent.Executor;
 
-@Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class FileEntity {
-
-
-    @Id
-    private String id;
-    private String name;
-    private Integer version;
-    private String mimeType;
-    private String status;
-    @Lob
-    private String url;
-    private String customerId;
+@Repository
+public interface FileEntityRepository extends JpaRepository<FileEntity,String> {
 
 }
 
 
 
-<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSearchMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.*;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.time.Duration;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
+
+
+/**
+ * The class representative Otp adaptarer
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
+
+  private final S3Client s3Client;
+
+  private final S3Presigner s3Presigner;
+
+  private final DocumentMapper mapper;
+
+  private final FileEntityRepository repository;
+
+  @Value("${aws.bucket}")
+  public String bucketName;
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
+    String documentId;
+    String url;
+    WrapperMyDocumentResponse documentResponse;
+    if(criteria.getDocument() == null){
+      return new WrapperGetDocumentsResponse();
+    }
+    documentResponse = criteria.getDocument();
+    if(documentResponse.getDocumentId() == null){
+      return new WrapperGetDocumentsResponse();
+    }
+    documentId = documentResponse.getDocumentId();
+    Optional<FileEntity> fileEntity = repository.findById(documentId);
+
+    if(fileEntity.isEmpty()){
+      return new WrapperGetDocumentsResponse();
+    }
+    url = generateDownloadUrl(fileEntity.get().getCustomerId());
+
+    return mapper.donwloadMapper(url);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostSearchDocumentsResponse searchDocuments(
+      WrapperPostSearchDocumentsRequest criteria) {
+    var paramters = criteria.getSearchParameters();
+    if (paramters == null){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    if(paramters.getSearchProperties() == null || paramters.getSearchProperties().isEmpty()){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    if(paramters.getDiscriminator() == null){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+
+    FileSearch search = FileSearchMapper.toSearch(paramters);
+    var objectListing = repository.findAll();
+    return mapper.searchMapper(objectListing);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
+
+
+    String userFolder = validateRequestAndGetFolderReference(criteria);
+    String documentId = UUID.randomUUID().toString();
+
+
+    try {
+      var document = criteria.getDocument();
+      if(document == null){
+        return new WrapperPostDocumentsResponse();
+      }
+      if (document.getFolderReference()==null){
+        return new WrapperPostDocumentsResponse();
+      }
+      if (document.getAclReference()==null){
+        return new WrapperPostDocumentsResponse();
+      }
+      String base64 = document.getFolderReference();
+
+      // ✅ mapear entity
+      FileEntity entity = mapper.toEntity(criteria, documentId,base64);
+
+      // guardar
+      entity = repository.save(entity);
+
+      return mapper.toDTOUpload(entity);
+
+    } catch (Exception ex) {
+      log.error("Error uploading document", ex);
+      log.error(String.valueOf(ex));
+      throw new RuntimeException("Error uploading document to S3", ex);
+    }
+  }
+
+  private String validateRequestAndGetFolderReference(WrapperPostDocumentsRequest criteria) {
+
+    if (criteria == null || criteria.getDocument() == null) {
+      throw new IllegalArgumentException("Document is required");
+    }
+
+    var doc = criteria.getDocument();
+    if (doc == null){
+      throw new IllegalArgumentException("File (base64) is required");
+    }
+    String folder = doc.getFolderReference();
+    if (folder == null ) {
+      throw new IllegalArgumentException("File (base64) is required");
+    }
+
+    if (folder.isEmpty()) {
+      throw new IllegalArgumentException("File (base64) is required");
+    }
+    String name = doc.getName();
+    if (name == null) {
+      throw new IllegalArgumentException("File name is required");
+    }
+
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("File name is required");
+    }
+    return folder;
+  }
+
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperMySearchDocumentResponse getDocument(String documentId) {
+    var objectMetadataOptional =repository.findById(documentId);
+    if(objectMetadataOptional.isEmpty()){
+      return new WrapperMySearchDocumentResponse();
+    }
+    var objectMetadata = objectMetadataOptional.get();
+    return mapper.getMapper(objectMetadata);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public Void deleteDocument(String documentId) {
+    Optional<FileEntity> fileEntityOptional = repository.findById(documentId);
+    if (fileEntityOptional.isEmpty()){
+      return null;
+    }
+    FileEntity fileEntity = fileEntityOptional.get();
+    String userFolder = fileEntity.getCustomerId();
+    String filename = generateKey(fileEntity.getName(), userFolder);
+    DeleteObjectRequest request = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(filename)
+            .build();
+
+    s3Client.deleteObject(request);
+    repository.delete(fileEntity);
+    return null;
+  }
+
+  private String generateDownloadUrl(String key) {
+
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build();
+
+    GetObjectPresignRequest presignRequest =
+            GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+
+    PresignedGetObjectRequest presignedRequest =
+            s3Presigner.presignGetObject(presignRequest);
+
+    return presignedRequest.url().toString();
+  }
+
+}
