@@ -1,489 +1,78 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
+spring.profiles.active: ${SPRING_PROFILES_ACTIVE:local}
+---
+santander:
+  region: boae
+  suffix:
+  app-name: nxhbsc
+  logging:
+    format: GLUONLOG
+    gluon-log:
+      company: cpe
+      componentName: bedocmanagement
+      componentId: CHANGEIT_CMPT_ID
+      componentType: microservice
+      appId: CHANGEIT_APP_ID
+    entity: ESP
+    paas-app-version: "1.3.0"
+  core:
+    exceptions:
+      error-format: GLUON
+  security:
+    enabled: false
+    white-list:
+      - /**
+
+spring:
+  application:
+    name: cpe-nxhbsc-bedocmanagement
+  session:
+    store-type: none
+  cache:
+    type: CAFFEINE #Activated cache caffeine by default (If you want to change the cache to JBoss DataGrid, check the documentacion in confluence)
+    caffeine:
+      spec: expireAfterWrite=10m #Specifies that each entry should be automatically removed from the cache once that duration has elapsed after the entry’s creation
+  lifecycle.timeout-per-shutdown-phase: 2m
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+    # Configuration of connection pool. Please configure it according to the needs of the microservice.
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 2
+      idle-timeout: 36000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+      leak-detection-threshold: 3000
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+logging.level:
+  org.hibernate.SQL: DEBUG
+  org.hibernate.jdbc.bind: TRACE
+  com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.OpenApiGeneratorApplication: INFO
+  root: WARN
+
+management:
+  endpoint.health:
+    show-details: ALWAYS
+
+health:
+  config:
+    enabled: false
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /swagger-ui.html
+
+server:
+  max-http-request-header-size: 128KB
+  forward-headers-strategy: framework
+  shutdown: graceful
 
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config.BaseDynamoRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-import java.util.Optional;
-import java.util.concurrent.Executor;
-
-@Repository
-public interface FileEntityRepository extends JpaRepository<FileEntity,String> {
-
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
-
-
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSearchMapper;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.*;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import java.io.ByteArrayInputStream;
-import java.time.Duration;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
-
-import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
-
-
-/**
- * The class representative Otp adaptarer
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
-
-  private final S3Client s3Client;
-
-  private final S3Presigner s3Presigner;
-
-  private final DocumentMapper mapper;
-
-  private final FileEntityRepository repository;
-
-  @Value("${aws.bucket}")
-  public String bucketName;
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param criteria valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
-    String documentId;
-    String url;
-    WrapperMyDocumentResponse documentResponse;
-    if(criteria.getDocument() == null){
-      return new WrapperGetDocumentsResponse();
-    }
-    documentResponse = criteria.getDocument();
-    if(documentResponse.getDocumentId() == null){
-      return new WrapperGetDocumentsResponse();
-    }
-    documentId = documentResponse.getDocumentId();
-    Optional<FileEntity> fileEntity = repository.findById(documentId);
-
-    if(fileEntity.isEmpty()){
-      return new WrapperGetDocumentsResponse();
-    }
-    url = generateDownloadUrl(fileEntity.get().getCustomerId());
-
-    return mapper.donwloadMapper(url);
-  }
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param criteria valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperPostSearchDocumentsResponse searchDocuments(
-      WrapperPostSearchDocumentsRequest criteria) {
-    var paramters = criteria.getSearchParameters();
-    if (paramters == null){
-      return new WrapperPostSearchDocumentsResponse();
-    }
-    if(paramters.getSearchProperties() == null || paramters.getSearchProperties().isEmpty()){
-      return new WrapperPostSearchDocumentsResponse();
-    }
-    if(paramters.getDiscriminator() == null){
-      return new WrapperPostSearchDocumentsResponse();
-    }
-
-    FileSearch search = FileSearchMapper.toSearch(paramters);
-    var objectListing = repository.findAll();
-    return mapper.searchMapper(objectListing);
-  }
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param criteria valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
-
-
-    String userFolder = validateRequestAndGetFolderReference(criteria);
-    String documentId = UUID.randomUUID().toString();
-
-
-    try {
-      var document = criteria.getDocument();
-      if(document == null){
-        return new WrapperPostDocumentsResponse();
-      }
-      if (document.getFolderReference()==null){
-        return new WrapperPostDocumentsResponse();
-      }
-      if (document.getAclReference()==null){
-        return new WrapperPostDocumentsResponse();
-      }
-      String base64 = document.getFolderReference();
-
-      // ✅ mapear entity
-      FileEntity entity = mapper.toEntity(criteria, documentId,base64);
-
-      // guardar
-      entity = repository.save(entity);
-
-      return mapper.toDTOUpload(entity);
-
-    } catch (Exception ex) {
-      log.error("Error uploading document", ex);
-      log.error(String.valueOf(ex));
-      throw new RuntimeException("Error uploading document to S3", ex);
-    }
-  }
-
-  private String validateRequestAndGetFolderReference(WrapperPostDocumentsRequest criteria) {
-
-    if (criteria == null || criteria.getDocument() == null) {
-      throw new IllegalArgumentException("Document is required");
-    }
-
-    var doc = criteria.getDocument();
-    if (doc == null){
-      throw new IllegalArgumentException("File (base64) is required");
-    }
-    String folder = doc.getFolderReference();
-    if (folder == null ) {
-      throw new IllegalArgumentException("File (base64) is required");
-    }
-
-    if (folder.isEmpty()) {
-      throw new IllegalArgumentException("File (base64) is required");
-    }
-    String name = doc.getName();
-    if (name == null) {
-      throw new IllegalArgumentException("File name is required");
-    }
-
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("File name is required");
-    }
-    return folder;
-  }
-
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param documentId valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public WrapperMySearchDocumentResponse getDocument(String documentId) {
-    var objectMetadataOptional =repository.findById(documentId);
-    if(objectMetadataOptional.isEmpty()){
-      return new WrapperMySearchDocumentResponse();
-    }
-    var objectMetadata = objectMetadataOptional.get();
-    return mapper.getMapper(objectMetadata);
-  }
-
-  /**
-   * Metodo de salida para validar otp
-   *
-   * @param documentId valor del onjecto request
-   * @return WrapperClassifyEmail objecto de response valid
-   */
-  @Override
-  public Void deleteDocument(String documentId) {
-    Optional<FileEntity> fileEntityOptional = repository.findById(documentId);
-    if (fileEntityOptional.isEmpty()){
-      return null;
-    }
-    FileEntity fileEntity = fileEntityOptional.get();
-    String userFolder = fileEntity.getCustomerId();
-    String filename = generateKey(fileEntity.getName(), userFolder);
-    DeleteObjectRequest request = DeleteObjectRequest.builder()
-            .bucket(bucketName)
-            .key(filename)
-            .build();
-
-    s3Client.deleteObject(request);
-    repository.delete(fileEntity);
-    return null;
-  }
-
-  private String generateDownloadUrl(String key) {
-
-    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-            .bucket(bucketName)
-            .key(key)
-            .build();
-
-    GetObjectPresignRequest presignRequest =
-            GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
-                    .getObjectRequest(getObjectRequest)
-                    .build();
-
-    PresignedGetObjectRequest presignedRequest =
-            s3Presigner.presignGetObject(presignRequest);
-
-    return presignedRequest.url().toString();
-  }
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
-
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Configuration;
-
-/**
- * Enable caching in the application.
- */
-@Configuration
-@EnableCaching
-class ApplicationConfiguration {
-}
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.ExpressionBuilder;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
-import org.jetbrains.annotations.Nullable;
-import software.amazon.awssdk.enhanced.dynamodb.*;
-import software.amazon.awssdk.enhanced.dynamodb.Expression;
-import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
-import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-public abstract class BaseDynamoRepository<T> {
-
-    protected final DynamoDbEnhancedClient enhancedClient;
-    protected final DynamoDbTable<T> table;
-    private final String partitionKeyAttr;
-    @Nullable
-    private final String sortKeyAttr;
-    private final Class<T> itemClass;
-
-    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
-                                   String tableName,
-                                   TableSchema<T> schema,
-                                   Class<T> itemClass,
-                                   String partitionKeyAttr,
-                                   @Nullable String sortKeyAttr) {
-        this.enhancedClient = enhancedClient;
-        this.table = enhancedClient.table(tableName, schema);
-        this.itemClass = itemClass;
-        this.partitionKeyAttr = partitionKeyAttr;
-        this.sortKeyAttr = sortKeyAttr;
-    }
-
-    public T putIfAbsent(T item) {
-        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
-        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
-            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
-        }
-        Expression condition = Expression.builder()
-                .expression(expr)
-                .build();
-        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
-                .item(item)
-                .conditionExpression(condition)
-                .build();
-        table.putItem(request);
-        return request.item();
-    }
-
-    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
-        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
-                ? Key.builder().partitionValue(partitionKeyValue).build()
-                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
-
-        T item = table.getItem(r -> r.key(key));
-        return Optional.ofNullable(item);
-    }
-
-
-    public List<T> findAll() {
-        List<T> results = new ArrayList<>();
-        table.scan(ScanEnhancedRequest.builder().build())
-                .items()
-                .forEach(results::add);
-        return results;
-    }
-
-    public void delete(T item){
-        table.deleteItem(item);
-    }
-
-    public List<T> search(FileSearch search) {
-
-        ExpressionBuilder builder = new ExpressionBuilder();
-        Expression expression = builder.build(search);
-
-        ScanEnhancedRequest request = ScanEnhancedRequest.builder()
-                .filterExpression(expression)
-                .build();
-
-        List<T> results = new ArrayList<>();
-
-        table.scan(request)
-                .items()
-                .forEach(results::add);
-
-        return results;
-    }
-
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
-import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
-
-/**
- * Configuration class for setting up DynamoDB clients.
- * <p>
- * This class provides beans for the DynamoDbClient and DynamoDbEnhancedClient, using AWS region and
- * credentials from environment variables. It is used to enable integration with AWS DynamoDB in the
- * application context.
- */
-@Configuration
-public class DynamoDBConfig {
-
-    @Value("${aws.region}")
-    private String awsRegion;
-
-    @Value("${aws.dynamodb.role-arn}")
-    private String dynamoRoleArn;
-
-
-    @Bean
-    public StsClient stsClient() {
-        return StsClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
-    }
-
-    /**
-     * Creates and configures a DynamoDbClient bean.
-     *
-     * @return a configured DynamoDbClient instance
-     */
-    @Bean(name = "dynamoDbClient")
-    public DynamoDbClient dynamoDbClient(StsClient stsClient) {
-        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
-                StsAssumeRoleCredentialsProvider.builder()
-                        .stsClient(stsClient)
-                        .refreshRequest(AssumeRoleRequest.builder()
-                                .roleArn(dynamoRoleArn)
-                                .roleSessionName("dynamodb-cross-account-session")
-                                .build())
-                        .build();
-
-        return DynamoDbClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(assumeRoleCredentialsProvider)
-                .build();
-    }
-
-    /**
-     * Creates a DynamoDbEnhancedClient bean using the provided DynamoDbClient.
-     *
-     * @param dynamoDbClient the DynamoDbClient to use
-     * @return a configured DynamoDbEnhancedClient instance
-     */
-    @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient(
-            @Qualifier("dynamoDbClient") DynamoDbClient dynamoDbClient) {
-        return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(dynamoDbClient)
-                .build();
-    }
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
-
-
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-/**
- * The class representative Xml config
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Configuration
-public class S3Config {
-
-    @Bean
-    public S3Client s3Client() {
-
-        return S3Client.builder()
-                .region(Region.US_EAST_1) // <- ESTO FALTA
-                .build();
-    }
-
-
-    @Bean
-    public S3Presigner s3Presigner() {
-        return S3Presigner.builder()
-                .region(Region.US_EAST_1) // <- ESTO FALTA
-                .build();
-    }
-}
-
-
-}
