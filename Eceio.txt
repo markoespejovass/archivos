@@ -253,4 +253,237 @@ public class DocumentManagementAdapter implements DocumentManagementRepositoryPo
     return presignedRequest.url().toString();
   }
 
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Enable caching in the application.
+ */
+@Configuration
+@EnableCaching
+class ApplicationConfiguration {
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.ExpressionBuilder;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public abstract class BaseDynamoRepository<T> {
+
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
+    }
+
+    public T putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
+        return request.item();
+    }
+
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T item = table.getItem(r -> r.key(key));
+        return Optional.ofNullable(item);
+    }
+
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
+    }
+
+    public void delete(T item){
+        table.deleteItem(item);
+    }
+
+    public List<T> search(FileSearch search) {
+
+        ExpressionBuilder builder = new ExpressionBuilder();
+        Expression expression = builder.build(search);
+
+        ScanEnhancedRequest request = ScanEnhancedRequest.builder()
+                .filterExpression(expression)
+                .build();
+
+        List<T> results = new ArrayList<>();
+
+        table.scan(request)
+                .items()
+                .forEach(results::add);
+
+        return results;
+    }
+
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
+import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
+
+/**
+ * Configuration class for setting up DynamoDB clients.
+ * <p>
+ * This class provides beans for the DynamoDbClient and DynamoDbEnhancedClient, using AWS region and
+ * credentials from environment variables. It is used to enable integration with AWS DynamoDB in the
+ * application context.
+ */
+@Configuration
+public class DynamoDBConfig {
+
+    @Value("${aws.region}")
+    private String awsRegion;
+
+    @Value("${aws.dynamodb.role-arn}")
+    private String dynamoRoleArn;
+
+
+    @Bean
+    public StsClient stsClient() {
+        return StsClient.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+    }
+
+    /**
+     * Creates and configures a DynamoDbClient bean.
+     *
+     * @return a configured DynamoDbClient instance
+     */
+    @Bean(name = "dynamoDbClient")
+    public DynamoDbClient dynamoDbClient(StsClient stsClient) {
+        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
+                StsAssumeRoleCredentialsProvider.builder()
+                        .stsClient(stsClient)
+                        .refreshRequest(AssumeRoleRequest.builder()
+                                .roleArn(dynamoRoleArn)
+                                .roleSessionName("dynamodb-cross-account-session")
+                                .build())
+                        .build();
+
+        return DynamoDbClient.builder()
+                .region(Region.of(awsRegion))
+                .credentialsProvider(assumeRoleCredentialsProvider)
+                .build();
+    }
+
+    /**
+     * Creates a DynamoDbEnhancedClient bean using the provided DynamoDbClient.
+     *
+     * @param dynamoDbClient the DynamoDbClient to use
+     * @return a configured DynamoDbEnhancedClient instance
+     */
+    @Bean
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient(
+            @Qualifier("dynamoDbClient") DynamoDbClient dynamoDbClient) {
+        return DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
+                .build();
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+
+
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * The class representative Xml config
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+public class S3Config {
+
+    @Bean
+    public S3Client s3Client() {
+
+        return S3Client.builder()
+                .region(Region.US_EAST_1) // <- ESTO FALTA
+                .build();
+    }
+
+
+    @Bean
+    public S3Presigner s3Presigner() {
+        return S3Presigner.builder()
+                .region(Region.US_EAST_1) // <- ESTO FALTA
+                .build();
+    }
+}
+
+
 }
