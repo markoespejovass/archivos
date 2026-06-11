@@ -1,0 +1,3994 @@
+Date: Thu, 11 Jun 2026 01:31:45 +0000 (UTC)
+Message-ID: <406837645.17.1781141505384@08e6e66ce89d>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_16_510816567.1781141505383"
+
+------=_Part_16_510816567.1781141505383
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Ejecucion v1</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Ejecucion v1</h1>
+    <div class=3D"Section1">
+        <p local-id=3D"4bf35336bffa">Se probo con:<br>
+Con https</p>
+<p local-id=3D"4252d1ed284e">sin token(cognito)</p>
+<p local-id=3D"23dc946d024e">vpn conectada</p>
+<p local-id=3D"693bb1162271"></p>
+<div id=3D"expander-307858224" class=3D"expand-container">
+<div id=3D"expander-control-307858224" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">CURL para obtener token </span>
+</div>
+<div id=3D"expander-content-307858224" class=3D"expand-content">
+<p local-id=3D"4c79af38-ce1f-443b-bb0c-f333f53683cf">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://nexhub.auth.us-east-1.amazoncognito.c=
+om/oauth2/token'" rel=3D"nofollow">https://nexhub.auth.us-east-1.amazoncogn=
+ito.com/oauth2/token'</a> \<br>
+--header 'Content-Type: application/x-www-form-urlencoded' \<br>
+--header 'Cookie: XSRF-TOKEN=3D98ac5113-d31f-4536-b746-a32e93ff7167; XSRF-T=
+OKEN=3D98ac5113-d31f-4536-b746-a32e93ff7167' \<br>
+--data-urlencode 'grant_type=3Dclient_credentials' \<br>
+--data-urlencode 'client_id=3D4hlsjm1crciv3t1n46jfnr4n3t' \<br>
+--data-urlencode 'client_secret=3D1sgkjctd02orfvifflhuins6vq9hckssfhggna7ib=
+a58elncm5go' \<br>
+--data-urlencode 'scope=3Dexternal-api/read'</p>
+</div>
+</div>
+<div class=3D"table-wrap">
+<table data-table-width=3D"968" data-layout=3D"center" data-local-id=3D"347=
+05b49-579c-4dd9-9742-dccb1d447218" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 118.0px;">
+<col style=3D"width: 122.0px;">
+<col style=3D"width: 101.0px;">
+<col style=3D"width: 187.0px;">
+<col style=3D"width: 303.0px;">
+<col style=3D"width: 62.0px;">
+<col style=3D"width: 73.0px;">
+</colgroup>
+<tbody>
+<tr data-local-id=3D"6eef6d177d94">
+<th data-local-id=3D"47613a56ea14" class=3D"confluenceTh">
+<p local-id=3D"a79bc3ac83b3"></p></th>
+<th data-local-id=3D"6f8fa0735ca2" class=3D"confluenceTh">
+<p local-id=3D"ba98b7a789b0"><strong>endpoint</strong></p></th>
+<th data-local-id=3D"3589ad6d65c3" class=3D"confluenceTh">
+<p local-id=3D"fec7238d1dde"></p></th>
+<th data-local-id=3D"7056753af63f" class=3D"confluenceTh">
+<p local-id=3D"622e83bb4cb9"><strong>CURLs</strong></p></th>
+<th data-local-id=3D"9bd502c030d4" class=3D"confluenceTh">
+<p local-id=3D"6aa233ff02d6"><strong>Response - ejecucion1</strong></p></th=
+>
+<th data-local-id=3D"41019c8b56cb" class=3D"confluenceTh">
+<p local-id=3D"319677a1b066"><strong>Nota</strong></p></th>
+<th data-local-id=3D"7b53d528ee17" class=3D"confluenceTh">
+<p local-id=3D"127932eeca31"><strong>Response - ejecucion2</strong></p></th=
+>
+</tr>
+<tr data-local-id=3D"d7d20fb47151">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"41f2cb6d81c8" class=
+=3D"confluenceTd">
+<p local-id=3D"9f53ca39dfe8"><strong>no llama a externos</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"877d9ca67760" class=
+=3D"confluenceTd">
+<p local-id=3D"469b9ac16d7f">POST kyc</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"6d84b8c684d0" class=
+=3D"confluenceTd">
+<p local-id=3D"21036f852b9a"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v6/know_your_customer" rel=3D"nofollow"><u>ht=
+tps://api-uat.santanderconsumer.com.pe/v6/know_your_customer</u></a></p></t=
+d>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"45b151c5aa6e" class=
+=3D"confluenceTd">
+<div id=3D"expander-221487649" class=3D"expand-container">
+<div id=3D"expander-control-221487649" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-221487649" class=3D"expand-content">
+<p local-id=3D"6de0b377-0f34-4ba0-b6e9-c53e3eb74cfd">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v6/k=
+now_your_customer'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.=
+pe/v6/know_your_customer'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DlscfJOoCOBGUG16jTrqMjQAAAAA2xQ=
+Pz2FN1sgoTJzdG67bW; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "party": {<br>
+ "partyId": "F12345678",<br>
+ "person": {<br>
+ "documents": [<br>
+ {<br>
+ "documentNumber": "12345678",<br>
+ "documentTypeCode": "DNI",<br>
+ "documentTypeDescription": "Documento Nacional de Identidad",<br>
+ "country": {<br>
+ "code": "PE",<br>
+ "name": "Peru"<br>
+ }<br>
+ }<br>
+ ],<br>
+ "personName": {<br>
+ "fullName": "Juan Perez"<br>
+ },<br>
+ "placeOfBirth": {<br>
+ "country": {<br>
+ "code": "PE",<br>
+ "name": "Peru"<br>
+ }<br>
+ },<br>
+ "firstNationality": {<br>
+ "code": "PE",<br>
+ "name": "Peru"<br>
+ },<br>
+ "politicalExposure": {<br>
+ "isSelfDeclaredPEP": false,<br>
+ "declarationComments": "No"<br>
+ },<br>
+ "birthDate": "1990-01-01",<br>
+ "countryOfResidence": {<br>
+ "code": "PE",<br>
+ "name": "Peru"<br>
+ },<br>
+ "employmentInformation": {<br>
+ "occupationDescription": "Empleado",<br>
+ "economicActivity": {<br>
+ "categoryDescription": "Comercio",<br>
+ "subCategoryCode": "1234",<br>
+ "subCategoryDescription": "Venta"<br>
+ }<br>
+ }<br>
+ }<br>
+ },<br>
+ "products": [<br>
+ {<br>
+ "family": {<br>
+ "productFamily": {<br>
+ "productFamilyId": "001",<br>
+ "name": "Cuenta"<br>
+ }<br>
+ },<br>
+ "productCode": "001",<br>
+ "productDescription": "Cuenta de Ahorros"<br>
+ }<br>
+ ],<br>
+ "preferenceChannel": {<br>
+ "code": "01",<br>
+ "description": "Web"<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"689d31b28118" class=
+=3D"confluenceTd">
+<div id=3D"expander-1219308377" class=3D"expand-container">
+<div id=3D"expander-control-1219308377" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">404Not Found</span>
+</div>
+<div id=3D"expander-content-1219308377" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "404",
+            "description": "NoResourceFoundException",
+            "level": "error",
+            "message": "1781121725373-cpe-nxhbsc-beknowyocustomer-http_inte=
+rnal_exception-No static resource v6/know_your_customer."
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"a356ba1ecdec" class=
+=3D"confluenceTd">
+<p local-id=3D"3a2765e3e0a1"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"4a72e573d08c" class=
+=3D"confluenceTd">
+<p local-id=3D"1072a417a14c"></p></td>
+</tr>
+<tr data-local-id=3D"95ca82fdd003">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"867cadcc4406" class=
+=3D"confluenceTd">
+<p local-id=3D"79eef2b859f6"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"9fc2989baa3e" class=
+=3D"confluenceTd">
+<p local-id=3D"7e8c20edb920">POST kyc</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"b0593632983f" class=
+=3D"confluenceTd">
+<p local-id=3D"482541291910"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/risk_score" rel=3D"nofollow"><u>https://api-u=
+at.santanderconsumer.com.pe/risk_score</u></a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"2f9eb277c2ed" class=
+=3D"confluenceTd">
+<div id=3D"expander-1614578511" class=3D"expand-container">
+<div id=3D"expander-control-1614578511" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token </span>
+</div>
+<div id=3D"expander-content-1614578511" class=3D"expand-content">
+<p local-id=3D"b243d49b-a051-47fb-a90c-321059a24bc6">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/risk=
+_score'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/risk_sco=
+re'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3D8B07ENalUBSsCm6nTrqMjQAAAAC9EO=
+c1geVNmnSp+32y9BlF; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '{<br>
+ "knowYourCustomerResolution": {<br>
+ "knowYourCustomerQuestionnaire": {<br>
+ "questionnaireId": "GE00000120250620",<br>
+ "questionnaireAssetsId": "Origen",<br>
+ "questions": [<br>
+ {<br>
+ "translationCode": "PF01",<br>
+ "answer": "Save money",<br>
+ "answers": [<br>
+ {<br>
+ "values": [<br>
+ "PE"<br>
+ ]<br>
+ }<br>
+ ]<br>
+ }<br>
+ ]<br>
+ },<br>
+ "party": {<br>
+ "partyId": "54532019",<br>
+ "types": [<br>
+ {<br>
+ "code": "F"<br>
+ }<br>
+ ],<br>
+ "person": {<br>
+ "personName": {<br>
+ "givenName": "Mary",<br>
+ "lastName": "Clark",<br>
+ "secondLastName": "Butler"<br>
+ },<br>
+ "birthDate": "1980-01-15",<br>
+ "countryOfResidence": {<br>
+ "code": "052"<br>
+ },<br>
+ "firstNationality": {<br>
+ "code": "052"<br>
+ },<br>
+ "secondNationality": {<br>
+ "code": "National"<br>
+ },<br>
+ "genderCode": "Mujer",<br>
+ "placeOfBirth": {<br>
+ "country": {<br>
+ "code": "052"<br>
+ }<br>
+ },<br>
+ "additionalEmployments": [<br>
+ {<br>
+ "economicActivity": {<br>
+ "description": "Businessadministrator",<br>
+ "categoryCode": "08V",<br>
+ "subCategoryCode": "0950109"<br>
+ }<br>
+ }<br>
+ ],<br>
+ "documents": [<br>
+ {<br>
+ "documentNumber": "MEMA8700512HDFRRS06",<br>
+ "documentTypeCode": "CURP"<br>
+ }<br>
+ ]<br>
+ },<br>
+ "organization": {<br>
+ "organizationName": {<br>
+ "legalName": "Commercial Business &amp; Sons Co.",<br>
+ "tradingName": "Business Co."<br>
+ },<br>
+ "registrationDate": "2010-05-10",<br>
+ "economicActivity": {<br>
+ "categoryCode": "08V",<br>
+ "subCategoryCode": "0950109",<br>
+ "description": "Department store"<br>
+ },<br>
+ "documents": [<br>
+ {<br>
+ "documentNumber": "DECJ880426XXX",<br>
+ "documentTypeCode": "RFC"<br>
+ }<br>
+ ],<br>
+ "countryOfOperation": {<br>
+ "code": "052"<br>
+ }<br>
+ },<br>
+ "contactPoint": {<br>
+ "postalAddress": {<br>
+ "streetName": "Av. Reforma",<br>
+ "streetBuildingIdentification": "1234",<br>
+ "unitNumber": "",<br>
+ "location": "Col. Centro",<br>
+ "districtCode": "00014",<br>
+ "countyIdentification": {<br>
+ "name": "00014QT"<br>
+ },<br>
+ "city": {<br>
+ "code": "QT"<br>
+ },<br>
+ "state": {<br>
+ "code": "00014QT"<br>
+ },<br>
+ "zipCode": "07570"<br>
+ },<br>
+ "phoneAddress": {<br>
+ "phoneNumber": "4421231234"<br>
+ },<br>
+ "electronicAddress": {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:user@email.com"=
+ rel=3D"nofollow">user@email.com</a>"<br>
+ }<br>
+ },<br>
+ "structuralSegmentCode": "013",<br>
+ "structuralSegmentDescription": "RALRM",<br>
+ "bank": {<br>
+ "bankId": "0220",<br>
+ "bankName": "Sucursal patio Santa Fe.",<br>
+ "touchpoints": [<br>
+ {<br>
+ "name": "Matt Gilmartin"<br>
+ }<br>
+ ],<br>
+ "contactPoint": {<br>
+ "postalAddress": {<br>
+ "fullAddress": "Av. Reforma 123, CiudaddeM=C3=A9xico, 06600",<br>
+ "land": {<br>
+ "code": "0525",<br>
+ "name": "Patio Santa Fe."<br>
+ },<br>
+ "buildingName": "CONS. DIR. ZONA PONIENTE",<br>
+ "detailCode": "0877",<br>
+ "province": {<br>
+ "code": "9168",<br>
+ "name": "CONS. REGIONAL OCCIDENTE"<br>
+ }<br>
+ }<br>
+ }<br>
+ }<br>
+ },<br>
+ "products": [<br>
+ {<br>
+ "productCode": "01",<br>
+ "productDescription": "CONTRATOS DE PRESTACI=C3=93N DE SERVICIOS FI 142",<=
+br>
+ "subproduct": {<br>
+ "code": "0100"<br>
+ }<br>
+ }<br>
+ ]<br>
+ },<br>
+ "currency": {<br>
+ "code": "MXP"<br>
+ },<br>
+ "Verification": {<br>
+ "isVerificationSuccessful": false<br>
+ }<br>
+}'</p>
+</div>
+</div>
+<div id=3D"expander-1225024617" class=3D"expand-container">
+<div id=3D"expander-control-1225024617" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token </span>
+</div>
+<div id=3D"expander-content-1225024617" class=3D"expand-content">
+<p local-id=3D"7186404f-fc55-4087-af9e-46b1633afd62">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/risk=
+_score'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/risk_sco=
+re'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMjIzMDMsImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEyNTkwMywiaWF0IjoxNzgxMTIyMzAzLCJ2ZXJzaW9uIjoyLCJqdGkiOiJlNzI0MmEzNC0xMT=
+AzLTQzODMtOTAzNS1kZGFhNTMwNjdmNGQiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.agpXmuI1TMyyc0DQvN8_6eQgDP9x0OTnE3hAY3fW02YD3p0jALrqEddEqRc=
+t4quUYmkGqhUSy6XPTdrBODbl2JJrkB8_fVEal0yjLqWrljU7nIyaqdV6Gp7lBl65Q3iem_L-en=
+embWKPMekaFLyuWfei2MllHy62JFtcSAXHHDbLZ5XQik-g22fIf-BXxAn5dEkBQjLqEK3ULdqTj=
+1R9sgl5Jooz4EWPqsd-NxVxVw3bncW034oqXXHZo9t1DYhDxR7KNlGer9a8bKSLyTyhk4PlUSfH=
+DWj5b5wr_a6oWROKGI7eBIRfG3GLk4MuuA56bya61IxV5r3X_fRdVmxCFg' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3D8B07ENalUBSsCm6nTrqMjQAAAAC9EO=
+c1geVNmnSp+32y9BlF; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '{<br>
+ "knowYourCustomerResolution": {<br>
+ "knowYourCustomerQuestionnaire": {<br>
+ "questionnaireId": "GE00000120250620",<br>
+ "questionnaireAssetsId": "Origen",<br>
+ "questions": [<br>
+ {<br>
+ "translationCode": "PF01",<br>
+ "answer": "Save money",<br>
+ "answers": [<br>
+ {<br>
+ "values": [<br>
+ "PE"<br>
+ ]<br>
+ }<br>
+ ]<br>
+ }<br>
+ ]<br>
+ },<br>
+ "party": {<br>
+ "partyId": "54532019",<br>
+ "types": [<br>
+ {<br>
+ "code": "F"<br>
+ }<br>
+ ],<br>
+ "person": {<br>
+ "personName": {<br>
+ "givenName": "Mary",<br>
+ "lastName": "Clark",<br>
+ "secondLastName": "Butler"<br>
+ },<br>
+ "birthDate": "1980-01-15",<br>
+ "countryOfResidence": {<br>
+ "code": "052"<br>
+ },<br>
+ "firstNationality": {<br>
+ "code": "052"<br>
+ },<br>
+ "secondNationality": {<br>
+ "code": "National"<br>
+ },<br>
+ "genderCode": "Mujer",<br>
+ "placeOfBirth": {<br>
+ "country": {<br>
+ "code": "052"<br>
+ }<br>
+ },<br>
+ "additionalEmployments": [<br>
+ {<br>
+ "economicActivity": {<br>
+ "description": "Businessadministrator",<br>
+ "categoryCode": "08V",<br>
+ "subCategoryCode": "0950109"<br>
+ }<br>
+ }<br>
+ ],<br>
+ "documents": [<br>
+ {<br>
+ "documentNumber": "MEMA8700512HDFRRS06",<br>
+ "documentTypeCode": "CURP"<br>
+ }<br>
+ ]<br>
+ },<br>
+ "organization": {<br>
+ "organizationName": {<br>
+ "legalName": "Commercial Business &amp; Sons Co.",<br>
+ "tradingName": "Business Co."<br>
+ },<br>
+ "registrationDate": "2010-05-10",<br>
+ "economicActivity": {<br>
+ "categoryCode": "08V",<br>
+ "subCategoryCode": "0950109",<br>
+ "description": "Department store"<br>
+ },<br>
+ "documents": [<br>
+ {<br>
+ "documentNumber": "DECJ880426XXX",<br>
+ "documentTypeCode": "RFC"<br>
+ }<br>
+ ],<br>
+ "countryOfOperation": {<br>
+ "code": "052"<br>
+ }<br>
+ },<br>
+ "contactPoint": {<br>
+ "postalAddress": {<br>
+ "streetName": "Av. Reforma",<br>
+ "streetBuildingIdentification": "1234",<br>
+ "unitNumber": "",<br>
+ "location": "Col. Centro",<br>
+ "districtCode": "00014",<br>
+ "countyIdentification": {<br>
+ "name": "00014QT"<br>
+ },<br>
+ "city": {<br>
+ "code": "QT"<br>
+ },<br>
+ "state": {<br>
+ "code": "00014QT"<br>
+ },<br>
+ "zipCode": "07570"<br>
+ },<br>
+ "phoneAddress": {<br>
+ "phoneNumber": "4421231234"<br>
+ },<br>
+ "electronicAddress": {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:user@email.com"=
+ rel=3D"nofollow">user@email.com</a>"<br>
+ }<br>
+ },<br>
+ "structuralSegmentCode": "013",<br>
+ "structuralSegmentDescription": "RALRM",<br>
+ "bank": {<br>
+ "bankId": "0220",<br>
+ "bankName": "Sucursal patio Santa Fe.",<br>
+ "touchpoints": [<br>
+ {<br>
+ "name": "Matt Gilmartin"<br>
+ }<br>
+ ],<br>
+ "contactPoint": {<br>
+ "postalAddress": {<br>
+ "fullAddress": "Av. Reforma 123, CiudaddeM=C3=A9xico, 06600",<br>
+ "land": {<br>
+ "code": "0525",<br>
+ "name": "Patio Santa Fe."<br>
+ },<br>
+ "buildingName": "CONS. DIR. ZONA PONIENTE",<br>
+ "detailCode": "0877",<br>
+ "province": {<br>
+ "code": "9168",<br>
+ "name": "CONS. REGIONAL OCCIDENTE"<br>
+ }<br>
+ }<br>
+ }<br>
+ }<br>
+ },<br>
+ "products": [<br>
+ {<br>
+ "productCode": "01",<br>
+ "productDescription": "CONTRATOS DE PRESTACI=C3=93N DE SERVICIOS FI 142",<=
+br>
+ "subproduct": {<br>
+ "code": "0100"<br>
+ }<br>
+ }<br>
+ ]<br>
+ },<br>
+ "currency": {<br>
+ "code": "MXP"<br>
+ },<br>
+ "Verification": {<br>
+ "isVerificationSuccessful": false<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"c443553fbb81" class=
+=3D"confluenceTd">
+<div id=3D"expander-1641061553" class=3D"expand-container">
+<div id=3D"expander-control-1641061553" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1641061553" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-247312242" class=3D"expand-container">
+<div id=3D"expander-control-247312242" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-247312242" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Invalid key=3Dvalue pair (missing equal-sign) in Authorizat=
+ion header (hashed with SHA-256 and encoded with Base64): 'JunbX8Y21mdEAKa/=
+OFm7q7lEfCjs6IbK7ky2LVCdBRw=3D'."
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"fa226f93ee82" class=
+=3D"confluenceTd">
+<p local-id=3D"db7af822f768"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"4b87775f970a" class=
+=3D"confluenceTd">
+<p local-id=3D"eebf7405d233"></p></td>
+</tr>
+<tr data-local-id=3D"110f0464d293">
+<td data-local-id=3D"f4b17420dbbd" class=3D"confluenceTd">
+<p local-id=3D"17431cc98809"><strong>no llama a externos</strong></p></td>
+<td data-local-id=3D"144c5c484336" class=3D"confluenceTd">
+<p local-id=3D"cb4861bddede">POST Data consent</p></td>
+<td data-local-id=3D"cb9334f93477" class=3D"confluenceTd">
+<p local-id=3D"dd6dc98422ab"><a class=3D"external-link" href=3D"http://api-=
+uat.santanderconsumer.com.pe/v7/data_consents_management/parties/45189087/c=
+onsent_agreements" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.co=
+m.pe/v7/data_consents_management/parties/{party_id}/consent_agreements</u><=
+/a></p></td>
+<td data-local-id=3D"b2c058596100" class=3D"confluenceTd">
+<div id=3D"expander-1822976386" class=3D"expand-container">
+<div id=3D"expander-control-1822976386" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token </span>
+</div>
+<div id=3D"expander-content-1822976386" class=3D"expand-content">
+<p local-id=3D"7362ff90-5fe5-491c-a1ef-5b0cb4190171">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v7/d=
+ata_consents_management/parties/4518908901/consent_agreements'" rel=3D"nofo=
+llow">https://api-uat.santanderconsumer.com.pe/v7/data_consents_management/=
+parties/4518908901/consent_agreements'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DHA2VU0Xc81NRUNIdTrqMjQAAAACivG=
+7DqlGNVIbc6lcawxYg; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "statusInfo": {<br>
+ "statusCode": "01"<br>
+ },<br>
+ "validityPeriod": {<br>
+ "startDate": "2025-05-01",<br>
+ "endDate": "2025-08-01"<br>
+ },<br>
+ "bank": {<br>
+ "bankId": "AAOZ"<br>
+ },<br>
+ "legitimateCode": "02",<br>
+ "treatmentCode": "002",<br>
+ "purposeCode": "001"<br>
+}'</p>
+</div>
+</div>
+<div id=3D"expander-737679834" class=3D"expand-container">
+<div id=3D"expander-control-737679834" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token</span>
+</div>
+<div id=3D"expander-content-737679834" class=3D"expand-content">
+<p local-id=3D"425dbe06-83e6-4932-b3c3-5174a6c04c64">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v7/d=
+ata_consents_management/parties/4518908901/consent_agreements'" rel=3D"nofo=
+llow">https://api-uat.santanderconsumer.com.pe/v7/data_consents_management/=
+parties/4518908901/consent_agreements'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DHA2VU0Xc81NRUNIdTrqMjQAAAACivG=
+7DqlGNVIbc6lcawxYg; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq; incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4=
+doMGDO5KWoAAAAAkQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DHA2VU0Xc81NRUNI=
+dTrqMjQAAAACivG7DqlGNVIbc6lcawxYg; visid_incap_3319235=3DF8oVgf4aQDydCNYoKM=
+NC5lBjB2oAAAAAQUIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMjM0MzYsImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEyNzAzNiwiaWF0IjoxNzgxMTIzNDM2LCJ2ZXJzaW9uIjoyLCJqdGkiOiIyN2JjZTU4Yy1mN2=
+ViLTQ3MjUtODY5OC02ZmIzODFlNjExZDgiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.Z6C5cM4dGAuYrF8xO4g1ttR3d3cBv_qKY5z_3_ARp0e5t8sqWe5tdr_1iMz=
+X2Pqiv6Lrs4odpj7_tNc39xtoCaty3-6Qd68EUmCi74Z5Y4OdfPNB26vzdoODWozVpBglpZ4igx=
+5mC4ZFtIz9X14O0AKngdRJDJzaCPTcOpTwl9Y36PZfSv9TXh5SYfWqZoPu_AVELUlll72qXrxKH=
+fLMTg7Ez8hn5zxsAlcWfx8hszwC8MjfoCUakT2ZdXSF-hM7Y9lza4KJkQFi5_zR_y87b_zm7RaJ=
+ZHaBgJ1VjZiD2a6-Ns9sps3urvjMeXxO-YrMoFv4ucltILB2FYbMBymUdA' \<br>
+--data '{<br>
+ "statusInfo": {<br>
+ "statusCode": "01"<br>
+ },<br>
+ "validityPeriod": {<br>
+ "startDate": "2025-05-01",<br>
+ "endDate": "2025-08-01"<br>
+ },<br>
+ "bank": {<br>
+ "bankId": "AAOZ"<br>
+ },<br>
+ "legitimateCode": "02",<br>
+ "treatmentCode": "002",<br>
+ "purposeCode": "001"<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"08fb5448e703" class=3D"confluenceTd">
+<div id=3D"expander-1652676375" class=3D"expand-container">
+<div id=3D"expander-control-1652676375" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">401Unauthorized</span>
+</div>
+<div id=3D"expander-content-1652676375" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Unauthorized"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-1193235406" class=3D"expand-container">
+<div id=3D"expander-control-1193235406" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">500Internal Server Error</span>
+</div>
+<div id=3D"expander-content-1193235406" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "500",
+            "description": "Unable to execute HTTP request: Network is unre=
+achable (SDK Attempt Count: 4)",
+            "level": "error",
+            "message": "1781123516824-cpe-nxhbsc-bedatacomangment-software.=
+amazon.awssdk.core.exception.SdkClientException-Unable to execute HTTP requ=
+est: Network is unreachable (SDK Attempt Count: 4)"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"95bdf66374b2" class=3D"confluenceTd">
+<p local-id=3D"6ba850f25052"></p></td>
+<td data-local-id=3D"80748423d6f3" class=3D"confluenceTd">
+<p local-id=3D"444fb626865b"></p></td>
+</tr>
+<tr data-local-id=3D"a41fd0405b66">
+<td data-local-id=3D"ae7972d5655b" class=3D"confluenceTd">
+<p local-id=3D"ba4122725808"></p></td>
+<td data-local-id=3D"351243a68eb4" class=3D"confluenceTd">
+<p local-id=3D"8008e28b28d7">GET Data consent</p></td>
+<td data-local-id=3D"6ce41da76f30" class=3D"confluenceTd">
+<p local-id=3D"cb52f5542a15"><a class=3D"external-link" href=3D"http://api-=
+uat.santanderconsumer.com.pe/v7/parties/4518908701/consent_agreements" rel=
+=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v7/parties/451890=
+8701/consent_agreements</u></a></p></td>
+<td data-local-id=3D"66c15cffafd4" class=3D"confluenceTd">
+<div id=3D"expander-719645735" class=3D"expand-container">
+<div id=3D"expander-control-719645735" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-719645735" class=3D"expand-content">
+<p local-id=3D"2297a3f4-bfdc-412b-aa0c-0f4b5fa53f7e">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v7/p=
+arties/4518908701/consent_agreements'" rel=3D"nofollow">https://api-uat.san=
+tanderconsumer.com.pe/v7/parties/4518908701/consent_agreements'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div>
+<div id=3D"expander-1977729120" class=3D"expand-container">
+<div id=3D"expander-control-1977729120" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token </span>
+</div>
+<div id=3D"expander-content-1977729120" class=3D"expand-content">
+<p local-id=3D"62d85d65-20ee-45ad-b870-d556a66e8b08">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v7/p=
+arties/4518908701/consent_agreements'" rel=3D"nofollow">https://api-uat.san=
+tanderconsumer.com.pe/v7/parties/4518908701/consent_agreements'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMjM3MzQsImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEyNzMzNCwiaWF0IjoxNzgxMTIzNzM0LCJ2ZXJzaW9uIjoyLCJqdGkiOiI0NmI0MjU1My01M2=
+QwLTRhMzItODZhZC1jZDc5NTA1NmE1MGYiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.b9y9DCj4-olLXaowqQ3DhV8XlfkQ3Qk2vpVSOIyrLrCFmENTEOm2Z0AiYUB=
+1CqmQH9j62ZdvhdrteMLCFE87jqGCa2wDsaIrs-ZkVtSnisBTnQToQOihDBSZ_RrpnFz5mv9LVC=
+VxSAAIhRMllyOTSCsQYFiQsFNcBuBJoWmYLRF5bm_BAJdyltZ902toj2Z7WlVwCqh0LICKOt2UF=
+_SQIBhmGENX3YOcDOkn8PKioTEnIFKMAYT-OurPf11dJP6CUrJjAcxsY0omRD4gBfYoR9PfXwsC=
+aZondD5xtflsh-684n_8qQ3oe5gAybpQ-2HgVy7806B5GJB0dStafbINvA' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-local-id=3D"45a98f864238" class=3D"confluenceTd">
+<div id=3D"expander-1651045125" class=3D"expand-container">
+<div id=3D"expander-control-1651045125" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1651045125" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-502001415" class=3D"expand-container">
+<div id=3D"expander-control-502001415" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-502001415" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Invalid key=3Dvalue pair (missing equal-sign) in Authorizat=
+ion header (hashed with SHA-256 and encoded with Base64): 'fSgyjfC5EX4syKFo=
+TW2ehY5Nz8hZsvuDG4xkygJXIT8=3D'."
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"c3d02021dc51" class=3D"confluenceTd">
+<p local-id=3D"7ad35433bad9"></p></td>
+<td data-local-id=3D"f50592a99858" class=3D"confluenceTd">
+<p local-id=3D"1bacca792ce1"></p></td>
+</tr>
+<tr data-local-id=3D"04e68c2dd98e">
+<td data-local-id=3D"94b6a02fd49d" class=3D"confluenceTd">
+<p local-id=3D"6eea4c030ffd"></p></td>
+<td data-local-id=3D"366f1dedc6ee" class=3D"confluenceTd">
+<p local-id=3D"d76c918a1dce">PATCH Data consent</p></td>
+<td data-local-id=3D"66102fae25b0" class=3D"confluenceTd">
+<p local-id=3D"80a76563821e"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v7/data_consents_management/parties/%7Bparty_=
+id%7D/consent_agreements/%7Bconsent_id%7D" rel=3D"nofollow"><u>https://api-=
+uat.santanderconsumer.com.pe/v7/data_consents_management/parties/{party_id}=
+/consent_agreements/{consent_id}</u></a></p></td>
+<td data-local-id=3D"cfe21f733b4a" class=3D"confluenceTd">
+<div id=3D"expander-438083069" class=3D"expand-container">
+<div id=3D"expander-control-438083069" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token </span>
+</div>
+<div id=3D"expander-content-438083069" class=3D"expand-content">
+<p local-id=3D"bf237d8f-7047-490b-ac16-97c51c8b880a">curl --location --requ=
+est PATCH '<a class=3D"external-link" href=3D"https://api-uat.santandercons=
+umer.com.pe/v7/data_consents_management/parties/4518908701/consent_agreemen=
+ts/123456'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v7/da=
+ta_consents_management/parties/4518908701/consent_agreements/123456'</a> \<=
+br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "statusInfo": {<br>
+ "statusCode": "string",<br>
+ "statusDescription": "string"<br>
+ },<br>
+ "validityPeriod": {<br>
+ "startDate": "string",<br>
+ "endDate": "string"<br>
+ },<br>
+ "changeReasonCode": "string"<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"e285a03d7927" class=3D"confluenceTd">
+<div id=3D"expander-768706945" class=3D"expand-container">
+<div id=3D"expander-control-768706945" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">400Bad Request</span>
+</div>
+<div id=3D"expander-content-768706945" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "400",
+            "description": "Http Message Not Readable Exception",
+            "level": "error",
+            "message": "1781123838122-cpe-nxhbsc-bedatacomangment-http_mess=
+age_not_readable_exception-JSON parse error: Cannot deserialize value of ty=
+pe `java.time.LocalDate` from String \"string\": Failed to deserialize java=
+.time.LocalDate: (java.time.format.DateTimeParseException) Text 'string' co=
+uld not be parsed at index 0"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"e86fbc105193" class=3D"confluenceTd">
+<p local-id=3D"396b173a5b21"></p></td>
+<td data-local-id=3D"ac587387611f" class=3D"confluenceTd">
+<p local-id=3D"9ae97b85ae31"></p></td>
+</tr>
+<tr data-local-id=3D"486afefa5b08">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"3dcc4973d4f9" class=
+=3D"confluenceTd">
+<p local-id=3D"445f2d4c756b"><strong>usa Gesintel</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"269dec82e5d8" class=
+=3D"confluenceTd">
+<p local-id=3D"2d6d638a1166">POST watchlist screening</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"4c316e02073c" class=
+=3D"confluenceTd">
+<p local-id=3D"b587247cd8b3"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/watchlist_screening/validate_status" rel=
+=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/watchlist_scre=
+ening/validate_status</u></a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"5f91ecaaaed7" class=
+=3D"confluenceTd">
+<div id=3D"expander-1143030244" class=3D"expand-container">
+<div id=3D"expander-control-1143030244" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1143030244" class=3D"expand-content">
+<p local-id=3D"84f65e91-47e0-462d-9d0c-b47f522b5f02">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/w=
+atchlist_screening/validate_status'" rel=3D"nofollow">https://api-uat.santa=
+nderconsumer.com.pe/v1/watchlist_screening/validate_status'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DPDrmL2V+Wge1vhDs4doMGDudKWoAAAAA=
+KFU1YnFnyQalhFyULFsygQ=3D=3D; nlbi_3319235=3Dy/s2OP7WtnmLk8v3TrqMjQAAAABCID=
+OrAI641atpeJpRnuiP; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '{<br>
+ "operationTypeCode": "01",<br>
+ "operationSubtypeCode": "01",<br>
+ "idempotentReference": "AML-XXX-XXXXXXXXXXXXXX",<br>
+ "person": {<br>
+ "personName": {<br>
+ "givenName": "John",<br>
+ "middleName": "Nicholas",<br>
+ "birthName": "Artis",<br>
+ "lastName": "Clark",<br>
+ "secondLastName": "Butler",<br>
+ "fullName": "John Nicholas Clark"<br>
+ },<br>
+ "documents": [<br>
+ {<br>
+ "documentTypeCode": "DNI",<br>
+ "documentNumber": "12345678"<br>
+ }<br>
+ ],<br>
+ "birthDate": "1980-06-20",<br>
+ "placeOfBirth": {<br>
+ "country": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ }<br>
+ },<br>
+ "countryOfResidence": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ },<br>
+ "firstNationality": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ },<br>
+ "employmentInformation": {<br>
+ "employer": {<br>
+ "name": "BritishAirways"<br>
+ }<br>
+ }<br>
+ },<br>
+ "organization": {<br>
+ "documents": [<br>
+ {<br>
+ "documentNumber": "50456713W",<br>
+ "documentTypeCode": "SSN",<br>
+ "documentTypeDescription": "SocialSecurityNumber",<br>
+ "country": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ }<br>
+ }<br>
+ ],<br>
+ "typeCode": "02",<br>
+ "typeDescription": "Sole trader",<br>
+ "organizationName": {<br>
+ "legalName": "Business Co."<br>
+ },<br>
+ "foreignTaxes": [<br>
+ {<br>
+ "country": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ }<br>
+ }<br>
+ ],<br>
+ "placeOfRegistration": {<br>
+ "country": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ }<br>
+ },<br>
+ "countryOfOperation": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ },<br>
+ "economicData": {<br>
+ "actualTurnover": {<br>
+ "amount": 99.99,<br>
+ "currency": "EUR"<br>
+ }<br>
+ },<br>
+ "registrationDate": "2020-02-01",<br>
+ "complexOwnershipStructureIndicator": true,<br>
+ "economicActivity": {<br>
+ "categoryDescription": "Financial and insurance activities",<br>
+ "subCategoryCode": "6491",<br>
+ "subCategoryDescription": "Leasing"<br>
+ },<br>
+ "otherCountriesOfOperation": [<br>
+ {<br>
+ "country": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ }<br>
+ }<br>
+ ]<br>
+ },<br>
+ "contactPoints": [<br>
+ {<br>
+ "postalAddress": {<br>
+ "formatCode": "01",<br>
+ "detailCode": "21",<br>
+ "streetName": "Market St.",<br>
+ "postOfficeBox": "0040",<br>
+ "streetBuildingIdentification": "5",<br>
+ "zipCode": "02171",<br>
+ "state": {<br>
+ "code": "US-MA",<br>
+ "name": "Massachusetts"<br>
+ },<br>
+ "city": {<br>
+ "code": "HOU",<br>
+ "name": "Houston"<br>
+ },<br>
+ "country": {<br>
+ "code": "US",<br>
+ "name": "United States of America"<br>
+ },<br>
+ "unitType": "APT",<br>
+ "unitNumber": "315",<br>
+ "zip4Code": "1234",<br>
+ "displayLine1": "Flat 4",<br>
+ "displayLine2": "8 Abbey Road",<br>
+ "ruralTypeCode": "RR",<br>
+ "ruralNumber": "12"<br>
+ },<br>
+ "phoneAddress": {<br>
+ "mobileNumber": "+16176425587",<br>
+ "phoneNumber": "+19877658908"<br>
+ },<br>
+ "electronicAddress": {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:john.doe@santan=
+der.us" rel=3D"nofollow">john.doe@santander.us</a>"<br>
+ }<br>
+ }<br>
+ ]<br>
+} '</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"ab10b6862f35" class=
+=3D"confluenceTd">
+<div id=3D"expander-2059559453" class=3D"expand-container">
+<div id=3D"expander-control-2059559453" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">500Internal Server Error</span>
+</div>
+<div id=3D"expander-content-2059559453" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "500",
+            "level": "error",
+            "message": "1781116918640-cpe-nxhbsc-bewatchscreening-org.sprin=
+gframework.web.reactive.function.client.WebClientRequestException-null"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"4cb6691578ba" class=
+=3D"confluenceTd">
+<p local-id=3D"61d1c276533f"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"59590b31923b" class=
+=3D"confluenceTd">
+<p local-id=3D"6c4bec474408"></p></td>
+</tr>
+<tr data-local-id=3D"020e0a61e30c">
+<td data-local-id=3D"3efc705d1dad" class=3D"confluenceTd">
+<p local-id=3D"696b31849e84"><strong>no llama a externos</strong></p></td>
+<td data-local-id=3D"a91462d725ab" class=3D"confluenceTd">
+<p local-id=3D"5b784fe633e4">GET oferta productos</p></td>
+<td data-local-id=3D"678ff4cf2b28" class=3D"confluenceTd">
+<p local-id=3D"98dcbc69edb8"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/customer_card_position" rel=3D"nofollow"><=
+u>https://api-uat.santanderconsumer.com.pe/v1/customer_card_position</u></a=
+></p></td>
+<td data-local-id=3D"780deeec23f5" class=3D"confluenceTd">
+<div id=3D"expander-758178038" class=3D"expand-container">
+<div id=3D"expander-control-758178038" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-758178038" class=3D"expand-content">
+<p local-id=3D"646cae97-840c-49d8-bb5b-cf61fc10dd95">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/c=
+ustomer_card_position'" rel=3D"nofollow">https://api-uat.santanderconsumer.=
+com.pe/v1/customer_card_position'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DtAMDNt4QKS8/3mPHTrqMjQAAAACAeP=
+rWBcc9PoUtaGadSFLV; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-local-id=3D"12d75bcb9eb3" class=3D"confluenceTd">
+<div id=3D"expander-1923803276" class=3D"expand-container">
+<div id=3D"expander-control-1923803276" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">404Not Found</span>
+</div>
+<div id=3D"expander-content-1923803276" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "404",
+            "description": "NoResourceFoundException",
+            "level": "error",
+            "message": "1781119417227-cpe-nxhbsc-beproducoffering-http_inte=
+rnal_exception-No static resource v1/customer_card_position."
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"71a262deea53" class=3D"confluenceTd">
+<p local-id=3D"2394df82f194"></p></td>
+<td data-local-id=3D"7c4d792cf29e" class=3D"confluenceTd">
+<p local-id=3D"00fb7a5ed55b"></p></td>
+</tr>
+<tr data-local-id=3D"d5f92d2f7de4">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"24ffa500d529" class=
+=3D"confluenceTd">
+<p local-id=3D"e4b89d6afabe"><strong>llama a externo OTP </strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"7d73e8dddf23" class=
+=3D"confluenceTd">
+<p local-id=3D"016e908afcb8">POST Notificaciones correo</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"0ebfd29c20d7" class=
+=3D"confluenceTd">
+<p local-id=3D"b1b8916d036f"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/emailboxes/%7Bemailbox_id%7D/send_email" r=
+el=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/emailboxes/{ema=
+ilbox_id}/send_email</a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"a538d613b7d5" class=
+=3D"confluenceTd">
+<div id=3D"expander-71851442" class=3D"expand-container">
+<div id=3D"expander-control-71851442" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-71851442" class=3D"expand-content">
+<p local-id=3D"b358b81a-57f5-4562-89e3-74ec59f5631b">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/e=
+mailboxes/otp/send_email'" rel=3D"nofollow">https://api-uat.santanderconsum=
+er.com.pe/v1/emailboxes/otp/send_email'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DtAMDNt4QKS8/3mPHTrqMjQAAAACAeP=
+rWBcc9PoUtaGadSFLV; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw ' {<br>
+ "user": {<br>
+ "userId": "Nxxxxx",<br>
+ "displayName": "Carl Jr",<br>
+ "contactPoint": {<br>
+ "electronicAddress": {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:john.doe@santan=
+der.us" rel=3D"nofollow">john.doe@santander.us</a>"<br>
+ }<br>
+ }<br>
+ },<br>
+ "center": {<br>
+ "centerId": "1001"<br>
+ },<br>
+ "report": {<br>
+ "reportId": "12345"<br>
+ },<br>
+ "email": {<br>
+ "classification": {<br>
+ "categoryName": "Subhome"<br>
+ },<br>
+ "subject": "Better interest rate opportunity",<br>
+ "recipients": {<br>
+ "to": [<br>
+ {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:john.doe@santan=
+der.us" rel=3D"nofollow">john.doe@santander.us</a>"<br>
+ }<br>
+ ],<br>
+ "bcc": [<br>
+ {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:john.doe@santan=
+der.us" rel=3D"nofollow">john.doe@santander.us</a>"<br>
+ }<br>
+ ],<br>
+ "cc": [<br>
+ {<br>
+ "emailAddress": "<a class=3D"external-link" href=3D"mailto:john.doe@santan=
+der.us" rel=3D"nofollow">john.doe@santander.us</a>"<br>
+ }<br>
+ ]<br>
+ },<br>
+ "bodyPreview": "Hi, Megan Bowen, I hope this message finds you well. My na=
+me is Amelia Davies, and I am a customer service representative at Santande=
+r. We are writing to inform you that we have noticed some unusual activity =
+on your account. As part of our commitment to ensuring the security of our =
+customers'\'' accounts, we have temporarily suspe",<br>
+ "body": "Dear all, we are pleased to inform you that your proposal has bee=
+n accepted."<br>
+ }<br>
+}<br>
+ '</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"d712085fd13c" class=
+=3D"confluenceTd">
+<div id=3D"expander-550105935" class=3D"expand-container">
+<div id=3D"expander-control-550105935" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">503Service Unavailable</span>
+</div>
+<div id=3D"expander-content-550105935" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: html; gutter: false; theme: Confluence" data-theme=3D"Confluence">&lt;htm=
+l&gt;
+
+&lt;head&gt;
+=09&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+=09&lt;center&gt;
+=09=09&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;
+=09&lt;/center&gt;
+=09&lt;hr&gt;
+=09&lt;center&gt;nginx&lt;/center&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"8fdd2e751d22" class=
+=3D"confluenceTd">
+<p local-id=3D"2b65a9e0cf5c"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"67c329fc4837" class=
+=3D"confluenceTd">
+<p local-id=3D"bda1a986d342"></p></td>
+</tr>
+<tr data-local-id=3D"f30f51d51c37">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"9fc499d13e3c" class=
+=3D"confluenceTd">
+<p local-id=3D"b84ab8e0e603"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"41488cede7d7" class=
+=3D"confluenceTd">
+<p local-id=3D"aaf1e329a1b6">POST Notificaciones correo</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"97e3d9cfec39" class=
+=3D"confluenceTd">
+<p local-id=3D"b602ffc5b9ad"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/emailboxes/%7Bemailbox_id%7D/emails/%7Bema=
+il_id%7D/classify_email" rel=3D"nofollow"><u>https://api-uat.santanderconsu=
+mer.com.pe/v1/emailboxes/{emailbox_id}/emails/{email_id}/classify_email</u>=
+</a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"329bf33c5e11" class=
+=3D"confluenceTd">
+<div id=3D"expander-1168823166" class=3D"expand-container">
+<div id=3D"expander-control-1168823166" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1168823166" class=3D"expand-content">
+<p local-id=3D"d0128ce8-e820-47e2-a3c5-e922e03f6b30">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/e=
+mailboxes/otp/emails/12345/classify_email'" rel=3D"nofollow">https://api-ua=
+t.santanderconsumer.com.pe/v1/emailboxes/otp/emails/12345/classify_email'</=
+a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DtAMDNt4QKS8/3mPHTrqMjQAAAACAeP=
+rWBcc9PoUtaGadSFLV; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data ' {<br>
+ "classifications": [<br>
+ {<br>
+ "typeCode": "1",<br>
+ "categoryName": "Amendments"<br>
+ }<br>
+ ]<br>
+}'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"540111ccb6c4" class=
+=3D"confluenceTd">
+<div id=3D"expander-1228563324" class=3D"expand-container">
+<div id=3D"expander-control-1228563324" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">503Service Unavailable</span>
+</div>
+<div id=3D"expander-content-1228563324" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: html; gutter: false; theme: Confluence" data-theme=3D"Confluence">&lt;htm=
+l&gt;
+
+&lt;head&gt;
+=09&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+=09&lt;center&gt;
+=09=09&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;
+=09&lt;/center&gt;
+=09&lt;hr&gt;
+=09&lt;center&gt;nginx&lt;/center&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"8197e360aa94" class=
+=3D"confluenceTd">
+<p local-id=3D"bc355dbdfd3e"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"ddd633d939fb" class=
+=3D"confluenceTd">
+<p local-id=3D"ef28a9db1a19"></p></td>
+</tr>
+<tr data-local-id=3D"275029089f4c">
+<td data-local-id=3D"fa47d9ce4d1c" class=3D"confluenceTd">
+<p local-id=3D"a7c13f6850bc"><strong>lama a externo Sky</strong></p></td>
+<td data-local-id=3D"76dd75573d75" class=3D"confluenceTd">
+<p local-id=3D"83f06e5e6de7">POST Customer benefit program (SKY)</p></td>
+<td data-local-id=3D"b65f9fd02808" class=3D"confluenceTd">
+<p local-id=3D"2cba566abe40"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/customer_benefit_programs/register_custome=
+r" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/customer_be=
+nefit_programs/register_customer</a></p></td>
+<td data-local-id=3D"df704a763a35" class=3D"confluenceTd">
+<div id=3D"expander-1384688305" class=3D"expand-container">
+<div id=3D"expander-control-1384688305" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1384688305" class=3D"expand-content">
+<p local-id=3D"ffc25e31-95bd-4aee-8483-60c3818e5e88">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/c=
+ustomer_benefit_programs/register_customer'" rel=3D"nofollow">https://api-u=
+at.santanderconsumer.com.pe/v1/customer_benefit_programs/register_customer'=
+</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DlnjraCBr6T4wqZukTrqMjQAAAACti9=
+iQThvBiTU5uxmKKMPE; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '{<br>
+ "benefitProgramCode": "SKY",<br>
+ "activationProperties": [<br>
+ {<br>
+ "key": "name",<br>
+ "value": "Marko"<br>
+ },<br>
+ {<br>
+ "key": "lastname",<br>
+ "value": "Espejo"<br>
+ },<br>
+ {<br>
+ "key": "birthdate",<br>
+ "value": "15-07-1983"<br>
+ },<br>
+ {<br>
+ "key": "email",<br>
+ "value": "<a class=3D"external-link" href=3D"mailto:mark@gmail.com" rel=3D=
+"nofollow">mark@gmail.com</a>"<br>
+ },<br>
+ {<br>
+ "key": "country",<br>
+ "value": "CL"<br>
+ },<br>
+ {<br>
+ "key": "type",<br>
+ "value": "RUT"<br>
+ },<br>
+ {<br>
+ "key": "number",<br>
+ "value": "84834858"<br>
+ }<br>
+ ]<br>
+} '</p>
+</div>
+</div></td>
+<td data-local-id=3D"c742deb5a121" class=3D"confluenceTd">
+<div id=3D"expander-1426968982" class=3D"expand-container">
+<div id=3D"expander-control-1426968982" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">504Gateway Timeout</span>
+</div>
+<div id=3D"expander-content-1426968982" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Endpoint request timed out"
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"d9946ab681d6" class=3D"confluenceTd">
+<p local-id=3D"1a102760484a"></p></td>
+<td data-local-id=3D"277b0114f17f" class=3D"confluenceTd">
+<p local-id=3D"492d3fbcbfa5"></p></td>
+</tr>
+<tr data-local-id=3D"80edbfd3233f">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"b7f628e76aec" class=
+=3D"confluenceTd">
+<p local-id=3D"10959761edcb"><strong>no llama a externos</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"91ba5ed799fa" class=
+=3D"confluenceTd">
+<p local-id=3D"e486240a2d1f"><strong>POST Credit risk</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"b1abb1ca573e" class=
+=3D"confluenceTd">
+<p local-id=3D"987d5fd4f6d6"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/credit_risk_decisions/decide_risk" rel=3D"=
+nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/credit_risk_decisi=
+ons/decide_risk</u></a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"3e962f62c298" class=
+=3D"confluenceTd">
+<div id=3D"expander-979674619" class=3D"expand-container">
+<div id=3D"expander-control-979674619" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-979674619" class=3D"expand-content">
+<p local-id=3D"3e03396e6d0c">curl --location '<a class=3D"external-link" hr=
+ef=3D"https://api-uat.santanderconsumer.com.pe/v1/credit_risk_decisions/dec=
+ide_risk'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/cre=
+dit_risk_decisions/decide_risk'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3D3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAA=
+kQrJw6svXhPPNRzg2Dt7cQ=3D=3D; nlbi_3319235=3DuZIfK+vkUWNzjO91TrqMjQAAAAAcEU=
+MOR/vOHQYH4lzVtYOW; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "globalParameter": {<br>
+ "identifierType": 1,<br>
+ "identifier": 10073,<br>
+ "evaluationType": 1,<br>
+ "requestType": 2<br>
+ },<br>
+ "customerAccountHolder": {<br>
+ "documentType": 171,<br>
+ "documentNumber": "477826",<br>
+ "gender": "Masculino",<br>
+ "maritalStatus": "Soltero",<br>
+ "dateOfBirth": "06/06/1986"<br>
+ }<br>
+} '</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"aa3339da076a" class=
+=3D"confluenceTd">
+<div id=3D"expander-1828587815" class=3D"expand-container">
+<div id=3D"expander-control-1828587815" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">200OK</span>
+</div>
+<div id=3D"expander-content-1828587815" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "transactionId": "1",
+    "filedValidMessage": "",
+    "riskPolicy": {
+        "creditDecision": null,
+        "rejectionReasons": {
+            "details": [
+                {
+                    "cmaCode": "CMA_0004",
+                    "description": "Deudas Refinanciadas &gt; S/2000 en los=
+ =C3=BAltimos 36 meses",
+                    "party": "Titular"
+                }
+            ]
+        }
+    }
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"ee99f5d30280" class=
+=3D"confluenceTd">
+<p local-id=3D"77535c058c17">Me lo compartio Angel:<br>
+"documentNumber": "477826"<br></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"f1905e293f86" class=
+=3D"confluenceTd">
+<p local-id=3D"c26424cc1f32"></p></td>
+</tr>
+<tr data-local-id=3D"f0defa101980">
+<td data-local-id=3D"e677b070d396" class=3D"confluenceTd">
+<p local-id=3D"36ac8ed300f0"><strong>no llama a externos</strong></p></td>
+<td data-local-id=3D"4d863ce1497c" class=3D"confluenceTd">
+<p local-id=3D"2d11a1ca13f2">?DELETE Gestor documentario</p></td>
+<td data-local-id=3D"8bc968adacc7" class=3D"confluenceTd">
+<p local-id=3D"03046ced8a0e"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v2/document_management/documents/%7Bdocument_=
+id%7D" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v2/docu=
+ment_management/documents/{document_id}</u></a></p></td>
+<td data-local-id=3D"5924aff1eb21" class=3D"confluenceTd">
+<div id=3D"expander-1081786477" class=3D"expand-container">
+<div id=3D"expander-control-1081786477" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1081786477" class=3D"expand-content">
+<p local-id=3D"4ea9f1e0-3211-42d0-92e1-3cc53186eaba">curl --location --requ=
+est DELETE '<a class=3D"external-link" href=3D"https://api-uat.santandercon=
+sumer.com.pe/v2/document_management/documents/987654321'" rel=3D"nofollow">=
+https://api-uat.santanderconsumer.com.pe/v2/document_management/documents/9=
+87654321'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DLASnO/nHenQ5kk3s4doMGFHOKWoAAAAA=
+vqIoAVfpiYkK3Ab1JAid0w=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-local-id=3D"17bf47bbf761" class=3D"confluenceTd">
+<div id=3D"expander-1594736628" class=3D"expand-container">
+<div id=3D"expander-control-1594736628" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">204No Content</span>
+</div>
+<div id=3D"expander-content-1594736628" class=3D"expand-content">
+<p local-id=3D"81080815-8785-4f71-a6e3-fe3dfc7cd70a"></p>
+</div>
+</div></td>
+<td data-local-id=3D"fb3c1541a4ba" class=3D"confluenceTd">
+<p local-id=3D"34f91bd40923"></p></td>
+<td data-local-id=3D"5229d405a512" class=3D"confluenceTd">
+<p local-id=3D"fa3ce7190e3b"></p></td>
+</tr>
+<tr data-local-id=3D"4a11c30e9775">
+<td data-local-id=3D"edda398898b2" class=3D"confluenceTd">
+<p local-id=3D"92ceb269cc54"></p></td>
+<td data-local-id=3D"4c8b0c10af84" class=3D"confluenceTd">
+<p local-id=3D"096ff0e31cc8">?GET Gestor documentario</p></td>
+<td data-local-id=3D"ef5e38a47a0c" class=3D"confluenceTd">
+<p local-id=3D"cbe8b43951de"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v2/document_management/documents/%7Bdocument_=
+id%7D/versions" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v=
+2/document_management/documents/{document_id}/versions</a></p></td>
+<td data-local-id=3D"c9c9aff95c56" class=3D"confluenceTd">
+<div id=3D"expander-1905285013" class=3D"expand-container">
+<div id=3D"expander-control-1905285013" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1905285013" class=3D"expand-content">
+<p local-id=3D"867c1d2f-a254-46ec-88fd-5d9c52e60533">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v2/d=
+ocument_management/documents/12345678/versions'" rel=3D"nofollow">https://a=
+pi-uat.santanderconsumer.com.pe/v2/document_management/documents/12345678/v=
+ersions'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DLASnO/nHenQ5kk3s4doMGFHOKWoAAAAA=
+vqIoAVfpiYkK3Ab1JAid0w=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-local-id=3D"07ad7a524a36" class=3D"confluenceTd">
+<div id=3D"expander-944607543" class=3D"expand-container">
+<div id=3D"expander-control-944607543" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">501Not Implemented</span>
+</div>
+<div id=3D"expander-content-944607543" class=3D"expand-content">
+<p local-id=3D"5ae93359-7c7b-4070-9ca4-e786373e9c56"></p>
+</div>
+</div></td>
+<td data-local-id=3D"44652cc74b60" class=3D"confluenceTd">
+<p local-id=3D"6d60385abbc8"></p></td>
+<td data-local-id=3D"172b3d1a771e" class=3D"confluenceTd">
+<p local-id=3D"5b4d4883d772"></p></td>
+</tr>
+<tr data-local-id=3D"5ace2d0d4859">
+<td data-local-id=3D"842163e745e1" class=3D"confluenceTd">
+<p local-id=3D"b2f9cc5d501b"></p></td>
+<td data-local-id=3D"b599b2009282" class=3D"confluenceTd">
+<p local-id=3D"dd8af364da9c">?POST Gestor documentario</p></td>
+<td data-local-id=3D"df73721a25d2" class=3D"confluenceTd">
+<p local-id=3D"44c7e15fd670"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v2/document_management/download_document" rel=
+=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v2/document_manageme=
+nt/download_document</a></p></td>
+<td data-local-id=3D"66850b1dd27d" class=3D"confluenceTd">
+<div id=3D"expander-1129495273" class=3D"expand-container">
+<div id=3D"expander-control-1129495273" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1129495273" class=3D"expand-content">
+<p local-id=3D"8e7ccb57-f417-4d91-a7c0-c44cbbf56aee">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v2/d=
+ocument_management/download_document'" rel=3D"nofollow">https://api-uat.san=
+tanderconsumer.com.pe/v2/document_management/download_document'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DLASnO/nHenQ5kk3s4doMGFHOKWoAAAAA=
+vqIoAVfpiYkK3Ab1JAid0w=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "document": {<br>
+ "documentId": "123123124124124",<br>
+ "versionCode": ""<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"2c8ab67fde56" class=3D"confluenceTd">
+<div id=3D"expander-1979770943" class=3D"expand-container">
+<div id=3D"expander-control-1979770943" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">500Internal Server Error</span>
+</div>
+<div id=3D"expander-content-1979770943" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "500",
+            "description": "could not prepare statement [Table \"FILE_ENTIT=
+Y\" not found (this database is empty); SQL statement:\nselect fe1_0.id,fe1=
+_0.customer_id,fe1_0.mime_type,fe1_0.name,fe1_0.status,fe1_0.url,fe1_0.vers=
+ion from file_entity fe1_0 where fe1_0.id=3D? [42104-232]] [select fe1_0.id=
+,fe1_0.customer_id,fe1_0.mime_type,fe1_0.name,fe1_0.status,fe1_0.url,fe1_0.=
+version from file_entity fe1_0 where fe1_0.id=3D?]; SQL [select fe1_0.id,fe=
+1_0.customer_id,fe1_0.mime_type,fe1_0.name,fe1_0.status,fe1_0.url,fe1_0.ver=
+sion from file_entity fe1_0 where fe1_0.id=3D?]",
+            "level": "error",
+            "message": "1781125136623-cpe-nxhbsc-bedocmanagement-org.spring=
+framework.dao.InvalidDataAccessResourceUsageException-could not prepare sta=
+tement [Table \"FILE_ENTITY\" not found (this database is empty); SQL state=
+ment:\nselect fe1_0.id,fe1_0.customer_id,fe1_0.mime_type,fe1_0.name,fe1_0.s=
+tatus,fe1_0.url,fe1_0.version from file_entity fe1_0 where fe1_0.id=3D? [42=
+104-232]] [select fe1_0.id,fe1_0.customer_id,fe1_0.mime_type,fe1_0.name,fe1=
+_0.status,fe1_0.url,fe1_0.version from file_entity fe1_0 where fe1_0.id=3D?=
+]; SQL [select fe1_0.id,fe1_0.customer_id,fe1_0.mime_type,fe1_0.name,fe1_0.=
+status,fe1_0.url,fe1_0.version from file_entity fe1_0 where fe1_0.id=3D?]"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"45a22cc73e31" class=3D"confluenceTd">
+<p local-id=3D"62146d2577a6"></p></td>
+<td data-local-id=3D"828583a88be9" class=3D"confluenceTd">
+<p local-id=3D"f70fdb532699"></p></td>
+</tr>
+<tr data-local-id=3D"68e8eb3ca07e">
+<td data-local-id=3D"832a786d16a2" class=3D"confluenceTd">
+<p local-id=3D"af250a424ae3"></p></td>
+<td data-local-id=3D"8235277e9bbb" class=3D"confluenceTd">
+<p local-id=3D"666e2ca0d131">POST Gestor documentario</p></td>
+<td data-local-id=3D"393a8190c2ed" class=3D"confluenceTd">
+<p local-id=3D"436943b565a6"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v2/document_management/search_documents" rel=
+=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v2/document_manag=
+ement/search_documents</u></a></p></td>
+<td data-local-id=3D"c1bf5547c5c3" class=3D"confluenceTd">
+<div id=3D"expander-90233778" class=3D"expand-container">
+<div id=3D"expander-control-90233778" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-90233778" class=3D"expand-content">
+<p local-id=3D"b6e80b36-411a-4409-bd74-c482a746c56d">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v2/d=
+ocument_management/search_documents'" rel=3D"nofollow">https://api-uat.sant=
+anderconsumer.com.pe/v2/document_management/search_documents'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DLASnO/nHenQ5kk3s4doMGFHOKWoAAAAA=
+vqIoAVfpiYkK3Ab1JAid0w=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "caller_information": {<br>
+ "appId": "",<br>
+ "name": ""<br>
+ },<br>
+ "search_parameters": {<br>
+ "discriminator": "AND",<br>
+ "searchProperties": [<br>
+ {<br>
+ "keyOperator": "Contains",<br>
+ "keyId": "NAME",<br>
+ "keyValue": "Terminos y condiciones"<br>
+ },<br>
+ {<br>
+ "keyOperator": "Equal",<br>
+ "keyId": "MIME_TYPE",<br>
+ "keyValue": "aplication/pdf"<br>
+ },<br>
+ {<br>
+ "keyOperator": "Equal",<br>
+ "keyId": "STATUS",<br>
+ "keyValue": "UPLOADED"<br>
+ },<br>
+ {<br>
+ "keyOperator": "Equal",<br>
+ "keyId": ""VERSION"",<br>
+ "keyValue": "1"<br>
+ },<br>
+ {<br>
+ "keyOperator": "Equal",<br>
+ "keyId": "ID",<br>
+ "keyValue": "1321325"<br>
+ }<br>
+ ],<br>
+ "sortOrder": "",<br>
+ "sortBy": ""<br>
+ },<br>
+ "navigation_parameters": {<br>
+ "_limit": "",<br>
+ "_offset": ""<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"6bed3b641f77" class=3D"confluenceTd">
+<div id=3D"expander-1093608202" class=3D"expand-container">
+<div id=3D"expander-control-1093608202" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">400Bad Request</span>
+</div>
+<div id=3D"expander-content-1093608202" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "400",
+            "description": "Http Message Not Readable Exception",
+            "level": "error",
+            "message": "1781124962192-cpe-nxhbsc-bedocmanagement-http_messa=
+ge_not_readable_exception-JSON parse error: Unexpected character ('V' (code=
+ 86)): was expecting comma to separate Object entries"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"a2d75e9e69a4" class=3D"confluenceTd">
+<p local-id=3D"78f5e0ad25c1"></p></td>
+<td data-local-id=3D"d22fe862e677" class=3D"confluenceTd">
+<p local-id=3D"8484efe5a955"></p></td>
+</tr>
+<tr data-local-id=3D"a91c9e09bf16">
+<td data-local-id=3D"be167c057229" class=3D"confluenceTd">
+<p local-id=3D"ce567b838fa6"></p></td>
+<td data-local-id=3D"9e6cb2537106" class=3D"confluenceTd">
+<p local-id=3D"282e3af974fa">1ero POST Gestor documentario</p></td>
+<td data-local-id=3D"d6b135a494d4" class=3D"confluenceTd">
+<p local-id=3D"42a9d7a122d2"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v2/document_management/upload_document" rel=
+=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v2/document_manageme=
+nt/upload_document</a></p></td>
+<td data-local-id=3D"48cd6437dcc3" class=3D"confluenceTd">
+<div id=3D"expander-250508410" class=3D"expand-container">
+<div id=3D"expander-control-250508410" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-250508410" class=3D"expand-content">
+<p local-id=3D"f53d219b-4a1e-4245-88d4-440bdc2ee566">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v2/d=
+ocument_management/upload_document'" rel=3D"nofollow">https://api-uat.santa=
+nderconsumer.com.pe/v2/document_management/upload_document'</a> \<br>
+--header 'x-santander-client-id: 1234' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DJ68vNi85A1wvA2fs4doMGJLjKWoAAAAA=
+V7ciZM1gntMVz2CfLe3qbg=3D=3D; nlbi_3319235=3DG35OQyrv62aZbKoxTrqMjQAAAAAiaV=
+tKNXaKnoiUuAZphYw4; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "document": {<br>
+ "mimeType": "application/pdf",<br>
+ "name": "document.pdf",<br>
+ "typeCode": "Santdr-eDoc",<br>
+ "folderReference": "JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG=
+9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgN=
+CAwIFIgL0Y0IDUgMCBSIC9GNSA2IDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQg=
+L0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGU=
+gL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdm=
+V0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlI=
+C9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQmFzZUZvbnQgL1phcGZE=
+aW5nYmF0cyAvTmFtZSAvRjMgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago=
+1IDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLU9ibGlxdWUgL0VuY29kaW5nIC9XaW5Bbn=
+NpRW5jb2RpbmcgL05hbWUgL0Y0IC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvY=
+moKNiAwIG9iago8PAovQmFzZUZvbnQgL0NvdXJpZXIgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2Rp=
+bmcgL05hbWUgL0Y1IC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNyAwIG9=
+iago8PAovQ29udGVudHMgMTYgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OC=
+BdIC9QYXJlbnQgMTUgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvU=
+ERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8=
+PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0NvbnRlbnRzIDE3IDA=
+gUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSAvUGFyZW50IDE1IDAgUiAvUm=
+Vzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9Jb=
+WFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdl=
+Cj4+CmVuZG9iago5IDAgb2JqCjw8Ci9Db250ZW50cyAxOCAwIFIgL01lZGlhQm94IFsgMCAwIDU=
+5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCAxNSAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxID=
+AgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvU=
+m90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKMTAgMCBvYmoK=
+PDwKL0NvbnRlbnRzIDE5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSA=
+vUGFyZW50IDE1IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERi=
+AvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKC=
+j4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iagoxMSAwIG9iago8PAovQ29udGVudHMgMjAgMCBS=
+IC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgMTUgMCBSIC9SZXN=
+vdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYW=
+dlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKP=
+j4KZW5kb2JqCjEyIDAgb2JqCjw8Ci9Db250ZW50cyAyMSAwIFIgL01lZGlhQm94IFsgMCAwIDU5=
+NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCAxNSAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDA=
+gUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm=
+90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKMTMgMCBvYmoKP=
+DwKL1BhZ2VNb2RlIC9Vc2VOb25lIC9QYWdlcyAxNSAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5k=
+b2JqCjE0IDAgb2JqCjw8Ci9BdXRob3IgKENlbG1lZGlhKSAvQ3JlYXRpb25EYXRlIChEOjIwMjY=
+wMzI1MTg0NTM4KzAwJzAwJykgL0NyZWF0b3IgKFwodW5zcGVjaWZpZWRcKSkgL0tleXdvcmRzIC=
+gpIC9Nb2REYXRlIChEOjIwMjYwMzI1MTg0NTM4KzAwJzAwJykgL1Byb2R1Y2VyIChSZXBvcnRMY=
+WIgUERGIExpYnJhcnkgLSBcKG9wZW5zb3VyY2VcKSkgCiAgL1N1YmplY3QgKERvY3VtZW50YWNp=
+b24gdGVjbmljYSBkZSBpbnRlZ3JhY2lvbiBBUEkgT1RQKSAvVGl0bGUgKEFQSSBPVFAgU2FudGF=
+uZGVyIFBlcnUgLSBHdWlhIGRlIEludGVncmFjaW9uIENsaWVudGUpIC9UcmFwcGVkIC9GYWxzZQ=
+o+PgplbmRvYmoKMTUgMCBvYmoKPDwKL0NvdW50IDYgL0tpZHMgWyA3IDAgUiA4IDAgUiA5IDAgU=
+iAxMCAwIFIgMTEgMCBSIDEyIDAgUiBdIC9UeXBlIC9QYWdlcwo+PgplbmRvYmoKMTYgMCBvYmoK=
+PDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMjAzNAo=
++PgpzdHJlYW0KR2F0bTxmaSRRcSdSZi1wbVw+dDxSVTNEX04/alRwTUZqMlJSM3UnMTIsYEhfLE=
+hIZT5QMERQKG1GR2FpKV5ZT2daP2ooKWwjVzFMIixhaztzJWFDMURsN1EjXzE2Tm1oPyZtL19Yb=
+jJcVl5IWzk2cjRVZSovS0VMTSIpPmYxOEZyOG85MDU3OCFGWl5BSSdiZEtTTSNXJlgrPjg8J2s8=
+V3A+bFNmYEV1bTs8SCpjLSMia1ViIXRNWl9RazJjP0o0WVJESmlIIkFkZmlHJVNSOz5AcnIyS1Q=
+iXGNcS29PWU1QPVc5QHVXLDViJUxdakQuaE4yaSZJMGxPQ2YuYzVJS0ZjPSQuJkEoRUUqOlwmP0=
+tyZipNKk1kRTAkYXJkWFFedD41cTMobGEtKlw1OC9PX3FiNHRubiJUQSpNIyVGaWhATW07SSRhJ=
+21fLjhXUEw7XGZURCxgTyUlYVUrKTlhUGFmPzguYkJbM0VbPTRfZysickghKGIrOmMoVCI9Zjww=
+bkVbIlI9LEYxYENGOk9ycDNEbTo6REdnRSpuYCctPHE4W11HQjMtWk0/UmxOSEI5RzJSRyZJdGk=
+qNl9dUC9fcnE8YGVhSGBtbkNHTEJyOHI2ZTgoPlMsUzxJVixIXVFSK2tcdC4xcEZCKUlqKzFgQ1=
+AwcGQmQChqTFAvWmhtIUJTZGI1aGBMWiZdMz1rM1ZrS0NFbik+TyM1V1tZMyp1MGtpP2J1OUNnY=
+kMlPy4/R1Y5YVRGS1M9dElxUStQOyZOIVJfKGM0JlBNRzVpOSFmcz43RUM8YU9qJk8mQytGQTJD=
+TFsmJ3VVYlxARCJUdWZlQUxsO3M/bURrPjY2LykuSCcwSWhBLUErUFZqb004cmlDLDpfVT9iRFl=
+KTTMlWil1O283LmlubTs2VTs5WllaM3Nlb1NVLDpITjNmJklvW0RrSWE+OWwkRFJDR05TQURra1=
+RbMV1WN2VmN1tIMWAlKHJsVlMoaTplIiIvNVIoTW8va3RDZFtISXBfYD1tJjNsPThIUUNtOkA9L=
+WNLMWQ5SSVqITA3RShkRjRSQjhgNihyPlxkI2VQRHU5ZypCdEoqVWtlVmNmRitqPm9FRzZxPERC=
+MSNGLypYblFUOVBYI0hyUygqRUxbUCwrbEFfVlNoNitqOWhXO2FDQVNhOCpKRT1gcnM8O3RAZzs=
+lI1VZYV8qJyU4SjpqQFZQQ2pZdXE8JTpcPV8tJWJVYC1sY1pwMyk2OjNsPnRNVXUpU241VlNUOj=
+08LWNSaklwKWkjMkcsY11yZS1IQ0dwWXMxbEQ8I01WJl5vbHBuZyxGMUBWRSgqPGNJcyRJajl1V=
+WpxIzJmN2BYRVxMb3BzcjY+RS4oJyxfaDxpcy1oKzcxQC4/ZDc0QjEiKUZeLUVdQzM2XFRjbXNa=
+WSlNRiI8ME5GMFNOI2NKYy9TM18vLmdaSEZdbWdIWy8qb0wqYUVLZjdsWD9gL29ULTA5MyMlJiV=
+lamdhYm0iczhMcDZWI20kU2N0IlspQ1snMk0mNDNYUmFWT0FgY15UViluIz9mJF5AazgyP2EqbD=
+JXMyYxaU1kNixpTlFTSDAwdEgyIigpQy08SWQxQTUrO1dkYiYkKDImMkpbOU48JCZEOjB1PlhCR=
+Es8IUo8PTtvVkNyc1s5SSgwNDNPb2EydTQ0RUZhQFBJRzA7cz8tM1IuUm4ndHNFKHE0RCg/PmU8=
+JVBvckpzRk5sbCM9T2ExOENNMzFjUUkkPi1rWCtHYVg7NjdOUDIyRWJbPURgcGdIKz4zJW5nIUZ=
+MQC9dVU41M0syODJQM2VrUUpOTzBndEVXKVAtUkVwJVwwOWo6cjtIQnJlPkRBUy9WX00mVDZzXE=
+hUVjloJjInZCRKU11lT1RXLVpASVc9RS5fcVlmI2ohXGxcUSQ/TW1ySDdbcmwkPzRMOVdwT2wxd=
+XFPJUZgU1BDWzpcTmdgLFIyInNmTV48XG5zXGgxdGZxMWlFSk0mTklyR1hebHA4KzgjK2hPYXRo=
+TGVnIXFGZ0ovXV1hc2VaQmlSSXVdcSNRXU5FPyhkTzkkNk0/NV0uU0VkXFhuakJFYFNoZiQsMXR=
+bYjZBTyxSLkRFT19IKz5XTXNrT2I+IWkjcVpWJWo9IjwjQFdFUVFnSD5SZihuKyEtazRFa2k1PX=
+ExND9YLzE3K1IjIm5gV0JmVj8lNl06NiosYkIxXTduMXQrY0JwN2hdLjM8UF4kZzQ7KXFIRDZDQ=
+TIyZzNtck1fOSVYaStlODRjcEQ6X0MzOltNPFRlUGRiIyRvTlQwdGFPPk1eKHBXR2crUkE+UGBe=
+QD0zX0tkSy51KS1KXTRkKD1FKyNNPSFfKGk3PFckN0Zrc2NBZFs1LGlrLlQlcEBCWDVhO2BPYil=
+URFdNJjIwbiRPRk5CXXJeP1dhJFwpc19BclBrMFBNKy1Faz40NSdWKV1nYWNtPzRmWHJvZVJDU1=
+diWUYqKzhpLCQmczI+VUVbLl9jKjJVJ1lZVzctQy85NXJKQV1wYiNAQ0RCSDFta1JfMlQ8LlpCS=
+mJhREE7ZmQpUjRdNmhyPT8rX24kOkA7WXRScFdfcjRFMXAyNDhBUz1RJGlVZkhaamZkTTQ6UjVt=
+VWAkPWAqMk83QUpDS1M5WGd1ZyMyO2BqOVZnMCowW05UXCNOMFJIckFsLC9maDNiT1ljN1tMWCt=
+ZRiojVVVdbTpkJWtkbDFGVH4+ZW5kc3RyZWFtCmVuZG9iagoxNyAwIG9iago8PAovRmlsdGVyIF=
+sgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAyMTkwCj4+CnN0cmVhbQpHY=
+XVITEQvXC9lJkg4OC5FUUJNT1FsNUVvQF4tQVVlJE1kIjI8akRuO2gwQ1xrWS5JX1xXWWFGKXRy=
+MDVVdSMsK0VPJyRfUltFMSttV2NELW1cKSc0cGQ+I0tHUjxrZSJ0KSZROl40NmQ6ZEc2LmhTQGg=
+ya2VlImtKVyhjV0tMWidwcGZBc1gicSdxVVVEN1ssIV8tOTc2QkdAYCgubmE4JyxBVlM1XTEkMG=
+JuMkdFKy1jSUcoaGRoMitBbHRWVmVQTmxMcEtdTiE+MFhOJ2NOSmxAPC1cZmszJyZla0tmYThsa=
+m9KMzt0Il9fN1NYXCVxYmUpZzMhZlhMZGUpbnMqJWtpaUU1Ym9iWTtUSGU4Y3NwKG8yVExDRXRi=
+SFE+ayZRIS9sSVRgNGFSO2ojWUJTJC9MWlUvS0lUbHVqLU5oO0dgR1M7NVYwTkRadVpWIk8tM29=
+zMyVCYyw1ZGVIbyMhMFVUM0AyTm1DIVNGSTs0OzRhRj46RTpHRVItcGxPcC0+NVh0dDZMIiZBYD=
+txWmpCQG5FSldjQ1FFbDdPN0VNPEtvL25eLSRtYnBAZS5WZnBhSFZeRDdePl02TFMwZFo1OSNCY=
+FtxRi09KzZFTzpFTXRqXFA4UUJwNyRUbiM8UUFabGk0cmBXZkhzWUlMNzdsLGoibEQwcSVQZjZY=
+SzREYVZcOjhqZVUmbEVaUlIjOkByK005QVo6NlJNKyFjby9NNDFaUW1uMjdVPGpuWCkhc2lBQSQ=
+jPyxgZEdmWVNZQ1NUIWtTSlpIbj5aViMsQF07bTpdTnM3ZComUURfPmpTQWE8cSNuTmk5Mjs7QC=
+oyXWZnTFdgSDpNXF0+XWl0ZT5YOWUrZihXUHQpOGlNbjhXSzVJajFjW2U7RkNOOC9NLTNDIm5zO=
+C0kMyNrQjxvXGwxO24xcUM2L1YoTTpUQjooKkI9Pl0qNiUvYV1RPVsoN1JwYXMiaG4lPCZnaSY/=
+LmRFamBlJypFXT9SJipHVjY1S2NGXU05O0VrTUgrTEg/RFExSC5Ac1drMXJpOmFiYT0yNiZKZ19=
+EJjFpZFhBPl5yP2UrMiY3cjgsSCgvSiNBL0xSRnJRZ1VSXDI/Y1BjQSpRPS8wY1lsLkZaazY3QU=
+9nSi43LUZOcF9KcEY8NCtRZFtcMjRtTzwnVmVAWDckYWh1TUFvPj1pPi8lbWo4VkA7KDBdNmZDT=
+3JuJEthaiZJPEYnbkVIaDUnXTNwPlhOJm1xWF5dSmNKZ1gvYVgnLi4mVkVXKjVqWT0yQihXZy1N=
+azZoNypgaVtLb2BTMmtyN1A7KV8layNqNEtVP1g9YFlVKUI0dUpWaio+Vl5XbSI3JE1JQUovTUl=
+zWF9CanMncFRQY3BEIkY1UCtwaDAocT9lPltIQVxcMERUITw9byNaT01iVyxIPFo0TXFsUlheNl=
+lfLyJDZzI2SkIlPW8tT285PDxHQ1Y5IlcqQD5EZkJhVFtuWGVhJD1kKDhCVDlVW1NLUUIjJV5nP=
+mlJQlNYU1oiLVE2OmIuSSlvI2pVJEpzQStmLk05L15kSGIpLXJBTCVXdUBqVkMoWGhCYFIyJHAm=
+UlxTXFtSWlJ1Ylg9VyxJJFAndVhdcSgoZEQ4Z2EhYmdaVU5vaFhQSlxcV09PUmw7VU4mLTNMJzQ=
+3SmBYbGVCUC88QSU8aFJsPjhbLUtydSpFYSUnJ2ZmKWEjWS9KTT8tRGMuW0sxRnNERD8yYXNOQF=
+9KMGRuM1A9XGtdOkJuVl4wKUpvSU8qYTVnU0pwPD1MJFdwaUVaQDMvO0QhWzlrZFpHL0pIMTUuJ=
+W5mYFsmYCNxVj1hbS1ONWNkSCJUZmBxJUk+IVxPaGZATSN0LzNkWipZX2RwNkYvb2k6Pm4rWE0p=
+YktdST1NPVdJQUYsLHVoIWImIztyVVpSTEFnM1Y0UlBebkFmKSdjQiJdMT1Dc0w3ciZhLChSVEZ=
+oMkUiP3BYRV0lVSIyc0xMOSQkS0Uick9YOTBMLTYrYjVnM3JCKSlFMi4pZ2ZGPXIiMTpILENrKy=
+szYVwubi5nMnAxWCo5WTpdRTFdUmRFa1twLG1fLGhsJmZYLmFaXDBCNCRaYDJhblkmRzgzKkFsc=
+nRkPVJPWGRSOkMkUiRJWVVVR2ZMI29kOEMiWzhfJGpQcVdncT91WVAwcCJhM2hgKi9ELiZVTV90=
+LUk1SW04NHFYZUpfY2dwMT5QOnMvcEFWbzU0SkljQzwjZHRlcF9VMVhYWUVka2ZuRVQsJGk/OjE=
+tWCNPayRZbFZVTUBQPlgiW0kuaUw+Uj8iI0tRJT1EV3MrL28ib2A5VEklRFhWbkorMHRNUTgrT0=
+1CT0BASiFpKTUmZVFuSFwzV0tgQlA+LF9EcDIzS2hVWFEzW1liVzc7U1o4MSM4OWVZMTpZI0BWQ=
+zQ9QCRIZmNjS1dobC1kKDsjY1dXMGkyLENjKVxlTWVtJWAtMEQxcEk0YVYvczQoX28uW28nT18l=
+amMjYWsncmFBdTlCNyZqOm1aXGY3MykrbkgkcVdZLUplUmc8ZFhWMlkjTCtFN1NsUSx1XitLJ3B=
+DMnExXDxDO2FHWWwjQjIlQFwoOk4zZCwqVk1xSHJXcyU/aSJAWi5YKEt1ZV0yZFA8Py5HOmlVRE=
+s4Wj8zOGhQSm4maTwpaDhoUEtoRzFrc11zJWRzZzJOYmJ1MDxDWlM6OV9MRixXW1A5VCZMYlQ3S=
+zEkK2h0Qyo6MyxOT2JYclBiLUNOP2Y9bz4oayUxK2VYMTViLXJXVnAiPytFbm9RQlIqc3A8Xjg2=
+XVs/QCluPVBoT0hlSiVwN0RWXF5kKkE/YWFGR1E5XzZrTFNdUCpzZ04yRmRoKEUzZCQ9JSZHNFI=
+6L0RScycxNitHSUomV1FQIT5wJVI/Ky5BbStjdHNMW1VIJTlYWnV0WXJyUXBJOml1fj5lbmRzdH=
+JlYW0KZW5kb2JqCjE4IDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZ=
+WNvZGUgXSAvTGVuZ3RoIDI1MDEKPj4Kc3RyZWFtCkdhdUhNbFlrTjsnKiJRPEBaWENSRFUhdGo4=
+XiYxajhDT3JlRER0LWsrKWk7JydXVEEmYiQnamtqUmRKTnJTTU5hXWNBVzMnQjlfNDJUYXElRSN=
+1YjMxKShgK1Y9c3BDIydgKFpVQ1MlZUtAcF0xNW01Q3FfOmUyNWNORCQpbDIoa3BwRHBGKztuOW=
+JkPmZeZ28nJjtoOE4lZGJIK0krNHJQOmdmQz5bS01uRVhhcmwqP1w7WTc7PT8pSlssbi5pbiJmX=
+lJiI1crMzoiLlRKPChUcyhQVShCUiUwYXJxWWZkWnE4alNDaDhBVFdIQjZKKTJsb2owO2JsLTJg=
+LFg5NlZqIjAmXD0/akAyLklcVD5bREojIi4zamA6Si0mKSNAVmAhPyhTanIsMThJIlA9S1NFTzs=
+ldCFKbDNcSGtQP2glcSIhcVRjZ2JMWUxxIzYwNDFCYUQ4RW9yJSw4NEVFPDRRWzU4LDZnRl9hSV=
+RSbUozU08+ZkBDN11HTl1JUz47Xl5dRUU3bzpfQThtTzokZSMvMz5ZXy9XJGpjSCxlIVkmVyssI=
+UFgXypuJipORS0vbCdfZzUjaGdgPS04KzY6VWpMQmQ2aWUnPihIVG4pLmhxXDZwbGw4cUdZKGBv=
+Zk5TOUlWUFljLSZEI19ZXnQ8KUNHK2dmUFFcZEtnSEstIltHJjJbRVtgdVhPcUd1ZihXNGNrVi9=
+fMCROMlJTWSplJF8nJCNjUWRvOC43YSJbXl1bUidvcG49PzthdEIuclEmXDdCSTMyW1xLLSdfVS=
+RMMXAoVE1JOSkyJW5ZMGwwJCQvRUhuTVAqTztGX2koP3AoRjZdaDEyNkc+IW9yYWA6bWFZYC1HL=
+EAlWWI0ImZZRyIyTlo2KlVCJ0RAPUJbJC1cRk09Nj48blZVVGJJJ0UoP0dTVFtvUE4kSChsOGAk=
+QFROW2slT2tKJy5QL2NQJUMkc2Y1R0VIPjBNWjg9LGlMVWRobS4/Kl5DRVAkUVdfXCJaXCtJTGl=
+qT1s7JV06KkMoPC9ERmNucXEwYmtoZ2ZVVWU8KldjYltfRjM2KVc3QHM1I1tGMCVVbC1YWzhvN1=
+pYOTklbjYrIWNDazVqOjl1WHRJa0hpMFMhbStmdHNeQl1XOiUmKC5OJEhFdFE5XloqJCoiNixdP=
+FFVImU0KGotOSlmS0AxT1YxZEFJY3BoMG5LakhpUjEsbEs7bClkIiFCa05eQjdsU0hZbzFEOFVi=
+MSYsPlBnLDk+XDI+W0ghMWUua2FYOylvW1ctKlFRLjlrSGklMTovLjp0ZD8rWSdjU003dFdiMGN=
+IQEsoKjRoVWs0ITlBLDpiQSJgMD07XDo1KCleQTtYJiMpRiMkTCE0Tl05Ky0xM2UhWyRGLjY3Z3=
+UsKFtGcCY2PzdZaGAqcGZXV2IuK3FfS2Y+cE04Q2kyMjRLOTZER3NhSCUxMTxEOCRXR2VIcGpmJ=
+3M4SjxqcCw/O1cqSjtLJkJIXlFWbzVySk9ZLEpERiRiLy5AKS5oKycrSikqOlFTPG9tTV9MM3Qz=
+cFRqOFpzX2IiJiRKOT0vOHIhMUhaZi4sW2I0Y2JXODEndVg/KV9QZTU7KmJHQltURkJYOCJoKCE=
+ycW1sQ1tNOEhccTYuXnAiIzoiUD1oKjItMF8iJzMjL1FFQ05zdV8+VitkZlxNPTJLLksnMFRMV1=
+5hKj9pcXU0O2ReOCxCaHBAbmxkaSFbKmhXZjE+UVJZZl5BajpSO1U0I0doJSk6Q05RJj9fYj1vX=
+F5dWy9bNklYLkMuNVZLPk81X1QtX0o6OyNCdFtMZDI7QWJUSDQpXjQoPj01ZkUsPmleOnJfOzVe=
+aDErdGVCPVUlOiYjYkFCUi9YJm9gVlFGPVF0VS5tPiVQS18jaW9zKm1CKV88TWRVZCVHZC9MIU5=
+wLXBBRFFVMjdUUlFUQFhGMi1rO00jXUY+Mj5CLk49UmtCY2Q0My4mL1VaTDNHXSJPbSZGJ0MxPl=
+l0cHN1LlZqSGdTbi1AP2VTV2xhOU5rTDEsLFMidVMiKl0mM1E2J2JwZUE+TDolKE1VMVRsRklhR=
+WVdXF5IJkZUQStGVl86TS87MjdYPEhmMm1XWFIhRElWXWVGUHROT2dDNW45a2ldIUVPZG8pN2U7=
+XCs+Z28vRlZrSTklNXNaZl5CdWZhMjMjJzcjYEg9NnRgI0VvaG1NWzdGWik/NUw+Um8+YktpK1x=
+rLz9uSiFcQScyUWBZKFcmZltwNlVIYG0wdGtTQ3AtaidpXkhVZUxlLlpGQiFDVCw5IWhaYkItZz=
+k3QzVPU1c9JnAjWF1OV2JIPEpVSTFhU24lJStodFZgJyRwOmkyUCVkaURwI2ReaTNZXUViP0Rsb=
+nJlSzA0UmNuXDMxQitISl9kYloqXj82XSMwbWBXJzdocW9FVXMncHFMJDtoXVdoOEJsaCcwRE9W=
+ZiprblIlW1dYR2NNallNPDlQJXBAIXEoXTlBMDFWVVE5PDQ4JG9ybHM1XHVIPTxiMVwyYGhVclo=
+zXi9SIWtoREZcRVMpVDBdOy01KVdWXVJhTFYiO1UpQ0dNTjRqN0dmalMzWyRmaikmOjcsbj9OcC=
+1tKjojQFUkaTs/VytqUVJLP085K0pXQVl1ZTIzVi5zUzhXKjsuOTtnMT5zSDNPbVlvYik1bURfZ=
+z9UOXQ1SUoiPi4xM19uTnJcVEc7bmJXUWczYW1kMTkzQk43aztYXjUxJSk9YEVDTmJGWURVT2kp=
+XzEjXjNxJU8kVHBYVDxtdFVfVFt0UWJhUSs9PTYwJDY6S0RSXSxeP0ROISxjTi42MEQoaWFZWHE=
+8bS1TWW88TEt0YWg7TjU/OWQuIlRhKGswXjtaM1IlVyNmKGNTLiVvOWc7KFYkcV1Zcjk0PD0tOV=
+1XbVR0UWBsLml0bjNhTGMxI2gmcF4+aS5zRC5Kc1YrJzdHPz1mRztzSVUkRmtyNEY9YGBaYnAqW=
+lpZdCUmcUM6Q2o3RypwP2gyQUA7cjxKPl0/MlBPVXBcI0JGNEBrPktTXElVczVGVFhZXCJMb2Bd=
+RmFsOEdtTlxaTU9YUlZRXFY1TnJPV2tTPlBgT3NaSGhYc1tjZHEhXUNSaWEiNEBzTlgkN20lU1I=
+xdVA1bl0zJSZINiItVSRBTShaWGBiIm8hR04rcEU9PEZcKmNXNUJvaUgqaiRdRyMob2NhU2h1c0=
+VicGkuKzc3P0QpYUg7NjlQSisjaEwlKENPWmxObCtXVyY8by5QRkIkOW9bZDZkJlFTLyFpMkJjc=
+UlJI1lcSTg2YWtiX3VuUnBbLy9gM2BUXlhqYF0hVD0wY2tFPyNLcWxIP0JzVUtEdHMqX2FgYn4+=
+ZW5kc3RyZWFtCmVuZG9iagoxOSAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0Z=
+sYXRlRGVjb2RlIF0gL0xlbmd0aCAyMzIxCj4+CnN0cmVhbQpHYXRtPD5BclExJnE4MDEpISZlQ2=
+UxKW8xXSZZR2NdV0ReVzhhOXVJW1AvN0gmdFBmIi85dUJrVkNnKUM1PThVVS1dWGI1MHA1V1dFY=
+jc8Jm5KX3JlJkgjQXIyZD9JXyhyLVkoLjhVdDgnaThkZiNqKmZNY0cjbFFOIVJiOV8uIkhvNTV0=
+OXNtTGZjcWEwUUktSGMzQC9fSGRfZVlcW0IjXmpPPnEiUT5GbT1GR0NKOShAUC9OPHBQT0B0QGB=
+nRCNuIm1nKTFeYTNZKDkwVGEvO2E3WTNMVi1JX2RnbC4sLmshc0RzUnBvXjNgXiVKYF5bLltgPG=
+85X3QmXlNDJmFGcDluQS9NKGJuS3FHQGsnMSwkXUAkWyxEMHBjPV1BLkQ3QFAvSV5ib14jXj9KS=
+TtnTm07a2xfWVsjNGk6cmhSbjFMLnQtX2EoPDg6cGZbKFxBT0gzYHUtQXNIcFc1ZCIlZGtOX2tg=
+UTpVU00yMUUlSyY9SUIlR0NRamdaa3A3OVVNOyQwKlMzOUVSJj9qV3NAJFQjZk4mZ2ZaQzclKWV=
+xXmZnWHBhdUBvb0IzM1JKYW09Jl4lRkY4XiI4Kj9UPD1zYCgwTURlT1k+cjZfP1FnSVtiYCYwbU=
+E/RFMuJWVKMVBqWl4uOUsjUyFxRGpRRjNhI0tAIkhkZEYwZlg5UXNbQzw7dScrb2QkZjAnNGxnQ=
+z9MJGRWVkNgcycsODksPUdjMiRnaV9oLHBgYl82M2g+NjpyVDswNzRCcW1FTEBPU1E2VmtxUixn=
+bCouVSU7MihxO1pzTEtRNVFZKWV0YVFILU1hcGQ4P0IzOVosYiYtaUllN1tfR2dEMWs2az5UdVd=
+zTjprKTNvKzdcKGJBLUY/aDxyUy4uXiNELCw6bmdvZUNYa2BSb0dsT1kkRzhbOSxJZWRFV2AhbT=
+pvOkFubjU0X0ZgS11JLisjJjcyWSFJbFVoPWpgMU47YlxDZDteJXAoS0Q8UFUsXW88MTldNCU0a=
+W5VTGI9QDhMRjFpUzk8TjonVzhJMlhiPSgqUTBITWE5LUIxMCVpMzR1SC9Xbz9RYm4wL3BhLm8y=
+LitjOWpTUi5ccFI4OClCWC8ucHIsSWRlO2BlKE06KFZaczJcc2cpNV5gczJtL3VNMzRvdUpPaHF=
+AaWBtNW1aSURkQWZab2tnMG0qUV8+Uy1kYWNwJWBQYjstVV08MSdNRVtfckZoWEMiL2JTbDJbTF=
+YzWyE2b1k5NGM2XFBDQ0olbSpGQDg3IiNNJ2NnKkBsVkUrTStGQ1NoMUEzX0J1V1w8QF87QUZuP=
+FdeZEZYKkpucS4xQi9jMCIkbEhga1ExY0s8VC9XU0tyRmc+XmZKRjUibE9XOCc6MkI+Y0JoQk82=
+UFRhL21YKFVbZ09qcE1bUm0jQS4yKXFwKnElXmE8ODVrXlddJGpZMS4iRlJVcSNicERUJTszYyw=
+2cys8I21TR1A8M3IkInBNKUc7PENfajtpKTFCX2FQKzRWcFljdDhtL1J1UFc8WEg1WjFcQVZOQT=
+k6RWQ5Tjc9Xz5nJT8pW0JwZFtGRFdKPT9LQCpLPkpoXjVWPWI3bDtgY2I6WUZkWSguOzpnJDhHO=
+1tIRksoO0hOKDM9WiJdLEFOXjk0SkhHN0xEL08pLzhDJ01LLkVlSDRObFFMTU8mdGU9WTI1TEdl=
+O2czdDNFb0xxTyouVW9vLjdkRzQvSCMiRXNhOnJnJXViTVRkWi5vaDdKXVcmYFZmKjd1W0w+MVx=
+VWj5nYT8tTzhgMCUtXXJCcVZPJFhRRyxYU2AjRW5aQ0dwQ280PUJjVydWMzFsa05nPTtfOVkmdW=
+ZjU1xELFAhLyVnTUJkWFAwa0VMO2wsOzVEamx1VDM2SnI/O25jZSw2JlYxL1ImYGNTQDRXJ2wrO=
+1o/IzZzKDBvLGxBcD09Zj0xU0w9RCIhOG5sUVc6aG0zLlJgRkA9RFthcF9ncDg1R0loR1slRFxi=
+Ul9ZNCwsNTcsaj9JOlFZQGAwXGJnL0d1Ol4nY25tSzM5JTI9VyZKIiRNbTchPyFcRlRJWEhSXD9=
+bRVVkK3FhNjkkR0g8OkNbbTtVSktPZ1hzJytiQzpGTEhzaDNkQV05cm4uMCRnLGFOPWNWaS9gK0=
+cmcik4cWxUWzEmZmVvR2xeXTZmLUxZTjlWPiJzNEluUV5JYm0rJDtQKkw7XyQ2L2ViUDAhdGJJQ=
+ihbPmRMOC5JNTVAO2RsN2J0Lmo2bCgzJlE1PERJQ0dQZk4oTiVgSzIkUDAqISNnTVReWG5Pb2VL=
+QTEsQ21ZJypKMy9eIS8vSmRJUW1XYyRnc3EtOXI/Qz9CdE5ATCRIWWs/NDRiOG9sUE4xciYkWV5=
+CWFdsUSdsNydZQDVNQ1NlQnUrYlc9Tm8/YzctVVFbMSU/Qyg1SThuP1VQWW1DUT5YbXVYMHBzam=
+5JV1cmU0diQ3RgXWBQI11hR1YpYj43azZlK3JAXmwvTUdcXGJGUmxpYiEwSSElMmJyUl9VOHJeK=
+nNlKm10KUNsJ0dVK3JiLXIxIkJvYiwkQS1zPDZGYVJFQVBzME8jRTxKVSdQKnEkUDdxLildOWpG=
+QWNuPSloaSwjT1JYRUU6bWReTihSTkZPUmcqPidHQ0pJTjVgRE5GOTVmbUtXQj5dVio+VDojIyh=
+GalNILi9XO0VVL0xqKSZIayxDI05hJHRfRjticiFATklYJDshR2hUM2skbFgyZDYpTzpURlRkZT=
+k/WihGOjxuWyk5clhHZiV1a3UqYmxQZDlRRW9dKkc0MnQlJi9Jc0ZbIm9yKiZzKnEhPC9FVDErX=
+V0lVDFoV01RZ1dSSk4kXj1OM3A/Q1EwSEknaFsyYzAwXyhGZS49YSIhLlRrO2RBNFtrMVpnXl9r=
+OG4kWjloby5VNWhYP1loQUlcb3I4c0RNJDkhXGg0aUNoNmxEb1IsOjQnT01tM2Niam1hKlc5JyN=
+RJkhsNmkmUFZbMSluJkFaWk9Vck0qZ0gqUVVjb3NfS3J1KyNmUDBZOHBeV1RaMGgvQHVHOChjbW=
+xvPDFUKyJYcUkhLCdBTEQ2V29hVlwvVS9lUzZeOzJNays9QEk2R2hjTWU+P0Q3SS5+PmVuZHN0c=
+mVhbQplbmRvYmoKMjAgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURl=
+Y29kZSBdIC9MZW5ndGggMjMxNgo+PgpzdHJlYW0KR2F1MERnTiklLCY6TzpTbSVgISMmRGsycWh=
+kIl1LZVN1U1xARzJPQkdSdEtnT1JmLjhVODdiYSplNSYoT3RValVOJGpgVSFmUG1AI0E0aldhaG=
+paZXJfSVIvVDQzLUZNYlVXSW5LJDooby1oPktNdGxaMSkwN0FOTCg1cHNbK2txWk9tYEk+OlkiY=
+TNedVdqX1F0KENCblZBdEtpJytbYG8wW0RAPChYW3VpPSYzR0xYQl0/TEVhJ1ZgUFInLTRMVFRM=
+IV4tLihnUzU8JDZwO0JDRi4xPywwJktxM11KdEMsbkwnM0RraVpWdDZaITEyKkVtSk5RV1tAckJ=
+CZj4/NiNZZSE9dW9ERF5VP2UlRiRaZSQ3RkIxVixuZFYtSUNHa3BWQmhhLGVtayoqRUxXPS9IKy=
+JfKyRpSkEsTkxPOyQmQkMsQytTJSl1ajBPXiRAOlRwcS9yWUlHQU9lcTdbJVwqY0JkOTMoMTwuW=
+GdrIXIwV0NLaDozVGQoR0kpLVwuNT1FKTJHL3BLZENDUWh0aUpMMD1cU09aTk0qNiddYGw7MnFW=
+b3VsQFhNbFpbNXIzP0ZnSTlpJDZSVWc5OzJDMmJSODpHSSw+KDdqK01qUEFIUVdZcT4tJEpsOlh=
+RaTRxJFM8cDxaZy41M3AkQHFuIlMnVUA1PHVqLj5KS25qWVxeKmxMZDUlU1QnImE6UUhdTSxOaH=
+BVLFpCdUAsMikrZTVmailSOVF1LU9zUiwtYC5yVG0nXFhfPi9NSzdKbXNSXG5wOWZoTC5ZOydQR=
+yhQLFR1RixyL1gnZlQuJWhjZmdvJmtFQFkrSThXP0dWSCppUHFKajBDcltdZXJcdWQ5OzIkWiVq=
+WjgwViIuTTk0ZytrOlZARjlBRVghNCRdU1pWOGBXYlZZIm1ONz5STT5bKzEsVWFCLmI3JDNeTSN=
+Mbiovb21ORzlTM0k+R3MkaCRLOW4uUmpOUWJBWFcrJ24qaEYwYHJXX0QvWF5xOEhXO3E9WnNNOT=
+kzVVAham5vSnEvTDFldT5iRDdfWiRcTGhFSCFiIkRVXztHaz83Z28pOj5VYihwSk9PPmVCXzhjX=
+mQmX1ZCS2s9WTNPRl1sZSNMZTItIT0tYDljOC5YK1o2cypTPUVZST01TChDUWk8JEZdaidgZFQ+=
+MG1sT2tMN28zTk9XdU5ZQkZFJy0iZ0ZJO1VpKVcnQkFjZ2JpKUVEa0QnXmNITCJPSjM4Ql46QFh=
+xUzM/ZyUqKW84RmppNWspMk5HTWk2LmM/IV8/L1NHKkEmTzYpNDZFIixMNC4zKGgoQiRhVV9VYl=
+o7RE5TMD1eWFI5NjhVaGAyVSg6ZSNkUU5hZjw3LiwsLWohI2A3PDY0KFUyRDs+ITcwRG1vPEkwY=
+GlPWWhBWyRhOz89IUEraj9aOHI7S2Q2IjI2SjFOVGFUa145YUZidSdVVlVeJEA3aDp1aWQ+aChZ=
+UGx1azNkL3ItSHFLI1siY1pBVXViMCU7Yj0mVVQ7WkA0ZzwlKF1HPktyREEnbFkhZitiLTBJTEw=
+qMU1EV1MvKS9ZUzBmW2Q6IWBrZ2lOUi9LNXBETDo8PypEMD11V3M9ZVM3ZTxFMylzbVw7Pl1nWn=
+NjZW82QmchbDtlXypiSmNVIyYqK1I+VTlxRWc1N0s+UVxlLjFOO246PTsjOTU3bmJAUTVJVDY6R=
+DJTOyJFTStBOCxWZGBJLilQNFolXSdYT0xUUFJZLVg/JmMzSlUuLV5IUS1mKVtaN18tUGYhPSJb=
+QypmWCMudUxeYDtRTic8TFFnW2Jxb0hNdFEqMyFzLjE0TTs5Mz86Sl1QIjxIRyRxYVZWTixBZS5=
+kdWVPMilOOydZa1hEcylIZWYrSlg0bldkbHBCZGFvYkZXQTVpSHVsTU0tRSVuS3RWX0lBNyJXIV=
+JVbT0pYEROWj9XY3AwaS9pVSptWTJAQD42Lj1PJTQ4VkE+W0UkVFUrbj5dalwuX1QoXilrQkJUK=
+V5zNHA9SiorJ2EmViJeRkxlPV1LVzoyZVkpVWVfNlM+KmBsIV5uX2twS0w4aUsnXjBsPVU5P0Zz=
+OT1yJkBOaG8+dUFfKmViRjBKYGBAbGJSXG9wSztPaF1Ja0leVWtySGA7MGcybipeXlpbWC1DO29=
+NTC1CVFlNWlgtSktzJWtuI3RQXEMrcjpWLUQkQj01RjVnQXROOTZFa21uZEJtTG9nXGJMSiRZWn=
+BbQDtyOW9hUEU1OSJpL14xTnA6SjVrSypfJTMhLWc7c29za3BOJzIicUJLLkkmIiw5aDMnSi1Bc=
+2pJLiwtLzlSPSdZW0pGazJSOi5haT4qOUE8RkRrIXJRMCdjdSM6I3E5Ql47NjJHOVhtYDQ+YnFq=
+VVAzcnFFYG9oRmg0NFo/MGQmV1ZMY1IwMllgSWVMa0podSFtV0UjcVwnK19kcEltTGUqXCxYTGV=
+HKnBtaVlvLFNdLi1PaTIwQCRWYFVXVl4lc3BEWWBHTzNhVnUlaW1kbC5fdTpFRl10cEtYJWszUS=
+IiPGhQaWcpTlY+NFtfQSJYQS0zX1xDUEsoY2A0aUBgQ18oTl9qQXA6YWRsNig1aD5HVkBPT0ZqX=
+EVIOSxXY29hS1czW0teP3E/Ijk3c2QkRzhQQ0hINHA2TjBbZXIkYUJsYWI0YUhZMlZdI0sicWwx=
+QVgrZEVxYF5LJDFCbDcqJkZrQi9lKU8sRiM6PDVKUyFRUXAiITUmUEpaRFI2R0VSW1U9U1NMWG5=
+LXExeOHRWaWRRKSYyNUZlc2BvLVlPQCVNZkUiZGc1TDpVRStdb1tEKW0vMzJlWi1OYThAMlVnPF=
+RmdSxWJ3BkWS0valxJREBbTkgwaElPIVNdaG0pcVwqQm5SLnR1OF84N21lZ0g8Wks9V2UyOjA7Q=
+0FyaUF1MmEsZi1KbidlJVVkIWdKLE5ROmlxZSskKDwzI0JUMmFgRDdcWipiVDIpMCc8b1ZyS0V0=
+M0xbViJZSkQtN2QsWUBaJTUxT14tODRraEhYWVpIUVYrc0hwZ2BzOUVWcDtrckhlQ2heXSo4ZSM=
+iJTNJRF9NKGdEXWUjZyljPVtQaDNRRSNCPVVlUDNyOUhValwlMH4+ZW5kc3RyZWFtCmVuZG9iag=
+oyMSAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlb=
+md0aCAxNTkwCj4+CnN0cmVhbQpHYXRtO2ZsR2gqJ1JmXldnZGE0OF9aMSFebCdwX2MpMFpdYEQ6=
+Q2FwYFdNRWQkQzwiUDAlbXRRI0dBMEM5OWtOLUBvS3I/bVcuYStNWmUlNDcvMS09NnVRW1pFWm1=
+0QTFuMFxqOVtgOGpTXjM8WyswaDM2LztvPicpMzhpJG8wZkg8VGx0RyppLFpnXigzLGIqYXFdaD=
+RQdSshVyxaQHJHQ008XzQjWU9YKGwhUF4wNEJVTW0+P1FKWVhJTWoqOWJKVHVLKlFaJyxJPGdjQ=
+kJTX0pTQTJhInJJbmotMWpjWEFqMVdeTS5UaCVyLkYpREJIK3AzQEZGJE0jQjJjQyVVNk9MRGY8=
+SjVCOGplcT5EXGZILWx1ZWk6JUBwTU01ZEZzXmlJWSRcPUhsSCUxMUZzXC0uKTImXS1HOGFGVmZ=
+qWyIzIkdFZDNrR1gxRHJQT1E/LzA5ITBaTF9ALkhwIzpwUSpnLHFSMDU+XjBOZFAyUldnYkNWPl=
+ElMzFDIWo/aHRIUFpQREgpLUFYL2QhNWgsKSk2aExxMiJVXlgsRzAxaz51O19Wc2QtK3JwMVZtR=
+GFjTypwNTkjSCdxKkMjPzJEJEBHN2I1R2NWLj8uZGQjWE5oLTYvVEEvVTAtKk5SWlQ9R2hmTDFh=
+UUFYSUwjOGtoQmphaztpcjMhQmIlXyM8Zi9XaWMjW0ZZI182JGA+QnIjVWZmXGIhR3MhRkclKjJ=
+TXSlMM3FtZm02ZWgpQ2E4aTxQInNOL3IlL2xOZz9la1lpb3ApcSw0XGpMNSdJIVFvZGc/XSxlSU=
+heZ1lzSltBTmhELVxiLWQ4MkFLTTMocTc+W01eUzUoRmlFIUVVV0pea2YzLmpqLydsKjgzb1xOW=
+VstLTEiT2czLygxIyFZZ1VOOSpcX3UsXktjNyIxMSg6VHJNPShnSEhsUmhFKjU0YlJxYilXPURK=
+OW9WJjNYZSVlczozbEBMYEg9KDlsVzg0Zkw5U0xFSEAubmt0aEAhJ2hnWE1SUGc2ZWlnKVVVYy8=
+5b2pmIT5JLC5hTUIpZyNqOWMsJGZGT1IsYSIraSE/WUg4R18kMXElP2hMY0VhNChrJ2IoaiZsRU=
+kpQF8xKCpVbjtYRGAkYjUwKGEhbFxqS3BDSm47MzdHcXRtNm9xJi5YR0MuRzU0UEotW2xeXHMwY=
+FJdOy0xZ21kNkg8OXRmNVJmXCY+WFEhM3ByQ1lCVWRLaVwiTTchJSFUbDZqLyU/LCo1YypbRCk7=
+PCwoQSs3O2xbUlg+UFU4RDdASEUwczwwcCw/NFRINDBSOUBLQklLPGZUaW9rP2lmRS1UcXBLRlU=
+tLGtTQlhfTHVMMzAoZztuXTw0OTZLRCYvaCEoPzkzayJJS0heLFlrKjRfWEplazpMYiE3T2E+Q0=
+NQLUgsUiZuKmFoQD8rK3I3XTEqQTpwOWk9RHRxXEpMJlEhRCxSLnRLVl86aW4xS1UiKCpqbUYoJ=
+2pWUjdgaltNNG1cPzZTL11TTVBCTUxMWV5jXkc7Vk9hMCFcOVhqPV9WTGA7UnVYVnJoJVsjRHJu=
+YjVAaDAja1wrT0VOXjcmb20vb3FCRig5U2k7USFzTTp1JSE8dHJsLl8rZGszKF4pNWprbjFqPWV=
+CLVBUXkViJnU3ZTFuKGNAITQnVSNFL21ySDU9L3BbQEUtckQxXyInJFNALipDSTpbcW9aJFAhcC=
+UlMkkkLmR1czc4MiYzb0klSF5TKlJMaSk7KFc0ajJsc2hjYWgvPjM6PEVRdStEdFJ1OEk2NlNNY=
+SJrbkxzJ11yX14vLFlUP2JHb0snX3BPZzBmO2YpSXR0a2tsZEJuYT45ZTxkbWkoTURXTCk3WyVq=
+Ly4uZXJcXyJpZydkQyItTUcmXEBWQlxKY0skOF9hN185OWp1NXFaSnRFJyRbREhhWTVvQF1SUlE=
+4YWwkVyhkSjZkL1oxLT5aTlNpRUNvI1EzMVxuYjpkWlJyJmZxZTBMa3U5I2BTTHEjMGs3cWdNb0=
+dNdD4kWEI6JUMqZXJCJF5YLkwvaUIzXyU2NDtENkcmMV9JOEBAUFZtMmhgKUxmIlhvNVhcKUREN=
+TA+JmotLSYsMzdaZmdFZWZPOls/QGJbPHJyUCZaQU4wfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYK=
+MCAyMgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEzMiA=
+wMDAwMCBuIAowMDAwMDAwMjM5IDAwMDAwIG4gCjAwMDAwMDAzNTEgMDAwMDAgbiAKMDAwMDAwMD=
+QzNCAwMDAwMCBuIAowMDAwMDAwNTQ5IDAwMDAwIG4gCjAwMDAwMDA2NTQgMDAwMDAgbiAKMDAwM=
+DAwMDg1OSAwMDAwMCBuIAowMDAwMDAxMDY0IDAwMDAwIG4gCjAwMDAwMDEyNjkgMDAwMDAgbiAK=
+MDAwMDAwMTQ3NSAwMDAwMCBuIAowMDAwMDAxNjgxIDAwMDAwIG4gCjAwMDAwMDE4ODcgMDAwMDA=
+gbiAKMDAwMDAwMTk1NyAwMDAwMCBuIAowMDAwMDAyMzAxIDAwMDAwIG4gCjAwMDAwMDIzOTQgMD=
+AwMDAgbiAKMDAwMDAwNDUyMCAwMDAwMCBuIAowMDAwMDA2ODAyIDAwMDAwIG4gCjAwMDAwMDkzO=
+TUgMDAwMDAgbiAKMDAwMDAxMTgwOCAwMDAwMCBuIAowMDAwMDE0MjE2IDAwMDAwIG4gCnRyYWls=
+ZXIKPDwKL0lEIApbPDhjZGFmOWJhYzBjOThmNzhhNDVkMzFkYzcyODIxNDc0Pjw4Y2RhZjliYWM=
+wYzk4Zjc4YTQ1ZDMxZGM3MjgyMTQ3ND5dCiUgUmVwb3J0TGFiIGdlbmVyYXRlZCBQREYgZG9jdW=
+1lbnQgLS0gZGlnZXN0IChvcGVuc291cmNlKQoKL0luZm8gMTQgMCBSCi9Sb290IDEzIDAgUgovU=
+2l6ZSAyMgo+PgpzdGFydHhyZWYKMTU4OTgKJSVFT0Y=3D",<br>
+ "aclReference": "75371360",<br>
+ "owners": [<br>
+ {<br>
+ "ownerId": "123456789"<br>
+ }<br>
+ ],<br>
+ "documentProperties": [<br>
+ {<br>
+ "key": "GN_NAME",<br>
+ "value": "Document name"<br>
+ }<br>
+ ],<br>
+ "customMetadata": {}<br>
+ },<br>
+ "caller_information": {<br>
+ "appId": "13403",<br>
+ "name": "Fraud Ops Comms"<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"86699560aac1" class=3D"confluenceTd">
+<div id=3D"expander-535287671" class=3D"expand-container">
+<div id=3D"expander-control-535287671" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">500Internal Server Error</span>
+</div>
+<div id=3D"expander-content-535287671" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "500",
+            "description": "Error uploading document to S3",
+            "level": "error",
+            "message": "1781130143362-cpe-nxhbsc-bedocmanagement-java.lang.=
+RuntimeException-Error uploading document to S3"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"ee9624b65e0a" class=3D"confluenceTd">
+<p local-id=3D"68d069988949"></p></td>
+<td data-local-id=3D"5e00c81af5b0" class=3D"confluenceTd">
+<p local-id=3D"c393ca40f7b7"></p></td>
+</tr>
+<tr data-local-id=3D"4636c609d231">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"e52cbaf7b1c7" class=
+=3D"confluenceTd">
+<p local-id=3D"5144aa1d0fc6"><strong>llama externo (usa =E2=80=9CCompartamo=
+s=E2=80=9D externo dentro del banco)</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"17eca0a7d6a8" class=
+=3D"confluenceTd">
+<p local-id=3D"b3e9572f81a7">POST Reclamos</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"ed67e553b5cb" class=
+=3D"confluenceTd">
+<p local-id=3D"3f9a748e16f4"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/claims/" rel=3D"nofollow"><u>https://api-u=
+at.santanderconsumer.com.pe/v1/claims/</u></a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"cb590286bb8b" class=
+=3D"confluenceTd">
+<div id=3D"expander-775595827" class=3D"expand-container">
+<div id=3D"expander-control-775595827" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-775595827" class=3D"expand-content">
+<p local-id=3D"59430d45-2239-4f36-bd5e-7a42aa4a7ee9">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/c=
+laims/'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/claim=
+s/'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DLASnO/nHenQ5kk3s4doMGFHOKWoAAAAA=
+vqIoAVfpiYkK3Ab1JAid0w=3D=3D; nlbi_3319235=3DaeofB3QFvy3qiUe9TrqMjQAAAADcD/=
+KrI3XQtNWBVyU66fZ0; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '{<br>
+ "complaintBook": {<br>
+ "documentType": 1,<br>
+ "documentNumber": "12121212",<br>
+ "paternalLastName": "PRUEBA",<br>
+ "maternalLastName": "PRUEBA",<br>
+ "firstName": "PRUEBA",<br>
+ "homeAddress": "pruebadireccion",<br>
+ "ubigeoId": 0,<br>
+ "mobilePhone": "999999999",<br>
+ "email": "<a class=3D"external-link" href=3D"mailto:transdig2336@externos.=
+santanderconsumer.com.pe" rel=3D"nofollow">transdig2336@externos.santanderc=
+onsumer.com.pe</a>",<br>
+ "responseChannel": 1,<br>
+ "requestType": 3,<br>
+ "pdfBase64": "null",<br>
+ "registeredByUser": "jgonzalesi",<br>
+ "complaintReason": 12,<br>
+ "productType": 4,<br>
+ "representativeDocumentType": 0,<br>
+ "representativeDocumentNumber": "NULL",<br>
+ "representativePaternalLastName": "",<br>
+ "representativeMaternalLastName": "",<br>
+ "representativeFirstName": "",<br>
+ "amount": 50,<br>
+ "details": "Com=C3=A9ntanos el detalle de lo sucedido",<br>
+ "request": "Qu=C3=A9 solicitas que hagamos?",<br>
+ "customerHomeNumber": "",<br>
+ "customerHomeReference": "",<br>
+ "contactAddressType": "string",<br>
+ "contactHomeNumber": "string",<br>
+ "contactBlock": "string",<br>
+ "contactLot": "string",<br>
+ "contactHousingType": "string",<br>
+ "contactHousingNumber": "string",<br>
+ "contactUrbanizationType": "string",<br>
+ "contactSectorType": "string",<br>
+ "contactHomeReference": "string",<br>
+ "contactUbigeoId": 0,<br>
+ "contactHomeAddress": "pruebadireccion123",<br>
+ "contactEmail": "<a class=3D"external-link" href=3D"mailto:transdig2336@ex=
+ternos.santanderconsumer.com.pe" rel=3D"nofollow">transdig2336@externos.san=
+tanderconsumer.com.pe</a>",<br>
+ "contactMobilePhone": "999999999",<br>
+ "contactUrbanizationName": "string",<br>
+ "contactSectorName": "string",<br>
+ "currencyType": 1,<br>
+ "serviceChannelId": 2,<br>
+ "serviceStatusId": 1,<br>
+ "subReason": 21,<br>
+ "complaintBookId": 0,<br>
+ "claimNumber": "string"<br>
+ },<br>
+ "attachments": [<br>
+ {<br>
+ "attachmentFile": "",<br>
+ "name": "string"<br>
+ }<br>
+ ]<br>
+}'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"50c296dd7890" class=
+=3D"confluenceTd">
+<div id=3D"expander-1153811767" class=3D"expand-container">
+<div id=3D"expander-control-1153811767" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">404Not Found</span>
+</div>
+<div id=3D"expander-content-1153811767" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "404",
+            "description": "NoResourceFoundException",
+            "level": "error",
+            "message": "1781125331610-cpe-nxhbsc-beclaims-http_internal_exc=
+eption-No static resource v1/claims."
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"6eb78212d29d" class=
+=3D"confluenceTd">
+<p local-id=3D"80806b0fc486"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"d01b7336002b" class=
+=3D"confluenceTd">
+<p local-id=3D"c234d2c3a134"></p></td>
+</tr>
+<tr data-local-id=3D"35bb47e5cb73">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"042ded60fbf1" class=
+=3D"confluenceTd">
+<p local-id=3D"f69c8be3b3ad"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"a559963cbcbd" class=
+=3D"confluenceTd">
+<p local-id=3D"110cf934889f"><strong>GET Reclamos</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"144944b1a5f2" class=
+=3D"confluenceTd">
+<p local-id=3D"5e61da2228fe"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/claims/%7Bclaim_id%7D" rel=3D"nofollow">ht=
+tps://api-uat.santanderconsumer.com.pe/v1/claims/{claim_id}</a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"3c8ef3f0198d" class=
+=3D"confluenceTd">
+<div id=3D"expander-779724298" class=3D"expand-container">
+<div id=3D"expander-control-779724298" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-779724298" class=3D"expand-content">
+<p local-id=3D"9a7a5f0b-7885-41fe-a2eb-6c3c1926738b">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/c=
+laims/87654321'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/=
+v1/claims/87654321'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DJ68vNi85A1wvA2fs4doMGJLjKWoAAAAA=
+V7ciZM1gntMVz2CfLe3qbg=3D=3D; nlbi_3319235=3DNMP8W5xFOgWKlenmTrqMjQAAAAAtwb=
++CPn4wLCTzCz4TFxjY; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"d72cbeefa812" class=
+=3D"confluenceTd">
+<div id=3D"expander-774545195" class=3D"expand-container">
+<div id=3D"expander-control-774545195" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">200OK</span>
+</div>
+<div id=3D"expander-content-774545195" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "complaintBookId": 107087,
+    "claimNumber": "REC-2026-000084",
+    "documentType": 1,
+    "documentTypeDescription": "DNI",
+    "documentNumber": "12345678",
+    "paternalLastName": null,
+    "maternalLastName": null,
+    "firstName": null,
+    "mobilePhone": null,
+    "email": null,
+    "productType": null,
+    "productTypeDescription": null,
+    "requestType": null,
+    "requestTypeDescription": null,
+    "responseChannel": null,
+    "responseChannelDescription": null,
+    "complaintReason": null,
+    "complaintReasonDescription": null,
+    "subComplaintReason": null,
+    "subComplaintReasonDescription": null,
+    "currencyType": null,
+    "currencyTypeDescription": null,
+    "amount": null,
+    "details": null,
+    "request": null,
+    "ubigeoId": null,
+    "district": null,
+    "province": null,
+    "department": null,
+    "contactEmail": null,
+    "contactMobilePhone": null,
+    "contactHomeAddress": null,
+    "contactBlock": null,
+    "contactLot": null,
+    "contactDistrict": null,
+    "contactProvince": null,
+    "contactDepartment": null,
+    "claimDateTime": null,
+    "registrationDate": null,
+    "registrationTime": null,
+    "attentionDate": null,
+    "attentionDeadline": null,
+    "extensionDate": null,
+    "extensionDeadline": null,
+    "resolutionDate": null,
+    "registeredByUser": null,
+    "assignedUser": null,
+    "responsibleArea": null,
+    "serviceChannel": null,
+    "attentionStatus": null,
+    "attentionStatusId": null
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"283f38d72380" class=
+=3D"confluenceTd">
+<p local-id=3D"c8c30a3a5607">valida claim-id, se puede enviar cualquier n=
+=C3=BAmero no influye en el resultado</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"8bf2c5f765e3" class=
+=3D"confluenceTd">
+<p local-id=3D"379dd6df7e52"></p></td>
+</tr>
+<tr data-local-id=3D"6031bfc8b640">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"3a627ee907e8" class=
+=3D"confluenceTd">
+<p local-id=3D"914684a5673a"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"a9d9807db1fb" class=
+=3D"confluenceTd">
+<p local-id=3D"b5dd332747b5">GET Reclamos</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"22f876fa4272" class=
+=3D"confluenceTd">
+<p local-id=3D"f8e8e7af5884"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/claims/reasons" rel=3D"nofollow">https://a=
+pi-uat.santanderconsumer.com.pe/v1/claims/reasons</a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"73d0d37b1541" class=
+=3D"confluenceTd">
+<div id=3D"expander-1156621777" class=3D"expand-container">
+<div id=3D"expander-control-1156621777" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1156621777" class=3D"expand-content">
+<p local-id=3D"01d2fd40-08ae-49b8-ae26-00c6c72cf685">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/c=
+laims/reasons'" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v=
+1/claims/reasons'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DJ68vNi85A1wvA2fs4doMGJLjKWoAAAAA=
+V7ciZM1gntMVz2CfLe3qbg=3D=3D; nlbi_3319235=3DNOg/fkeiig+7L84/TrqMjQAAAADZtN=
+nsxDGJWFdYl5qniqY8; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"00b39d9ed6e6" class=
+=3D"confluenceTd">
+<div id=3D"expander-1810265107" class=3D"expand-container">
+<div id=3D"expander-control-1810265107" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">400Bad Request</span>
+</div>
+<div id=3D"expander-content-1810265107" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "errors": [
+        {
+            "code": "400",
+            "description": "Missing Servlet Request Parameter",
+            "level": "error",
+            "message": "1781130765153-cpe-nxhbsc-beclaims-missing_servlet_r=
+equest_parameter-Missing servlet request param: requestType"
+        }
+    ]
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"d895078d4e8b" class=
+=3D"confluenceTd">
+<p local-id=3D"1d3c0adebdb4"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"3c0459924ad8" class=
+=3D"confluenceTd">
+<p local-id=3D"851a1d73b1a6"></p></td>
+</tr>
+<tr data-local-id=3D"51b2d19e3f8c">
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"11040fb9c293" class=
+=3D"confluenceTd">
+<p local-id=3D"5bc95bc5f251"></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"ecffbb439a63" class=
+=3D"confluenceTd">
+<p local-id=3D"29d501080fd6"><strong>GET Reclamos</strong></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"5d7520ebb820" class=
+=3D"confluenceTd">
+<p local-id=3D"45e77ee6275b"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/claims/reasons/%7Breason_id%7D/sub-reasons=
+" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/claims/re=
+asons/{reason_id}/sub-reasons</u></a></p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"9b4d1573521d" class=
+=3D"confluenceTd">
+<div id=3D"expander-813494542" class=3D"expand-container">
+<div id=3D"expander-control-813494542" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-813494542" class=3D"expand-content">
+<p local-id=3D"bffa313b-0876-45a1-b527-1b75bea0f861">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/c=
+laims/reasons/73/sub-reasons'" rel=3D"nofollow">https://api-uat.santanderco=
+nsumer.com.pe/v1/claims/reasons/73/sub-reasons'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DJ68vNi85A1wvA2fs4doMGJLjKWoAAAAA=
+V7ciZM1gntMVz2CfLe3qbg=3D=3D; nlbi_3319235=3DNOg/fkeiig+7L84/TrqMjQAAAADZtN=
+nsxDGJWFdYl5qniqY8; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq'</p>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"9d1fe3bbc2ee" class=
+=3D"confluenceTd">
+<div id=3D"expander-1579164333" class=3D"expand-container">
+<div id=3D"expander-control-1579164333" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">200OK</span>
+</div>
+<div id=3D"expander-content-1579164333" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">[
+    {
+        "subReasonId": 1,
+        "reasonId": 100,
+        "description": "Inter=C3=A9s",
+        "sbsSubReason": null,
+        "statusId": null,
+        "creationDate": "2026-06-11T00:34:37.114751846"
+    },
+    {
+        "subReasonId": 2,
+        "reasonId": 200,
+        "description": "Comisiones",
+        "sbsSubReason": null,
+        "statusId": null,
+        "creationDate": "2026-06-11T00:34:37.115812129"
+    }
+]</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"325e0ca80ea8" class=
+=3D"confluenceTd">
+<p local-id=3D"f449e0a0eba1">valida reason_id, se puede enviar cualquier n=
+=C3=BAmero no influye en el resultado</p></td>
+<td data-highlight-colour=3D"#deebff" data-local-id=3D"eb9ffa3b74bb" class=
+=3D"confluenceTd">
+<p local-id=3D"15afb3e82687"></p></td>
+</tr>
+<tr data-local-id=3D"6c59b21433c7">
+<td data-local-id=3D"0dc4c8d1c7c7" class=3D"confluenceTd">
+<p local-id=3D"864f982741a6"></p></td>
+<td data-local-id=3D"37caa8bdb51c" class=3D"confluenceTd">
+<p local-id=3D"d339067fe1bb">Biometria y firma digital</p></td>
+<td data-local-id=3D"5d5246986aa6" class=3D"confluenceTd">
+<p local-id=3D"ffb5497d3559"></p></td>
+<td data-local-id=3D"695b6c0f21d4" class=3D"confluenceTd">
+<div id=3D"expander-456300296" class=3D"expand-container">
+<div id=3D"expander-control-456300296" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-456300296" class=3D"expand-content">
+<p local-id=3D"d3dba99d-e1bc-4625-85d1-9ab244cf8134"></p>
+</div>
+</div></td>
+<td data-local-id=3D"7edb70fb5ce7" class=3D"confluenceTd">
+<div id=3D"expander-1476452907" class=3D"expand-container">
+<div id=3D"expander-control-1476452907" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1476452907" class=3D"expand-content">
+<p local-id=3D"b5b7f1aa-73a2-4095-9b21-7f399732c2c3"></p>
+</div>
+</div></td>
+<td data-local-id=3D"0c09ac0bc452" class=3D"confluenceTd">
+<p local-id=3D"b3f84d8596e9"></p></td>
+<td data-local-id=3D"c5682adec18e" class=3D"confluenceTd">
+<p local-id=3D"bd783273ef54"></p></td>
+</tr>
+<tr data-local-id=3D"5bd4b3ad81ce">
+<td data-local-id=3D"6fdcc9c6f579" class=3D"confluenceTd">
+<p local-id=3D"7579a4ac16eb"></p></td>
+<td data-local-id=3D"cc5b25d3c808" class=3D"confluenceTd">
+<p local-id=3D"d192b35ddb7d">POST onboarding</p></td>
+<td data-local-id=3D"73cc040f8059" class=3D"confluenceTd">
+<p local-id=3D"7c5bf67ca80f"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/extractDocum=
+entData" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/id=
+entity_biometric/onboarding/extractDocumentData</u></a></p></td>
+<td data-local-id=3D"78606c3222dd" class=3D"confluenceTd">
+<div id=3D"expander-1103941768" class=3D"expand-container">
+<div id=3D"expander-control-1103941768" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1103941768" class=3D"expand-content">
+<p local-id=3D"fabd5292-1a0c-4ae0-918a-b44e59a31229"></p>
+</div>
+</div></td>
+<td data-local-id=3D"11805bfbd8e0" class=3D"confluenceTd">
+<div id=3D"expander-846956891" class=3D"expand-container">
+<div id=3D"expander-control-846956891" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-846956891" class=3D"expand-content">
+<p local-id=3D"461afa19-85ee-4cb1-9ff1-efe9bbd66ef4"></p>
+</div>
+</div></td>
+<td data-local-id=3D"8c6dd5f39e23" class=3D"confluenceTd">
+<p local-id=3D"e259cd213c4f"></p></td>
+<td data-local-id=3D"c37ee2e741a5" class=3D"confluenceTd">
+<p local-id=3D"173f256c14f8"></p></td>
+</tr>
+<tr data-local-id=3D"e739894ee086">
+<td data-local-id=3D"cf893eead16f" class=3D"confluenceTd">
+<p local-id=3D"6d36d7f322b4"></p></td>
+<td data-local-id=3D"98e58c2f74c6" class=3D"confluenceTd">
+<p local-id=3D"50bb8bb37711"></p></td>
+<td data-local-id=3D"3db3e5f0ea59" class=3D"confluenceTd">
+<p local-id=3D"48f2f2c9770c"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/extractDocum=
+entDataWeb" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/id=
+entity_biometric/onboarding/extractDocumentDataWeb</a></p></td>
+<td data-local-id=3D"a6381ca0805c" class=3D"confluenceTd">
+<div id=3D"expander-670159817" class=3D"expand-container">
+<div id=3D"expander-control-670159817" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-670159817" class=3D"expand-content">
+<p local-id=3D"a799d313-1362-45c3-9c17-f2d23f56602f"></p>
+</div>
+</div></td>
+<td data-local-id=3D"e714651c0a96" class=3D"confluenceTd">
+<div id=3D"expander-745370246" class=3D"expand-container">
+<div id=3D"expander-control-745370246" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-745370246" class=3D"expand-content">
+<p local-id=3D"29a5e972-6e49-486d-8b89-1ddd82b2b60f"></p>
+</div>
+</div></td>
+<td data-local-id=3D"e5e1ebeabab4" class=3D"confluenceTd">
+<p local-id=3D"99c8c953240f"></p></td>
+<td data-local-id=3D"6c9116f89c3e" class=3D"confluenceTd">
+<p local-id=3D"0534ff9678c2"></p></td>
+</tr>
+<tr data-local-id=3D"e9df5f90b664">
+<td data-local-id=3D"02e5782c380e" class=3D"confluenceTd">
+<p local-id=3D"5cbf8f559679"></p></td>
+<td data-local-id=3D"164c05db4231" class=3D"confluenceTd">
+<p local-id=3D"45a1c6d20ee0"></p></td>
+<td data-local-id=3D"6afed70071ff" class=3D"confluenceTd">
+<p local-id=3D"c3b83d1ebf67"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/documentVali=
+dationData" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/id=
+entity_biometric/onboarding/documentValidationData</a></p></td>
+<td data-local-id=3D"4da3f7f6ae4c" class=3D"confluenceTd">
+<div id=3D"expander-1564268952" class=3D"expand-container">
+<div id=3D"expander-control-1564268952" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1564268952" class=3D"expand-content">
+<p local-id=3D"f64fc285-7593-4756-907a-bace2ed6a11a"></p>
+</div>
+</div></td>
+<td data-local-id=3D"686d300563ce" class=3D"confluenceTd">
+<div id=3D"expander-421624698" class=3D"expand-container">
+<div id=3D"expander-control-421624698" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-421624698" class=3D"expand-content">
+<p local-id=3D"09442f2f-7692-4d8b-a66f-e1844086c802"></p>
+</div>
+</div></td>
+<td data-local-id=3D"25284d443d39" class=3D"confluenceTd">
+<p local-id=3D"56c9a0daa97a"></p></td>
+<td data-local-id=3D"5b4b476be117" class=3D"confluenceTd">
+<p local-id=3D"f73be8dcc483"></p></td>
+</tr>
+<tr data-local-id=3D"f14a3b542eb7">
+<td data-local-id=3D"d4e1cbd17a6f" class=3D"confluenceTd">
+<p local-id=3D"23be0c09a3d2"></p></td>
+<td data-local-id=3D"a05ec0951a96" class=3D"confluenceTd">
+<p local-id=3D"bc4c90185378"></p></td>
+<td data-local-id=3D"fb4034cea914" class=3D"confluenceTd">
+<p local-id=3D"cb0881028439"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/documentVali=
+dationStart" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v=
+1/identity_biometric/onboarding/documentValidationStart</u></a></p></td>
+<td data-local-id=3D"d35f77e0a5ce" class=3D"confluenceTd">
+<div id=3D"expander-850224069" class=3D"expand-container">
+<div id=3D"expander-control-850224069" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-850224069" class=3D"expand-content">
+<p local-id=3D"7373427d-dffb-4f75-bdad-80ad347e26e1"></p>
+</div>
+</div></td>
+<td data-local-id=3D"f27523ac466d" class=3D"confluenceTd">
+<div id=3D"expander-1562409243" class=3D"expand-container">
+<div id=3D"expander-control-1562409243" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1562409243" class=3D"expand-content">
+<p local-id=3D"7f529543-9699-45da-a216-658155915460"></p>
+</div>
+</div></td>
+<td data-local-id=3D"8802b7885797" class=3D"confluenceTd">
+<p local-id=3D"31a664a58d4c"></p></td>
+<td data-local-id=3D"509796a437c4" class=3D"confluenceTd">
+<p local-id=3D"adc4e932b6e1"></p></td>
+</tr>
+<tr data-local-id=3D"e78d21fb62c2">
+<td data-local-id=3D"922b09f8b2f7" class=3D"confluenceTd">
+<p local-id=3D"21ab53f1b15a"></p></td>
+<td data-local-id=3D"0cec7fc8087c" class=3D"confluenceTd">
+<p local-id=3D"3dc869fe2edc"></p></td>
+<td data-local-id=3D"44535b887416" class=3D"confluenceTd">
+<p local-id=3D"99a7d49e6a2e"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/documentVali=
+dationStatus" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/=
+v1/identity_biometric/onboarding/documentValidationStatus</u></a></p></td>
+<td data-local-id=3D"976a9ca8d982" class=3D"confluenceTd">
+<div id=3D"expander-140623070" class=3D"expand-container">
+<div id=3D"expander-control-140623070" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-140623070" class=3D"expand-content">
+<p local-id=3D"ce1c666a-a86e-4947-b899-a1d977fbc50b"></p>
+</div>
+</div></td>
+<td data-local-id=3D"f9af1d94ea92" class=3D"confluenceTd">
+<div id=3D"expander-1138166007" class=3D"expand-container">
+<div id=3D"expander-control-1138166007" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1138166007" class=3D"expand-content">
+<p local-id=3D"2308b7b6-ab53-434f-9714-adc2c37dea7f"></p>
+</div>
+</div></td>
+<td data-local-id=3D"dd27991a4148" class=3D"confluenceTd">
+<p local-id=3D"1daff630d5ce"></p></td>
+<td data-local-id=3D"7e95ce1e3c37" class=3D"confluenceTd">
+<p local-id=3D"c7c7fbbd0937"></p></td>
+</tr>
+<tr data-local-id=3D"4c90286801f5">
+<td data-local-id=3D"20499e0ec48f" class=3D"confluenceTd">
+<p local-id=3D"b9241d830c2f"></p></td>
+<td data-local-id=3D"aee9e2b53cbb" class=3D"confluenceTd">
+<p local-id=3D"1d55daccf701"></p></td>
+<td data-local-id=3D"09ce318da5b1" class=3D"confluenceTd">
+<p local-id=3D"e5441ddd1395"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/identity" re=
+l=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/identity_biometr=
+ic/onboarding/identity</a></p></td>
+<td data-local-id=3D"2b03887f6187" class=3D"confluenceTd">
+<div id=3D"expander-1347047634" class=3D"expand-container">
+<div id=3D"expander-control-1347047634" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1347047634" class=3D"expand-content">
+<p local-id=3D"af21be0b-7577-41aa-856c-b0fae244b901"></p>
+</div>
+</div></td>
+<td data-local-id=3D"150f220f1d93" class=3D"confluenceTd">
+<div id=3D"expander-1408344950" class=3D"expand-container">
+<div id=3D"expander-control-1408344950" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1408344950" class=3D"expand-content">
+<p local-id=3D"f51c92ed-5308-45d3-94e7-337c327654da"></p>
+</div>
+</div></td>
+<td data-local-id=3D"e8f5be29dfde" class=3D"confluenceTd">
+<p local-id=3D"cf49cebeaa23"></p></td>
+<td data-local-id=3D"e632315c9045" class=3D"confluenceTd">
+<p local-id=3D"02f1f47749d0"></p></td>
+</tr>
+<tr data-local-id=3D"61b5dc1eb8bc">
+<td data-local-id=3D"e3e0a448ced0" class=3D"confluenceTd">
+<p local-id=3D"1ffcbc2905cf"></p></td>
+<td data-local-id=3D"d981126de00d" class=3D"confluenceTd">
+<p local-id=3D"184593260e8e"></p></td>
+<td data-local-id=3D"aea8baae618b" class=3D"confluenceTd">
+<p local-id=3D"de8c8f6893e5"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/onboarding/civilValidat=
+ion" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/identi=
+ty_biometric/onboarding/civilValidation</u></a></p></td>
+<td data-local-id=3D"31b6fe31223a" class=3D"confluenceTd">
+<div id=3D"expander-1983080995" class=3D"expand-container">
+<div id=3D"expander-control-1983080995" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1983080995" class=3D"expand-content">
+<p local-id=3D"e008c39e-a643-4030-b749-deda80269625"></p>
+</div>
+</div></td>
+<td data-local-id=3D"ce559b35004c" class=3D"confluenceTd">
+<div id=3D"expander-661672020" class=3D"expand-container">
+<div id=3D"expander-control-661672020" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-661672020" class=3D"expand-content">
+<p local-id=3D"5187e3a8-3d7d-497c-b750-cf7e51db6900"></p>
+</div>
+</div></td>
+<td data-local-id=3D"0b114dff1a43" class=3D"confluenceTd">
+<p local-id=3D"6156c275fdf6"></p></td>
+<td data-local-id=3D"b4eedc2ef0d9" class=3D"confluenceTd">
+<p local-id=3D"478cb3dc7775"></p></td>
+</tr>
+<tr data-local-id=3D"f76e20673c33">
+<td data-local-id=3D"88e75e5a06d0" class=3D"confluenceTd">
+<p local-id=3D"d2027eb3d3d5"></p></td>
+<td data-local-id=3D"4ba7a060ca9b" class=3D"confluenceTd">
+<p local-id=3D"bf7eedfe0f7c">POST authentication</p></td>
+<td data-local-id=3D"b1a255427442" class=3D"confluenceTd">
+<p local-id=3D"2928f4f54f7a"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/authentication/authenti=
+cateUser" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/authentication/authenticateUser</u></a></p></td>
+<td data-local-id=3D"9c4dd14b986d" class=3D"confluenceTd">
+<div id=3D"expander-178374209" class=3D"expand-container">
+<div id=3D"expander-control-178374209" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-178374209" class=3D"expand-content">
+<p local-id=3D"ef4750e8-879b-4e10-a45a-d4cacb32ffbc">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/authentication/authenticateUser'" rel=3D"nofollow">https:=
+//api-uat.santanderconsumer.com.pe/v1/identity_biometric/authentication/aut=
+henticateUser'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3DO/hmV+58EVP2CgJyTrqMjQAAAACKvN=
+ZTCppVZ5QXyuxR+U2B; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "userId": "001",<br>
+ "registeredTemplateRaw": "BAMBAQLNHJoWGPjfeuDIzDXdZuP...",<br>
+ "image": "PE",<br>
+ "bestImageToken": "BAIBAQIJTHP8obR2r9ALdDtR5lT...",<br>
+ "template": "",<br>
+ "merchantReferenceId": "authenticate-001",<br>
+ "tracking": {<br>
+ "extraData": "BQABAQG2gBNjuHN4kLmPqYf7R...",<br>
+ "operationId": "123e4567-e89b-12d3-a456-426614174000"<br>
+ }<br>
+}'</p>
+</div>
+</div>
+<div id=3D"expander-968318881" class=3D"expand-container">
+<div id=3D"expander-control-968318881" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token</span>
+</div>
+<div id=3D"expander-content-968318881" class=3D"expand-content">
+<p local-id=3D"3731a503-002b-4a2f-9071-42c3e71b54a6">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/authentication/authenticateUser'" rel=3D"nofollow">https:=
+//api-uat.santanderconsumer.com.pe/v1/identity_biometric/authentication/aut=
+henticateUser'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMzMyMTMsImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEzNjgxMywiaWF0IjoxNzgxMTMzMjEzLCJ2ZXJzaW9uIjoyLCJqdGkiOiJkNzgyZjIyNC04NG=
+MzLTRlNjUtOGE3ZC02NWZmZGYyMTI4ZWUiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.ftEF0ZhOpV53y3r65A7NI1Lqanc-sgmu4bT2joaMMZ_YhMmjqzScIqrl2_Q=
+hGMEtASFhwHK5qchtCVea_MgDJ37UtV5KYI1n0f6Y1cFttMYz60Xh3Sb5pMVL_Xo8mtJYXf8sL0=
+5JxIj3lQHkc5JxPw3lATbdt608m55rb62SUEQfnZNIam0IEA29nRfrZcwGaFxBV-vDKD0FCvVnH=
+Y9vWXgO-pUEOLpin6iZc11WjtyeHE59UpOymeTmVcpFuXPY8d-WpZ6hyZ30SbffkaPYXRp2TXyd=
+1_cmrLBhocVEJhumTt2zmdmMhTDH-xQgzmubh0Zqu1XBPVDrAkjYaYGyjw' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3DO/hmV+58EVP2CgJyTrqMjQAAAACKvN=
+ZTCppVZ5QXyuxR+U2B; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "userId": "001",<br>
+ "registeredTemplateRaw": "BAMBAQLNHJoWGPjfeuDIzDXdZuP...",<br>
+ "image": "PE",<br>
+ "bestImageToken": "BAIBAQIJTHP8obR2r9ALdDtR5lT...",<br>
+ "template": "",<br>
+ "merchantReferenceId": "authenticate-001",<br>
+ "tracking": {<br>
+ "extraData": "BQABAQG2gBNjuHN4kLmPqYf7R...",<br>
+ "operationId": "123e4567-e89b-12d3-a456-426614174000"<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"eb333d494007" class=3D"confluenceTd">
+<div id=3D"expander-1353628195" class=3D"expand-container">
+<div id=3D"expander-control-1353628195" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1353628195" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-1208214475" class=3D"expand-container">
+<div id=3D"expander-control-1208214475" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1208214475" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Invalid key=3Dvalue pair (missing equal-sign) in Authorizat=
+ion header (hashed with SHA-256 and encoded with Base64): 'JMbixVe39jGPn6vM=
+UE/XCrLVKQl2lify+fpDUq4IuzU=3D'."
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"1ff2be92e0bf" class=3D"confluenceTd">
+<p local-id=3D"1abfe625ea28"></p></td>
+<td data-local-id=3D"92aa9f088113" class=3D"confluenceTd">
+<p local-id=3D"6abe5feba58e"></p></td>
+</tr>
+<tr data-local-id=3D"14d0f32f0ca2">
+<td data-local-id=3D"82ba2613e13a" class=3D"confluenceTd">
+<p local-id=3D"129f38fed95f"></p></td>
+<td data-local-id=3D"9aae4a96ced9" class=3D"confluenceTd">
+<p local-id=3D"6feaab43c9d1"></p></td>
+<td data-local-id=3D"f0ef4a8dd45c" class=3D"confluenceTd">
+<p local-id=3D"b170ef99223f"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/authentication/updateUs=
+erTemplate" rel=3D"nofollow">https://api-uat.santanderconsumer.com.pe/v1/id=
+entity_biometric/authentication/updateUserTemplate</a></p></td>
+<td data-local-id=3D"88d589d271de" class=3D"confluenceTd">
+<div id=3D"expander-407514858" class=3D"expand-container">
+<div id=3D"expander-control-407514858" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-407514858" class=3D"expand-content">
+<p local-id=3D"4079a851-4a0e-4d45-838f-13b894664a7e">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/authentication/updateUserTemplate'" rel=3D"nofollow">http=
+s://api-uat.santanderconsumer.com.pe/v1/identity_biometric/authentication/u=
+pdateUserTemplate'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3DO/hmV+58EVP2CgJyTrqMjQAAAACKvN=
+ZTCppVZ5QXyuxR+U2B; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "userId": "001",<br>
+ "oldRegisteredTemplateRaw": "BAIBAQFpWL...",<br>
+ "newRegisteredTemplateRaw": "BAIBAQG0NRm0d...",<br>
+ "image": "",<br>
+ "merchantReferenceId": "authenticate-001",<br>
+ "tracking": {<br>
+ "extraData": "BQABAQG2gBNjuHN4kLmPqYf7R...",<br>
+ "operationId": "123e4567-e89b-12d3-a456-426614174000"<br>
+ }<br>
+}'</p>
+</div>
+</div>
+<div id=3D"expander-1042039708" class=3D"expand-container">
+<div id=3D"expander-control-1042039708" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token</span>
+</div>
+<div id=3D"expander-content-1042039708" class=3D"expand-content">
+<p local-id=3D"5d5baa19-5be7-451f-bfee-3b5f37cb5077">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/authentication/updateUserTemplate'" rel=3D"nofollow">http=
+s://api-uat.santanderconsumer.com.pe/v1/identity_biometric/authentication/u=
+pdateUserTemplate'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMzM3MTYsImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEzNzMxNiwiaWF0IjoxNzgxMTMzNzE2LCJ2ZXJzaW9uIjoyLCJqdGkiOiJjMmMyNjEzZi0xZG=
+IxLTQ3ODAtOTlmNy1mMjMxMDg2NzY2NTgiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.Di4aHE3sCmE-_nP3zEeSf5Px-H0NHe8j71Mf8AzlS5n91e0gANakOOEtyXB=
+fiOWg4aWyHQcmRH8dWuk947MNWJ_JlFqxmk86kk9lBRWFrCFnjm97ROB5mm8JmIEzMRfyKsW-N-=
+hcERXp0QuP7fmoJUZIMvFPIHoK90vY2_Y7V1ZZgKyb9Oa3ilPdFGz-hxTbTVCOCMaK_65KOURNf=
+exlvlb5kwYqaccDKZHaoAPZi2CVQwv-b4cRby7xCKcAPr8zMquZKPrQCmXWBMYl-vLy37n2pGjs=
+WT4Dktszv2Fwf9u0sZmVwKyQ50vs4CyUga9gO2X_G2rqH3zO9ffLdUMgKw' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3DO/hmV+58EVP2CgJyTrqMjQAAAACKvN=
+ZTCppVZ5QXyuxR+U2B; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "userId": "001",<br>
+ "oldRegisteredTemplateRaw": "BAIBAQFpWL...",<br>
+ "newRegisteredTemplateRaw": "BAIBAQG0NRm0d...",<br>
+ "image": "",<br>
+ "merchantReferenceId": "authenticate-001",<br>
+ "tracking": {<br>
+ "extraData": "BQABAQG2gBNjuHN4kLmPqYf7R...",<br>
+ "operationId": "123e4567-e89b-12d3-a456-426614174000"<br>
+ }<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"bfe4ed906c45" class=3D"confluenceTd">
+<div id=3D"expander-304308616" class=3D"expand-container">
+<div id=3D"expander-control-304308616" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-304308616" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-134275361" class=3D"expand-container">
+<div id=3D"expander-control-134275361" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-134275361" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Invalid key=3Dvalue pair (missing equal-sign) in Authorizat=
+ion header (hashed with SHA-256 and encoded with Base64): 'lgpRH9ZEvZZlbOVJ=
+Pwl+I5B5xuqi34N6eNQ7W0Ffiio=3D'."
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"9301f19f668c" class=3D"confluenceTd">
+<p local-id=3D"8f93346cad5f"></p></td>
+<td data-local-id=3D"fc5caa531e9c" class=3D"confluenceTd">
+<p local-id=3D"6a9b4ee80ee1"></p></td>
+</tr>
+<tr data-local-id=3D"55e32dbec73e">
+<td data-local-id=3D"1a9b2caffdf5" class=3D"confluenceTd">
+<p local-id=3D"f9b7c3495325"></p></td>
+<td data-local-id=3D"479a4608af3c" class=3D"confluenceTd">
+<p local-id=3D"00f3b187da0b">POST biometric</p></td>
+<td data-local-id=3D"e04bb06c73f2" class=3D"confluenceTd">
+<p local-id=3D"2404bcf1101f"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/biometric/iad" rel=3D"n=
+ofollow">https://api-uat.santanderconsumer.com.pe/v1/identity_biometric/bio=
+metric/iad</a></p></td>
+<td data-local-id=3D"50a107a41a41" class=3D"confluenceTd">
+<div id=3D"expander-1834872423" class=3D"expand-container">
+<div id=3D"expander-control-1834872423" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1834872423" class=3D"expand-content">
+<p local-id=3D"92deb11d-a479-4fe9-8871-cf077c0d84a2">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/biometric/iad'" rel=3D"nofollow">https://api-uat.santande=
+rconsumer.com.pe/v1/identity_biometric/biometric/iad'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/octet-stream' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3DO/hmV+58EVP2CgJyTrqMjQAAAACKvN=
+ZTCppVZ5QXyuxR+U2B; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '@/C:/Users/tecdesa2538/Downloads/test1.jpg'</p>
+</div>
+</div>
+<div id=3D"expander-1600548366" class=3D"expand-container">
+<div id=3D"expander-control-1600548366" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token</span>
+</div>
+<div id=3D"expander-content-1600548366" class=3D"expand-content">
+<p local-id=3D"f7e682e5-14a7-4838-80d7-aedbaa68668b">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/biometric/iad'" rel=3D"nofollow">https://api-uat.santande=
+rconsumer.com.pe/v1/identity_biometric/biometric/iad'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/octet-stream' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMzM5NzksImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEzNzU3OSwiaWF0IjoxNzgxMTMzOTc5LCJ2ZXJzaW9uIjoyLCJqdGkiOiI0Mzg4Mzk1NS05Yj=
+g3LTQwNTUtOWNlNi04YzU2MDA3MjIzYzUiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.no47I-8tTI2c_JbgDrEqy8SdROXu6UXOe_doJlATER-XTCkY3ZOmuUCWOh1=
+twn8buf_WqlrEgTQy-OFgXute3pbeD63c5phOrvIAjso6lJFBebN5ns5nuaO00RIUfoxxCr1iKC=
+agoKdMXYYJz_Ovqq6-WPHE7hTTawfra5iwDJZA8Z8fM1zEEk44vdJ0UAC6fF0bNu2520WAVdq4q=
+2eAvu8QPwtuhEX3t6Jyzwng2Vl4hjhqqaB4NqNBgGs-nd3vUp6ksxkOcnYiCa_bcDibU9BhfB5A=
+_VQMa3XItcV7rpDpy31EuC1D0Jdkkn_TYKHTBTQrUpCtt1z8cGxFH3fYrg' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3DIRO+NMYNZX3+ydWuTrqMjQAAAAA50l=
+WrhoYYWkBPVstBZecU; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data-raw '@/C:/Users/tecdesa2538/Downloads/test1.jpg'</p>
+</div>
+</div></td>
+<td data-local-id=3D"11b284f37852" class=3D"confluenceTd">
+<div id=3D"expander-935810217" class=3D"expand-container">
+<div id=3D"expander-control-935810217" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-935810217" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-1619207881" class=3D"expand-container">
+<div id=3D"expander-control-1619207881" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1619207881" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Invalid key=3Dvalue pair (missing equal-sign) in Authorizat=
+ion header (hashed with SHA-256 and encoded with Base64): '8LXGyiEf0xwDUNS2=
+OEVn7KuHPuaIDcDKpnsf/5YnKeM=3D'."
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"8a9d2633a08c" class=3D"confluenceTd">
+<p local-id=3D"4cff89e32780"></p></td>
+<td data-local-id=3D"173fb5b4d327" class=3D"confluenceTd">
+<p local-id=3D"0e013bbb0e0a"></p></td>
+</tr>
+<tr data-local-id=3D"4ab27e80977a">
+<td data-local-id=3D"f1242492e3eb" class=3D"confluenceTd">
+<p local-id=3D"a52f1aa09538"></p></td>
+<td data-local-id=3D"33067de88e1d" class=3D"confluenceTd">
+<p local-id=3D"8f9dadad78ff"></p></td>
+<td data-local-id=3D"b4a80fed43a1" class=3D"confluenceTd">
+<p local-id=3D"5654fa2b632c"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/biometric/authenticateF=
+acial" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/iden=
+tity_biometric/biometric/authenticateFacial</u></a></p></td>
+<td data-local-id=3D"0f296df0cad5" class=3D"confluenceTd">
+<div id=3D"expander-404338909" class=3D"expand-container">
+<div id=3D"expander-control-404338909" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-404338909" class=3D"expand-content">
+<p local-id=3D"6bf24406-28b7-4a10-9185-f6d09a0b3f9a">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/biometric/authenticateFacial'" rel=3D"nofollow">https://a=
+pi-uat.santanderconsumer.com.pe/v1/identity_biometric/biometric/authenticat=
+eFacial'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3D7Jh8blBFbFvmD1+QTrqMjQAAAADZax=
+zwJ3NdN0XMLPySjXrA; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "token1": "BAMBAQLNHJoWGPjfeuDIzDXdZuP...",<br>
+ "token2": "BAMBAQLNHJoWGPjfeuDIzDXdZuP...",<br>
+ "method": 1<br>
+}'</p>
+</div>
+</div>
+<div id=3D"expander-1322373220" class=3D"expand-container">
+<div id=3D"expander-control-1322373220" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">con token</span>
+</div>
+<div id=3D"expander-content-1322373220" class=3D"expand-content">
+<p local-id=3D"98701b65-6ed5-4771-b3c6-36a33b254217">curl --location '<a cl=
+ass=3D"external-link" href=3D"https://api-uat.santanderconsumer.com.pe/v1/i=
+dentity_biometric/biometric/authenticateFacial'" rel=3D"nofollow">https://a=
+pi-uat.santanderconsumer.com.pe/v1/identity_biometric/biometric/authenticat=
+eFacial'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZ=
+QYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaX=
+YzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtY=
+XBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExMzQxNzYsImlzcyI6Imh0dHBzOi8vY29nbml0by1p=
+ZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc=
+4MTEzNzc3NiwiaWF0IjoxNzgxMTM0MTc2LCJ2ZXJzaW9uIjoyLCJqdGkiOiJmODBlMDkzZi0yZD=
+RiLTQ0ZTItYjdkOC05ZGI1MzMzODljNDgiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuN=
+DZqZm5yNG4zdCJ9.nitR2SS2feaHU9XjNd6HCecP4S-sqvH4kFC3Dv8wg_twOolzwFfPw8Gw5nH=
+3OckbyDh-DfgrmsTKYGrWkNFqV2yU0MmXaSJYTdECSTG9c9GfsrOFEInMg6kdMwzScmnghITV_W=
+aUi6V47KBA9gsHcAo-9pKdSuhs_4VEp0Jhx4J0gjBV3Gx4mQKOTbHKM2bZCjze6GOMAKIgmx8Rt=
+Xf5PYi4uNpJX2oQpUPBt0gGdu1ov_oYxvedGrgeuLybu7_iwDjEDtjQHdcPTeTQHwS3wOCwt7_8=
+KjyD5OULvrv5UCSq4-G0goo4bzxAYx07VBqHRoApvMLGC91kioCiehmVYg' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3D7Jh8blBFbFvmD1+QTrqMjQAAAADZax=
+zwJ3NdN0XMLPySjXrA; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "token1": "BAMBAQLNHJoWGPjfeuDIzDXdZuP...",<br>
+ "token2": "BAMBAQLNHJoWGPjfeuDIzDXdZuP...",<br>
+ "method": 1<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"11016179a7ba" class=3D"confluenceTd">
+<div id=3D"expander-1771787033" class=3D"expand-container">
+<div id=3D"expander-control-1771787033" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1771787033" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div id=3D"expander-1669394731" class=3D"expand-container">
+<div id=3D"expander-control-1669394731" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1669394731" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Invalid key=3Dvalue pair (missing equal-sign) in Authorizat=
+ion header (hashed with SHA-256 and encoded with Base64): 'WMhwEWEaw4GdYYa9=
+dZGj0/1R0HfnTZQGxyBx73Yd73Y=3D'."
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"8155c49063db" class=3D"confluenceTd">
+<p local-id=3D"4aabf64c2880"></p></td>
+<td data-local-id=3D"1a6979830d9f" class=3D"confluenceTd">
+<p local-id=3D"28504ecad226"></p></td>
+</tr>
+<tr data-local-id=3D"e4d54800d210">
+<td data-local-id=3D"d0d0c4f6c7e3" class=3D"confluenceTd">
+<p local-id=3D"c4dc57e82f33"></p></td>
+<td data-local-id=3D"5fb301aea25d" class=3D"confluenceTd">
+<p local-id=3D"2fd9b946b919"></p></td>
+<td data-local-id=3D"c9e1c9f77b49" class=3D"confluenceTd">
+<p local-id=3D"15bf46b427b4"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/biometric/evaluatePassi=
+veLivenessToken" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.=
+pe/v1/identity_biometric/biometric/evaluatePassiveLivenessToken</u></a></p>=
+</td>
+<td data-local-id=3D"0bec19d5dfa8" class=3D"confluenceTd">
+<div id=3D"expander-1706463661" class=3D"expand-container">
+<div id=3D"expander-control-1706463661" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">sin token</span>
+</div>
+<div id=3D"expander-content-1706463661" class=3D"expand-content">
+<p local-id=3D"76b79b8edd2b">curl --location '<a class=3D"external-link" hr=
+ef=3D"https://api-uat.santanderconsumer.com.pe/v1/identity_biometric/biomet=
+ric/evaluatePassiveLivenessToken'" rel=3D"nofollow">https://api-uat.santand=
+erconsumer.com.pe/v1/identity_biometric/biometric/evaluatePassiveLivenessTo=
+ken'</a> \<br>
+--header 'x-santander-client-id: a1b30a84-7bf3-4' \<br>
+--header 'channel: App-Conexa' \<br>
+--header 'society: scp' \<br>
+--header 'Content-Type: application/json' \<br>
+--header 'Cookie: incap_ses_1733_3319235=3DtBpaEM736TNEeXbs4doMGILvKWoAAAAA=
+rjGVScRJVJ+RGXJMDZyViA=3D=3D; nlbi_3319235=3D7Jh8blBFbFvmD1+QTrqMjQAAAADZax=
+zwJ3NdN0XMLPySjXrA; visid_incap_3319235=3DF8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQ=
+UIPAAAAAACB4jJvF2uxnwaCcYH4UiGq' \<br>
+--data '{<br>
+ "imageBuffer": "BAMBAQLNHJoWGPjfeuDIzDXdZuP..."<br>
+}'</p>
+</div>
+</div></td>
+<td data-local-id=3D"bfa81b817eff" class=3D"confluenceTd">
+<div id=3D"expander-1240620945" class=3D"expand-container">
+<div id=3D"expander-control-1240620945" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">403Forbidden</span>
+</div>
+<div id=3D"expander-content-1240620945" class=3D"expand-content">
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+    "message": "Missing Authentication Token"
+}</pre>
+</div>
+</div>
+</div>
+</div></td>
+<td data-local-id=3D"1b049564758b" class=3D"confluenceTd">
+<p local-id=3D"72c552c9ca83"></p></td>
+<td data-local-id=3D"cb73b62f645b" class=3D"confluenceTd">
+<p local-id=3D"5a730d2387ab"></p></td>
+</tr>
+<tr data-local-id=3D"f2921822883f">
+<td data-local-id=3D"2174d065c775" class=3D"confluenceTd">
+<p local-id=3D"839bbf269e64"></p></td>
+<td data-local-id=3D"b30fb38e1cb8" class=3D"confluenceTd">
+<p local-id=3D"1441eccea351">POST signature</p></td>
+<td data-local-id=3D"825f3c0f96f9" class=3D"confluenceTd">
+<p local-id=3D"a11e02e7cf03"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/signature/signer" rel=
+=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1/identity_biome=
+tric/signature/signer</u></a></p></td>
+<td data-local-id=3D"3b4f1e574eec" class=3D"confluenceTd">
+<div id=3D"expander-1906154021" class=3D"expand-container">
+<div id=3D"expander-control-1906154021" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1906154021" class=3D"expand-content">
+<p local-id=3D"2507ec8a-9174-4ad2-970d-2aa6c3ddbef9"></p>
+</div>
+</div></td>
+<td data-local-id=3D"2f135980c158" class=3D"confluenceTd">
+<div id=3D"expander-1385619438" class=3D"expand-container">
+<div id=3D"expander-control-1385619438" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-1385619438" class=3D"expand-content">
+<p local-id=3D"a5b75f3f-f604-4f5d-88c7-39dd02d4519f"></p>
+</div>
+</div></td>
+<td data-local-id=3D"7bd8c6f3c4a0" class=3D"confluenceTd">
+<p local-id=3D"4f036f95cec5"></p></td>
+<td data-local-id=3D"7f1f6e3719ef" class=3D"confluenceTd">
+<p local-id=3D"c82c149edfd0"></p></td>
+</tr>
+<tr data-local-id=3D"ced9b1bf1ccb">
+<td data-local-id=3D"d6881f03058a" class=3D"confluenceTd">
+<p local-id=3D"70a94878deea"></p></td>
+<td data-local-id=3D"2e0ff8d09a46" class=3D"confluenceTd">
+<p local-id=3D"114946f11d37"></p></td>
+<td data-local-id=3D"b7198b5a48ba" class=3D"confluenceTd">
+<p local-id=3D"299fba065aa8"><a class=3D"external-link" href=3D"https://api=
+-uat.santanderconsumer.com.pe/v1/identity_biometric/signature/webhook/%7Bre=
+questId%7D" rel=3D"nofollow"><u>https://api-uat.santanderconsumer.com.pe/v1=
+/identity_biometric/signature/webhook/{requestId}</u></a></p></td>
+<td data-local-id=3D"d967a00eb955" class=3D"confluenceTd">
+<div id=3D"expander-743207758" class=3D"expand-container">
+<div id=3D"expander-control-743207758" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-743207758" class=3D"expand-content">
+<p local-id=3D"11b85050-292b-4d4b-8666-54a3d650b34f"></p>
+</div>
+</div></td>
+<td data-local-id=3D"579814f486be" class=3D"confluenceTd">
+<div id=3D"expander-2066951452" class=3D"expand-container">
+<div id=3D"expander-control-2066951452" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Haz clic aqu=C3=AD para ampliar...</span>
+</div>
+<div id=3D"expander-content-2066951452" class=3D"expand-content">
+<p local-id=3D"2b28a047-e4a8-4c34-a716-f270f6fde8df"></p>
+</div>
+</div></td>
+<td data-local-id=3D"0086dbce6c78" class=3D"confluenceTd">
+<p local-id=3D"755c7ae24891"></p></td>
+<td data-local-id=3D"3b50374cb80c" class=3D"confluenceTd">
+<p local-id=3D"3a0f26dd1c2a"></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p local-id=3D"b80b6c2da723"></p>
+<p local-id=3D"db7b8806c3c1"></p>
+<div id=3D"expander-1055375597" class=3D"expand-container">
+<div id=3D"expander-control-1055375597" class=3D"expand-control">
+<span class=3D"expand-control-icon"><img style=3D"vertical-align:middle;" c=
+lass=3D"expand-control-image" src=3D"2c23bc27d791c19972cbe1d17d747b48bca85f=
+7c77aec2a0edaf229836e78927" width=3D"16" height=3D"16"></span><span class=
+=3D"expand-control-text">Credit risk - documentNumber (datos para probar)</=
+span>
+</div>
+<div id=3D"expander-content-1055375597" class=3D"expand-content">
+<p local-id=3D"ddf267f2-1b56-4662-9252-04b32fed2d99">477826<br>
+188206<br>
+3901665<br>
+983643<br>
+5580006<br>
+1127457<br>
+1130784<br>
+6160111<br>
+5234837<br>
+5237741<br>
+5240621<br>
+5240621<br>
+403800<br>
+3645789<br>
+3649422<br>
+3651264<br>
+3651264<br>
+2623141<br>
+2873589<br>
+424292<br>
+429497<br>
+431486<br>
+434560<br>
+1041234<br>
+1041234<br>
+1043279<br>
+1049078<br>
+5370222<br>
+479087<br>
+479087<br>
+4742039<br>
+4743169<br>
+4744019<br>
+4749388<br>
+2897448<br>
+1233780<br>
+1235572<br>
+6061652<br>
+3867264<br>
+4802766<br>
+4803775<br>
+64851<br>
+2422967<br>
+2892437<br>
+2896132<br>
+1227052<br>
+1230066<br>
+1235144<br>
+483516<br>
+483516<br>
+2424866<br>
+2425555<br>
+2427449<br>
+2429297<br>
+2429970</p>
+</div>
+</div>
+    </div>
+</body>
+</html>
+------=_Part_16_510816567.1781141505383
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: file:///C:/2c23bc27d791c19972cbe1d17d747b48bca85f7c77aec2a0edaf229836e78927
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAA3NCSVQICAjb4U/gAAAAFVBMVEX/
+//9wcHBwcHBwcHBwcHBwcHBwcHA3RenHAAAAB3RSTlMAZoiZzN3/SzZomQAAAAlwSFlzAAALEgAA
+CxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAUdEVYdENy
+ZWF0aW9uIFRpbWUANi8xLzEzOKlF0AAAACFJREFUCJljYCATsCgwqIAZTMnMyRAhsTABCIMxkVxT
+GQCLcwHyUKXpLgAAAABJRU5ErkJggg==
+------=_Part_16_510816567.1781141505383--
