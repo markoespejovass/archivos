@@ -1,78 +1,234 @@
-spring.profiles.active: ${SPRING_PROFILES_ACTIVE:local}
----
-santander:
-  region: boae
-  suffix:
-  app-name: nxhbsc
-  logging:
-    format: GLUONLOG
-    gluon-log:
-      company: cpe
-      componentName: bedocmanagement
-      componentId: CHANGEIT_CMPT_ID
-      componentType: microservice
-      appId: CHANGEIT_APP_ID
-    entity: ESP
-    paas-app-version: "1.3.0"
-  core:
-    exceptions:
-      error-format: GLUON
-  security:
-    enabled: false
-    white-list:
-      - /**
-
-spring:
-  application:
-    name: cpe-nxhbsc-bedocmanagement
-  session:
-    store-type: none
-  cache:
-    type: CAFFEINE #Activated cache caffeine by default (If you want to change the cache to JBoss DataGrid, check the documentacion in confluence)
-    caffeine:
-      spec: expireAfterWrite=10m #Specifies that each entry should be automatically removed from the cache once that duration has elapsed after the entry’s creation
-  lifecycle.timeout-per-shutdown-phase: 2m
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password: password
-    driver-class-name: org.h2.Driver
-    # Configuration of connection pool. Please configure it according to the needs of the microservice.
-    hikari:
-      minimum-idle: 1
-      maximum-pool-size: 2
-      idle-timeout: 36000
-      max-lifetime: 1800000
-      connection-timeout: 20000
-      leak-detection-threshold: 3000
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
-
-logging.level:
-  org.hibernate.SQL: DEBUG
-  org.hibernate.jdbc.bind: TRACE
-  com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.OpenApiGeneratorApplication: INFO
-  root: WARN
-
-management:
-  endpoint.health:
-    show-details: ALWAYS
-
-health:
-  config:
-    enabled: false
-
-springdoc:
-  swagger-ui:
-    disable-swagger-default-url: true
-    path: /swagger-ui.html
-
-server:
-  max-http-request-header-size: 128KB
-  forward-headers-strategy: framework
-  shutdown: graceful
-
+Executing command [helm upgrade --install --atomic --wait  cpe-nxhbsc-bedocmanagement /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/charttodeploy.tgz --kube-apiserver=https://549FFE3C4F0EA78BC082389AA0C11FDF.gr7.us-east-1.eks.amazonaws.com --kubeconfig ./kubecfg.tmp  --namespace=cpe-nexhub-tec-dev  --timeout=5m0s  --history-max=2  --version=1.0.1   -f .gluon/cd/values.yaml -f .gluon/cd/cert/values-cert.yaml  --set image.registry=885268411452.dkr.ecr.us-east-1.amazonaws.com --set image.repository=nexhub/cpe-nxhbsc-bedocmanagement --set image.tag=1.0.1  --dry-run] with args undefined
+  /tmp/asdfdata/shims/helm upgrade --install --atomic --wait cpe-nxhbsc-bedocmanagement /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/charttodeploy.tgz --kube-apiserver=https://549FFE3C4F0EA78BC082389AA0C11FDF.gr7.us-east-1.eks.amazonaws.com --kubeconfig ./kubecfg.tmp --namespace=cpe-nexhub-tec-dev --timeout=5m0s --history-max=2 --version=1.0.1 -f .gluon/cd/values.yaml -f .gluon/cd/cert/values-cert.yaml --set image.registry=885268411452.dkr.ecr.us-east-1.amazonaws.com --set image.repository=nexhub/cpe-nxhbsc-bedocmanagement --set image.tag=1.0.1 --dry-run
+  Release "cpe-nxhbsc-bedocmanagement" has been upgraded. Happy Helming!
+  NAME: cpe-nxhbsc-bedocmanagement
+  LAST DEPLOYED: Fri Jun 12 15:18:56 2026
+  NAMESPACE: cpe-nexhub-tec-dev
+  STATUS: pending-upgrade
+  REVISION: 19
+  TEST SUITE: None
+  HOOKS:
+  MANIFEST:
+  ---
+  # Source: micro-java/templates/service.yaml
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: cpe-nxhbsc-bedocmanagement-micro-java
+    namespace: "cpe-nexhub-tec-dev"
+    labels:
+      generator: "helm"
+      helm.sh/chart: micro-java-4.2.0
+      helm.sh/release: "cpe-nxhbsc-bedocmanagement"
+      helm.sh/date: "2026.06.12-15.18.56"
+      app.kubernetes.io/name: micro-java
+      app.kubernetes.io/instance: cpe-nxhbsc-bedocmanagement
+      app.kubernetes.io/version: "4.2.0"
+      app.kubernetes.io/managed-by: Helm
+      app_name: cpe-nxhbsc-bedocmanagement-micro-java
+    annotations:       
+  spec:
+    ports:
+      - name: http
+        port: 8080
+        targetPort: 8080
+        protocol: TCP
+        nodePort: 0 
+    selector:
+      app.kubernetes.io/name: micro-java
+      app.kubernetes.io/instance: cpe-nxhbsc-bedocmanagement
+      app_name: cpe-nxhbsc-bedocmanagement-micro-java
+    sessionAffinity: None
+    type: ClusterIP
+  ---
+  # Source: micro-java/templates/deployment.yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: cpe-nxhbsc-bedocmanagement-micro-java
+    namespace: "cpe-nexhub-tec-dev"
+    labels:
+      generator: "helm"
+      helm.sh/chart: micro-java-4.2.0
+      helm.sh/release: "cpe-nxhbsc-bedocmanagement"
+      helm.sh/date: "2026.06.12-15.18.56"
+      app.kubernetes.io/name: micro-java
+      app.kubernetes.io/instance: cpe-nxhbsc-bedocmanagement
+      app.kubernetes.io/version: "4.2.0"
+      app.kubernetes.io/managed-by: Helm
+      app_name: cpe-nxhbsc-bedocmanagement-micro-java
+      active: online
+      santander.com/component-type: s
+      santander.com/technology: java
+      santander.com/technology-version: "17"
+      santander.com/santander-version: my-santander-project-santander-framework-version
+      santander.com/git-host: github.com
+      santander.com/git-org: santander-group-cpe-gln
+      santander.com/git-repo: cpe-nxhbsc-bedocmanagement
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: micro-java
+        app.kubernetes.io/instance: cpe-nxhbsc-bedocmanagement
+        app_name: cpe-nxhbsc-bedocmanagement-micro-java
+    strategy:
+      rollingUpdate: {}
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          generator: "helm"
+          helm.sh/chart: micro-java-4.2.0
+          helm.sh/release: "cpe-nxhbsc-bedocmanagement"
+          helm.sh/date: "2026.06.12-15.18.56"
+          app.kubernetes.io/name: micro-java
+          app.kubernetes.io/instance: cpe-nxhbsc-bedocmanagement
+          app.kubernetes.io/version: "4.2.0"
+          app.kubernetes.io/managed-by: Helm
+          app_name: cpe-nxhbsc-bedocmanagement-micro-java
+          active: online
+          santander.com/component-type: s
+          santander.com/technology: java
+          santander.com/technology-version: "17"
+          santander.com/santander-version: my-santander-project-santander-framework-version
+          santander.com/git-host: github.com
+          santander.com/git-org: santander-group-cpe-gln
+          santander.com/git-repo: cpe-nxhbsc-bedocmanagement
+        annotations:
+      spec:
+        
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 20000
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: cpe-nxhbsc-bedocmanagement
+            env:
+            - name: APP_NAME
+              value: cpe-nxhbsc-bedocmanagement
+            - name: SANTANDER_REGION
+              value: "us-east-1"
+            - name: SANTANDER_SUFFIX
+              value: ""
+            - name: LOGGING_LEVEL_ROOT
+              value: "INFO"
+            - name: SPRING_APPLICATION_NAME
+              value: cpe-nxhbsc-bedocmanagement
+            - name: SPRING_PROFILES_ACTIVE
+              value: "cert"
+            - name: SPRING_CLOUD_CONFIG_FAILFAST
+              value: "true"
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://configuration-service${santander.suffix}:8080"
+            - name: SPRING_CLOUD_CONFIG_USERNAME
+              value: ""
+            - name: SPRING_CLOUD_CONFIG_PASSWORD
+              value: ""
+            - name: SPRING_CLOUD_CONFIG_RETRY_INITIALINTERVAL
+              value: "3000"
+            - name: SPRING_CLOUD_CONFIG_RETRY_MAXINTERVAL
+              value: "6000"
+            - name: SPRING_CLOUD_CONFIG_RETRY_MAXATTEMPS
+              value: "10"
+            - name: JAVA_OPTS_EXT
+              value: >-
+                -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -XX:ActiveProcessorCount=2 -XX:MaxRAMPercentage=60.0 -XX:+UseParallelGC
+            - name: JAVA_PARAMETERS
+              value: 
+            - name: PROJECT_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: TZ
+              value: "Europe/Madrid"
+            envFrom:
+            - configMapRef:
+                name: cm-nexhub-sc
+            image: 885268411452.dkr.ecr.us-east-1.amazonaws.com/nexhub/cpe-nxhbsc-bedocmanagement:1.0.1
+            imagePullPolicy: Always
+            ports:
+            - name: http
+              containerPort: 8080
+            livenessProbe:
+              httpGet:
+                path: /actuator/health/liveness
+                port: 8080
+                scheme: HTTP
+              initialDelaySeconds: 200
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            readinessProbe:
+              httpGet:
+                path: /actuator/health/readiness
+                port: 8080
+                scheme: HTTP
+              initialDelaySeconds: 15
+              periodSeconds: 10
+              timeoutSeconds: 1
+              successThreshold: 1
+              failureThreshold: 3
+            resources:
+              limits:
+                memory: 500M
+                cpu: 250m
+              requests:
+                cpu: 200m
+                memory: 500M
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              runAsNonRoot: true
+              runAsUser: 20000
+              seccompProfile:
+                type: RuntimeDefault
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            lifecycle:
+              preStop:
+                exec:
+                  command:
+                    - sleep 120
+            volumeMounts:
+              - name: podinfo
+                mountPath: /opt/metadata
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 300
+        volumes:
+          - name: podinfo
+            downwardAPI:
+              items:
+              - fieldRef:
+                  fieldPath: metadata.labels
+                path: labels
+              - fieldRef:
+                  fieldPath: metadata.annotations
+                path: annotations
+  
+  NOTES:
+  cpe-nxhbsc-bedocmanagement configured successfully by micro-java Helm Chart.
+  
+  Santander Javase Enabled!!
+  
+  To learn more about the release, try:
+  
+    $ helm status cpe-nxhbsc-bedocmanagement
+    $ helm get all cpe-nxhbsc-bedocmanagement
+Helm command execution
+  helm upgrade --install --atomic --wait  cpe-nxhbsc-bedocmanagement /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/charttodeploy.tgz --kube-apiserver=https://549FFE3C4F0EA78BC082389AA0C11FDF.gr7.us-east-1.eks.amazonaws.com --kubeconfig ./kubecfg.tmp  --namespace=cpe-nexhub-tec-dev  --timeout=5m0s  --history-max=2  --version=1.0.1   -f .gluon/cd/values.yaml -f .gluon/cd/cert/values-cert.yaml  --set image.registry=885268411452.dkr.ecr.us-east-1.amazonaws.com --set image.repository=nexhub/cpe-nxhbsc-bedocmanagement --set image.tag=1.0.1 
+  }Executing command [helm upgrade --install --atomic --wait  cpe-nxhbsc-bedocmanagement /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/charttodeploy.tgz --kube-apiserver=https://549FFE3C4F0EA78BC082389AA0C11FDF.gr7.us-east-1.eks.amazonaws.com --kubeconfig ./kubecfg.tmp  --namespace=cpe-nexhub-tec-dev  --timeout=5m0s  --history-max=2  --version=1.0.1   -f .gluon/cd/values.yaml -f .gluon/cd/cert/values-cert.yaml  --set image.registry=885268411452.dkr.ecr.us-east-1.amazonaws.com --set image.repository=nexhub/cpe-nxhbsc-bedocmanagement --set image.tag=1.0.1 ] with args undefined
+  /tmp/asdfdata/shims/helm upgrade --install --atomic --wait cpe-nxhbsc-bedocmanagement /runner/_work/cpe-nxhbsc-bedocmanagement/cpe-nxhbsc-bedocmanagement/charttodeploy.tgz --kube-apiserver=https://549FFE3C4F0EA78BC082389AA0C11FDF.gr7.us-east-1.eks.amazonaws.com --kubeconfig ./kubecfg.tmp --namespace=cpe-nexhub-tec-dev --timeout=5m0s --history-max=2 --version=1.0.1 -f .gluon/cd/values.yaml -f .gluon/cd/cert/values-cert.yaml --set image.registry=885268411452.dkr.ecr.us-east-1.amazonaws.com --set image.repository=nexhub/cpe-nxhbsc-bedocmanagement --set image.tag=1.0.1
+  Error: UPGRADE FAILED: release cpe-nxhbsc-bedocmanagement failed, and has been rolled back due to atomic being set: context deadline exceeded
+  Error: Something went wrong with helm deployment, review logs
+  after helm command execution with none deploy strategy
+Error: Helm deploy failed for CI_ID aws-nxhbsc-tec-cert
+Error: Something went wrong Something went wrong while performing helm deploy
+Error: Something went wrong performing helm deployment
