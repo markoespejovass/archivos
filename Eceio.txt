@@ -1,12 +1,11 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbewatchscreening.infrastructure.config;
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbewatchscreening.infrastructure.adapters.output.client.TokenService;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpHost;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +24,7 @@ public class RestTemplateConfig {
     private final ProxyProperties proxyProperties;
 
     @Bean
-    public RestTemplate restTemplate(TokenService tokenService) throws Exception {
+    public RestTemplate restTemplate() throws Exception {
 
         TrustStrategy acceptingTrustStrategy =
                 (X509Certificate[] chain, String authType) -> true;
@@ -47,56 +46,11 @@ public class RestTemplateConfig {
 
         var requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        requestFactory.setConnectTimeout(apiProperties.getTimeout());
-        requestFactory.setReadTimeout(apiProperties.getTimeout());
-
         RestTemplate restTemplate = new RestTemplate(requestFactory);
 
-        restTemplate.getInterceptors().add(authInterceptor(tokenService));
 
         return restTemplate;
     }
 
-    @Bean
-    public RestTemplate tokenRestTemplate() throws Exception {
-
-        TrustStrategy acceptingTrustStrategy =
-                (X509Certificate[] chain, String authType) -> true;
-
-        SSLContext sslContext = SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
-                .build();
-
-        var proxy = new HttpHost(
-                proxyProperties.getHost(),
-                Integer.parseInt(proxyProperties.getPort())
-        );
-
-        var httpClient = HttpClients.custom()
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .setProxy(proxy)
-                .build();
-
-        var requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-
-        requestFactory.setConnectTimeout(apiProperties.getTimeout());
-        requestFactory.setReadTimeout(apiProperties.getTimeout());
-
-        return new RestTemplate(requestFactory);
-    }
-
-    private ClientHttpRequestInterceptor authInterceptor(TokenService tokenService) {
-        return (request, body, execution) -> {
-
-            String token = tokenService.getToken();
-
-            request.getHeaders().add(
-                    HttpHeaders.AUTHORIZATION,
-                    "Bearer " + token
-            );
-
-            return execution.execute(request, body);
-        };
-    }
+    
 }
