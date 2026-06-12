@@ -1,119 +1,102 @@
 package com.santander.cpe.nxhbsc.cpenxhbscbewatchscreening.infrastructure.config;
 
 import com.santander.cpe.nxhbsc.cpenxhbscbewatchscreening.infrastructure.adapters.output.client.TokenService;
-import io.netty.channel.ChannelOption;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpHost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.transport.ProxyProvider;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLException;
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLContext;
+import java.security.cert.X509Certificate;
 
-/**
- * The WebClient Config Class.
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
 @Configuration
 @RequiredArgsConstructor
-public class WebClientConfig {
+public class RestTemplateConfig {
 
     private final ApiProperties apiProperties;
     private final ProxyProperties proxyProperties;
 
-    /**
-     * The web client
-     *
-     * @param tokenService the token service.
-     * @return A {@link WebClient}
-     * @throws SSLException if there is an error during the SSL context creation.
-     */
     @Bean
-    public WebClient webClient(TokenService tokenService) throws SSLException {
+    public RestTemplate restTemplate(TokenService tokenService) throws Exception {
 
-        var sslContext = SslContextBuilder.forClient()
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+        TrustStrategy acceptingTrustStrategy =
+                (X509Certificate[] chain, String authType) -> true;
+
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
                 .build();
 
-        var httpClient =
-                HttpClient.create()
-                        .proxy(proxy -> proxy
-                                .type(ProxyProvider.Proxy.HTTP)
-                                .host(proxyProperties.getHost())
-                                .port(Integer.parseInt(proxyProperties.getPort())))
-                        .secure(t ->
-                                t.sslContext(sslContext)
-                                        .handlerConfigurator((SslHandler sslHandler) -> {
-                                        }))
-                        .wiretap(true)
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiProperties.getTimeout())
-                        .responseTimeout(Duration.ofMillis(apiProperties.getTimeout()))
-                        .doOnConnected(
-                                conn ->
-                                        conn.addHandlerLast(
-                                                        new ReadTimeoutHandler(
-                                                                apiProperties.getTimeout(), TimeUnit.MILLISECONDS))
-                                                .addHandlerLast(
-                                                        new WriteTimeoutHandler(
-                                                                apiProperties.getTimeout(), TimeUnit.MILLISECONDS)));
+        var proxy = new HttpHost(
+                proxyProperties.getHost(),
+                Integer.parseInt(proxyProperties.getPort())
+        );
 
-        return WebClient.builder()
-                .baseUrl(apiProperties.getBaseUrl())
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                .filter(addTokenFilter(tokenService))
+        var httpClient = HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                .setProxy(proxy)
                 .build();
+
+        var requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+        requestFactory.setConnectTimeout(apiProperties.getTimeout());
+        requestFactory.setReadTimeout(apiProperties.getTimeout());
+
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+        restTemplate.getInterceptors().add(authInterceptor(tokenService));
+
+        return restTemplate;
     }
 
-    /**
-     * The Token Web Client.
-     *
-     * @return A{@link WebClient}
-     * @throws SSLException if there is an error during the SSL context creation.
-     */
     @Bean
-    public WebClient tokenWebClient() throws SSLException {
-        var sslContext = SslContextBuilder.forClient()
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+    public RestTemplate tokenRestTemplate() throws Exception {
+
+        TrustStrategy acceptingTrustStrategy =
+                (X509Certificate[] chain, String authType) -> true;
+
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
                 .build();
 
-        var httpClient = HttpClient.create()
-                .proxy(proxy -> proxy
-                        .type(ProxyProvider.Proxy.HTTP)
-                        .host(proxyProperties.getHost())
-                        .port(Integer.parseInt(proxyProperties.getPort())))
-                .secure(ssl -> ssl.sslContext(sslContext));
+        var proxy = new HttpHost(
+                proxyProperties.getHost(),
+                Integer.parseInt(proxyProperties.getPort())
+        );
 
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(apiProperties.getBaseUrl())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        var httpClient = HttpClients.custom()
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                .setProxy(proxy)
                 .build();
+
+        var requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+        requestFactory.setConnectTimeout(apiProperties.getTimeout());
+        requestFactory.setReadTimeout(apiProperties.getTimeout());
+
+        return new RestTemplate(requestFactory);
     }
 
-    private static ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
-        return ExchangeFilterFunction.ofRequestProcessor(request ->
-                Mono.fromCallable(tokenService::getToken)
-                        .subscribeOn(Schedulers.boundedElastic())
-                        .map(token -> ClientRequest.from(request)
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                                .build()));
-    }
+    private ClientHttpRequestInterceptor authInterceptor(TokenService tokenService) {
+        return (request, body, execution) -> {
 
+            String token = tokenService.getToken();
+
+            request.getHeaders().add(
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer " + token
+            );
+
+            return execution.execute(request, body);
+        };
+    }
 }
