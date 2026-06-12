@@ -1,159 +1,119 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
+package com.santander.cpe.nxhbsc.cpenxhbscbewatchscreening.infrastructure.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import com.santander.cpe.nxhbsc.cpenxhbscbewatchscreening.infrastructure.adapters.output.client.TokenService;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
-import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
+
+import javax.net.ssl.SSLException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Configuration class for setting up DynamoDB clients.
- * <p>
- * This class provides beans for the DynamoDbClient and DynamoDbEnhancedClient, using AWS region and
- * credentials from environment variables. It is used to enable integration with AWS DynamoDB in the
- * application context.
- */
-@Configuration
-public class DynamoDBConfig {
-
-    @Value("${aws.region}")
-    private String awsRegion;
-
-    @Value("${aws.dynamodb.role-arn}")
-    private String dynamoRoleArn;
-
-
-    @Bean
-    public StsClient stsClient() {
-        return StsClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
-    }
-
-    /**
-     * Creates and configures a DynamoDbClient bean.
-     *
-     * @return a configured DynamoDbClient instance
-     */
-    @Bean(name = "dynamoDbClient")
-    public DynamoDbClient dynamoDbClient(StsClient stsClient) {
-        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
-                StsAssumeRoleCredentialsProvider.builder()
-                        .stsClient(stsClient)
-                        .refreshRequest(AssumeRoleRequest.builder()
-                                .roleArn(dynamoRoleArn)
-                                .roleSessionName("dynamodb-cross-account-session")
-                                .build())
-                        .build();
-
-        return DynamoDbClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(assumeRoleCredentialsProvider)
-                .build();
-    }
-
-    /**
-     * Creates a DynamoDbEnhancedClient bean using the provided DynamoDbClient.
-     *
-     * @param dynamoDbClient the DynamoDbClient to use
-     * @return a configured DynamoDbEnhancedClient instance
-     */
-    @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient(
-            @Qualifier("dynamoDbClient") DynamoDbClient dynamoDbClient) {
-        return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(dynamoDbClient)
-                .build();
-    }
-}
-
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.config;
-
-
-import org.springframework.beans.factory.annotation.Value;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
-import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
-
-/**
- * The class representative Xml config
+ * The WebClient Config Class.
  *
  * @author Create by team Proyecto [NUBE] Pe
  */
 @Configuration
-public class S3Config {
+@RequiredArgsConstructor
+public class WebClientConfig {
 
-    @Value("${aws.region}")
-    private String awsRegion;
+    private final ApiProperties apiProperties;
+    private final ProxyProperties proxyProperties;
 
-    @Value("${aws.dynamodb.role-arn}")
-    private String dynamoRoleArn;
-
+    /**
+     * The web client
+     *
+     * @param tokenService the token service.
+     * @return A {@link WebClient}
+     * @throws SSLException if there is an error during the SSL context creation.
+     */
     @Bean
-    public StsClient stsClient() {
-        return StsClient.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(DefaultCredentialsProvider.create())
+    public WebClient webClient(TokenService tokenService) throws SSLException {
+
+        var sslContext = SslContextBuilder.forClient()
+                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                .build();
+
+        var httpClient =
+                HttpClient.create()
+                        .proxy(proxy -> proxy
+                                .type(ProxyProvider.Proxy.HTTP)
+                                .host(proxyProperties.getHost())
+                                .port(Integer.parseInt(proxyProperties.getPort())))
+                        .secure(t ->
+                                t.sslContext(sslContext)
+                                        .handlerConfigurator((SslHandler sslHandler) -> {
+                                        }))
+                        .wiretap(true)
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, apiProperties.getTimeout())
+                        .responseTimeout(Duration.ofMillis(apiProperties.getTimeout()))
+                        .doOnConnected(
+                                conn ->
+                                        conn.addHandlerLast(
+                                                        new ReadTimeoutHandler(
+                                                                apiProperties.getTimeout(), TimeUnit.MILLISECONDS))
+                                                .addHandlerLast(
+                                                        new WriteTimeoutHandler(
+                                                                apiProperties.getTimeout(), TimeUnit.MILLISECONDS)));
+
+        return WebClient.builder()
+                .baseUrl(apiProperties.getBaseUrl())
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .filter(addTokenFilter(tokenService))
                 .build();
     }
 
-
+    /**
+     * The Token Web Client.
+     *
+     * @return A{@link WebClient}
+     * @throws SSLException if there is an error during the SSL context creation.
+     */
     @Bean
-    public S3Client s3Client(StsClient stsClient) {
-        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
-                StsAssumeRoleCredentialsProvider.builder()
-                        .stsClient(stsClient)
-                        .refreshRequest(AssumeRoleRequest.builder()
-                                .roleArn(dynamoRoleArn)
-                                .roleSessionName("dynamodb-cross-account-session")
-                                .build())
-                        .build();
+    public WebClient tokenWebClient() throws SSLException {
+        var sslContext = SslContextBuilder.forClient()
+                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                .build();
 
-        return S3Client.builder()
-                .region(Region.of(awsRegion))
-                .credentialsProvider(assumeRoleCredentialsProvider)
+        var httpClient = HttpClient.create()
+                .proxy(proxy -> proxy
+                        .type(ProxyProvider.Proxy.HTTP)
+                        .host(proxyProperties.getHost())
+                        .port(Integer.parseInt(proxyProperties.getPort())))
+                .secure(ssl -> ssl.sslContext(sslContext));
+
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(apiProperties.getBaseUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
 
-
-    @Bean
-    public S3Presigner s3Presigner(StsClient stsClient) {
-        StsAssumeRoleCredentialsProvider assumeRoleCredentialsProvider =
-                StsAssumeRoleCredentialsProvider.builder()
-                        .stsClient(stsClient)
-                        .refreshRequest(AssumeRoleRequest.builder()
-                                .roleArn(dynamoRoleArn)
-                                .roleSessionName("dynamodb-cross-account-session")
-                                .build())
-                        .build();
-
-
-        return S3Presigner.builder()
-                .region(Region.US_EAST_1)
-                .build();
+    private static ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
+        return ExchangeFilterFunction.ofRequestProcessor(request ->
+                Mono.fromCallable(tokenService::getToken)
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .map(token -> ClientRequest.from(request)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                                .build()));
     }
+
 }
-
-
-
