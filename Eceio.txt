@@ -1,2 +1,110 @@
-C:\Users\jluque_ses>curl --location "https://apis-nexhub.sva.cloud.scf.dev.corp/v7/data_consents_management/parties/4518908911/consent_agreements%22 --header "x-santander-client-id: a1b30a84-7bf3-4" --header "channel: App-Conexa" --header "society: scp" --header "Content-Type: application/json" --header "Cookie: incap_ses_1733_3319235=3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAAkQrJw6svXhPPNRzg2Dt7cQ==; nlbi_3319235=aeofB3QFvy3qiUe9TrqMjQAAAADcD/KrI3XQtNWBVyU66fZ0; visid_incap_3319235=F8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQUIPAAAAAACB4jJvF2uxnwaCcYH4UiGq; incap_ses_1733_3319235=pQU3TtsLszEwfcTs4doMGItOKmoAAAAAWvXiaIgbmQ1XT1N5TztqHg==; nlbi_3319235=HpV7cVfezhiGW6pDTrqMjQAAAACfCQjGwobNAluJKD/4YfE1; visid_incap_3319235=F8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQUIPAAAAAACB4jJvF2uxnwaCcYH4UiGq; incap_ses_1733_3319235=vCFPEq05BSWbFkrt4doMGEziKmoAAAAAz6kRYZtu2/4OxDu5p8eSMA==; nlbi_3319235=mexzV2RY6CCI6/ESTrqMjQAAAACu8Q3q/RfU811umS4s+l+6; visid_incap_3319235=F8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQUIPAAAAAACB4jJvF2uxnwaCcYH4UiGq; incap_ses_1733_3319235=xVoLGAozoU9xCIwj5NoMGLN2LGoAAAAA+LibqJ6aTuLM53Kp221S8A==; nlbi_3319235=1h2EJNy04luXOgxzTrqMjQAAAACKwSlryQKZYuyTpt9eym5Q; visid_incap_3319235=F8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQUIPAAAAAACB4jJvF2uxnwaCcYH4UiGq" --header "Authorization: Bearer eyJraWQiOiJ4UE5hWGdSTURDMGdMZTk4dWp6aTd1SFZQYStlSFVSZHJCQ2hFN0ZHSHp3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0aGxzam0xY3JjaXYzdDFuNDZqZm5yNG4zdCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiZXh0ZXJuYWwtYXBpL3JlYWQiLCJhdXRoX3RpbWUiOjE3ODExNTc1MzUsImlzcyI6Imh0dHBzOi8vY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb20vdXMtZWFzdC0xXzNrQUt3RkdlQyIsImV4cCI6MTc4MTE2MTEzNSwiaWF0IjoxNzgxMTU3NTM1LCJ2ZXJzaW9uIjoyLCJqdGkiOiJlMzM2OGQyNy0xM2Y2LTRlOWEtYmFkMy05ODZjMDRmODRmNjUiLCJjbGllbnRfaWQiOiI0aGxzam0xY3JjaXYzdDFuNDZqZm5yNG4zdCJ9.cPm9OSZtdpu1v3t_pZto8fSqhXFFHBx1NALs4hH3WkxFb8RD4OD4IoK8yYb6nq3pP8Xe4EqZ7beRWGKmm5xlqIkLmNX7CH_d1UKVLoh0crHkDjUXhwYjVIyIf15AmLKQs5zl2tiVncB9LdLX5nc0D9440u3Eklwd4XDUCN2Gwj-CT5AZjLzEUAV8YKXG9vcTHmvA8v5akkEmn3ZjlzKVhsGAUfkBnRsTO26cKtq3qyqgegpMyzjfSZb6iGlaBLGRx7vW5pRqDGERnvuykEsRgk6S4tIfsSdapDigW8evu3bzM2_CnzFM1x4cPFigjlePMU-yjGZrtk4Q0arOuLyhTw" --header "Cookie: incap_ses_1733_3319235=3jbiDqhUfjJQKjXs4doMGDO5KWoAAAAAkQrJw6svXhPPNRzg2Dt7cQ==; nlbi_3319235=aeofB3QFvy3qiUe9TrqMjQAAAADcD/KrI3XQtNWBVyU66fZ0; visid_incap_3319235=F8oVgf4aQDydCNYoKMNC5lBjB2oAAAAAQUIPAAAAAACB4jJvF2uxnwaCcYH4UiGq"
-{"consents":[],"_links":null}
+RepositoryTest.shouldCreateRepository:34 » IllegalArgument Attempt to add an attribute to a mapper that already has one with the same name. [Attribute name: id]
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class RepositoryTest {
+    @Mock
+    private DynamoDbEnhancedClient enhancedClient;
+
+    @Mock
+    private DynamoDbTable<FileEntity> table;
+
+    @Test
+    void shouldCreateRepository() {
+
+        when(enhancedClient.table(
+                anyString(),
+                any(TableSchema.class)))
+                .thenReturn(table);
+
+        FileEntityRepository repository =
+                new FileEntityRepository(
+                        enhancedClient,
+                        "file-entity"
+                );
+
+        assertNotNull(repository);
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
+
+import lombok.*;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+
+@DynamoDbBean
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class FileEntity {
+
+
+    private String id;
+    private String name;
+    private String fileName;
+    private Integer version;
+    private String mimeType;
+    private String status;
+    private String url;
+    private String customerId;
+
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("id")
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    @DynamoDbSortKey
+    @DynamoDbAttribute("name")
+    public String getName() {
+        return name;
+    }
+
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+}
