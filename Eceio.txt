@@ -1,1 +1,350 @@
 
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class OtpEntityTest {
+
+    @Test
+    void shouldCreateEntityWithAllArgsConstructor() {
+        OtpEntity entity = new OtpEntity("123", "999999");
+
+        assertEquals("123", entity.getId());
+        assertEquals("999999", entity.getOtp());
+    }
+
+    @Test
+    void shouldSetValuesUsingSetters() {
+        OtpEntity entity = new OtpEntity();
+
+        entity.setId("ABC");
+        entity.setOtp("111111");
+
+        assertEquals("ABC", entity.getId());
+        assertEquals("111111", entity.getOtp());
+    }
+
+    @Test
+    void shouldCreateEmptyEntity() {
+        OtpEntity entity = new OtpEntity();
+
+        assertNull(entity.getId());
+        assertNull(entity.getOtp());
+    }
+}
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa;
+
+import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+
+class OtpRepositoryTest {
+
+    @Test
+    void shouldCreateRepository() {
+
+        DynamoDbEnhancedClient client = mock(DynamoDbEnhancedClient.class);
+
+        OtpRepository repository =
+                new OtpRepository(client, "otp-table");
+
+        assertNotNull(repository);
+    }
+}
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.dto.otp.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.OtpProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider;
+import com.santander.framework.springboot.core.exceptions.SantanderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+class JsonApiClientTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private TokenProvider tokenProvider;
+
+    @Mock
+    private OtpProperties otpProperties;
+
+    @InjectMocks
+    private JsonApiClient jsonApiClient;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void shouldGenerateOtpSuccessfully() {
+
+        OtpResponse.Data data = new OtpResponse.Data();
+        data.setOtpCode("123456");
+
+        OtpResponse response = new OtpResponse();
+        response.setData(data);
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(otpProperties.getGenerateUrl()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                eq("url"),
+                any(),
+                eq(OtpResponse.class)))
+                .thenReturn(ResponseEntity.ok(response));
+
+        String result = jsonApiClient.generarOTP("uuid");
+
+        assertEquals("123456", result);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenGenerateOtpFails() {
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(otpProperties.getGenerateUrl()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(),
+                eq(OtpResponse.class)))
+                .thenThrow(new RuntimeException("error"));
+
+        assertThrows(
+                SantanderException.class,
+                () -> jsonApiClient.generarOTP("uuid")
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenBodyIsNullGenerateOtp() {
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(otpProperties.getGenerateUrl()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(),
+                eq(OtpResponse.class)))
+                .thenReturn(ResponseEntity.ok(null));
+
+        assertThrows(
+                SantanderException.class,
+                () -> jsonApiClient.generarOTP("uuid")
+        );
+    }
+
+    @Test
+    void shouldValidateOtpSuccessfully() {
+
+        ValidateOtpResponse response = new ValidateOtpResponse();
+        response.setMessage("OTP VALIDO");
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(otpProperties.getValidateUrl()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                eq("url"),
+                any(),
+                eq(ValidateOtpResponse.class)))
+                .thenReturn(ResponseEntity.ok(response));
+
+        ValidateOtpRequest request = new ValidateOtpRequest();
+
+        String result = jsonApiClient.validOTP(request);
+
+        assertEquals("OTP VALIDO", result);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenValidateOtpFails() {
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(otpProperties.getValidateUrl()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(),
+                eq(ValidateOtpResponse.class)))
+                .thenThrow(new RuntimeException());
+
+        ValidateOtpRequest request = new ValidateOtpRequest();
+
+        assertThrows(
+                SantanderException.class,
+                () -> jsonApiClient.validOTP(request)
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenValidateBodyIsNull() {
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(otpProperties.getValidateUrl()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(),
+                eq(ValidateOtpResponse.class)))
+                .thenReturn(ResponseEntity.ok(null));
+
+        ValidateOtpRequest request = new ValidateOtpRequest();
+
+        assertThrows(
+                SantanderException.class,
+                () -> jsonApiClient.validOTP(request)
+        );
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.client;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.RequestOTP;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.domain.model.ResponseOTP;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.EmailProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.token.TokenProvider;
+import com.santander.framework.springboot.core.exceptions.SantanderException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+class XmlApiClientTest {
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private TokenProvider tokenProvider;
+
+    @Mock
+    private EmailProperties emailProperties;
+
+    @InjectMocks
+    private XmlApiClient xmlApiClient;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void shouldSendXmlSuccessfully() {
+
+        String xmlResponse =
+                "<ResponseOTP><message>OK</message></ResponseOTP>";
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(emailProperties.getUrlSendMail()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                eq("url"),
+                any(),
+                eq(String.class)))
+                .thenReturn(ResponseEntity.ok(xmlResponse));
+
+        ResponseOTP response =
+                xmlApiClient.sendXml(new RequestOTP());
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRestCallFails() {
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(emailProperties.getUrlSendMail()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(),
+                eq(String.class)))
+                .thenThrow(new RuntimeException());
+
+        assertThrows(
+                SantanderException.class,
+                () -> xmlApiClient.sendXml(new RequestOTP())
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenXmlResponseIsInvalid() {
+
+        when(tokenProvider.getToken()).thenReturn("token");
+        when(emailProperties.getUrlSendMail()).thenReturn("url");
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(),
+                eq(String.class)))
+                .thenReturn(ResponseEntity.ok("INVALID_XML"));
+
+        assertThrows(
+                SantanderException.class,
+                () -> xmlApiClient.sendXml(new RequestOTP())
+        );
+    }
+}
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.web.client.RestTemplate;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class RestTemplateConfigTest {
+
+    @Test
+    void shouldCreateRestTemplate() throws Exception {
+
+        ProxyProperties proxyProperties =
+                Mockito.mock(ProxyProperties.class);
+
+        Mockito.when(proxyProperties.getHost())
+                .thenReturn("localhost");
+
+        Mockito.when(proxyProperties.getPort())
+                .thenReturn("8080");
+
+        RestTemplateConfig config =
+                new RestTemplateConfig(proxyProperties);
+
+        RestTemplate restTemplate =
+                config.restTemplate();
+
+        assertNotNull(restTemplate);
+        assertNotNull(restTemplate.getRequestFactory());
+    }
+}
