@@ -1,10 +1,147 @@
-{
-  "errors": [
-    {
-      "code": "500",
-      "description": "The provided key element does not match the schema (Service: DynamoDb, Status Code: 400, Request ID: RUTDOTS51RJCSEF4N00NP72GE3VV4KQNSO5AEMVJF66Q9ASUAAJG) (SDK Attempt Count: 1)",
-      "level": "error",
-      "message": "1781540047809-cpe-nxhbsc-beemailboxes-software.amazon.awssdk.services.dynamodb.model.DynamoDbException-The provided key element does not match the schema (Service: DynamoDb, Status Code: 400, Request ID: RUTDOTS51RJCSEF4N00NP72GE3VV4KQNSO5AEMVJF66Q9ASUAAJG) (SDK Attempt Count: 1)"
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@DynamoDbBean
+public class OtpEntity {
+
+
+    private String id;
+    private String otp;
+
+    @DynamoDbSortKey
+    @DynamoDbAttribute("otp")
+    public String getId() {
+        return id;
     }
-  ]
+
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("id")
+    public String getOtp() {
+        return otp;
+    }
+
+}
+
+
+
+    private ValidateOtpRequest generateValidateOtp(String otp){
+        String uuid = "";
+        var optionalEntity = repository.getByKey(otp,null);
+        if(optionalEntity.isEmpty()){
+            return new ValidateOtpRequest();
+        }
+        uuid = optionalEntity.get().getId();
+        return new ValidateOtpRequest(uuid, otp);
+    }
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa;
+
+
+import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.BaseDynamoRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+
+import java.util.Optional;
+
+
+@Repository
+public class OtpRepository extends BaseDynamoRepository<OtpEntity> {
+
+    public OtpRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.table}") String table){
+        super(enhancedClient, table, TableSchema.fromBean(OtpEntity.class),OtpEntity.class,"id","otp");
+    }
+}
+
+
+
+
+
+package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config;
+
+import org.jetbrains.annotations.Nullable;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public abstract class BaseDynamoRepository<T> {
+
+    protected final DynamoDbEnhancedClient enhancedClient;
+    protected final DynamoDbTable<T> table;
+    private final String partitionKeyAttr;
+    @Nullable
+    private final String sortKeyAttr;
+    private final Class<T> itemClass;
+
+    protected BaseDynamoRepository(DynamoDbEnhancedClient enhancedClient,
+                                   String tableName,
+                                   TableSchema<T> schema,
+                                   Class<T> itemClass,
+                                   String partitionKeyAttr,
+                                   @Nullable String sortKeyAttr) {
+        this.enhancedClient = enhancedClient;
+        this.table = enhancedClient.table(tableName, schema);
+        this.itemClass = itemClass;
+        this.partitionKeyAttr = partitionKeyAttr;
+        this.sortKeyAttr = sortKeyAttr;
+    }
+
+    public T putIfAbsent(T item) {
+        String expr = "attribute_not_exists(" + partitionKeyAttr + ")";
+        if (sortKeyAttr != null && !sortKeyAttr.isBlank()) {
+            expr += " AND attribute_not_exists(" + sortKeyAttr + ")";
+        }
+        Expression condition = Expression.builder()
+                .expression(expr)
+                .build();
+        PutItemEnhancedRequest<T> request = PutItemEnhancedRequest.builder(itemClass)
+                .item(item)
+                .conditionExpression(condition)
+                .build();
+        table.putItem(request);
+        return request.item();
+    }
+
+    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
+        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
+                ? Key.builder().partitionValue(partitionKeyValue).build()
+                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
+
+        T result = table.getItem(r->r.key(key));
+        return Optional.of(result);
+    }
+
+
+    public List<T> findAll() {
+        List<T> results = new ArrayList<>();
+        table.scan(ScanEnhancedRequest.builder().build())
+                .items()
+                .forEach(results::add);
+        return results;
+    }
+
 }
