@@ -1,48 +1,304 @@
-[
-  { "id": 100, "inputCode": "TC", "valueText": "Persona Natural (física)", "valueNumeric": 2 },
-
-{ "id": 102, "inputCode": "CL", "valueText": "1ra Categoría", "valueNumeric": 3 },
-{ "id": 103, "inputCode": "CL", "valueText": "2da Categoría", "valueNumeric": 3 },
-{ "id": 104, "inputCode": "CL", "valueText": "3ra Categoría", "valueNumeric": 3 },
-{ "id": 105, "inputCode": "CL", "valueText": "4ta Categoría", "valueNumeric": 1 },
-{ "id": 106, "inputCode": "CL", "valueText": "5ta Categoría", "valueNumeric": 1 },
-
-{ "id": 115, "inputCode": "VALOR", "valueText": "Física", "valueNumeric": 3 },
-
-{ "id": 117, "inputCode": "P", "valueText": "Técnico", "valueNumeric": 5 },
-{ "id": 118, "inputCode": "P", "valueText": "Administrador", "valueNumeric": 5 },
-{ "id": 119, "inputCode": "P", "valueText": "Medico", "valueNumeric": 4 },
-{ "id": 120, "inputCode": "P", "valueText": "Psicólogo", "valueNumeric": 3 },
-{ "id": 121, "inputCode": "P", "valueText": "Empleado", "valueNumeric": 5 },
-
-{ "id": 130, "inputCode": "SO", "valueText": "SI", "valueNumeric": 5 },
-{ "id": 131, "inputCode": "SO", "valueText": "NO", "valueNumeric": 2 },
-
-{ "id": 132, "inputCode": "RDD", "valueText": "Régimen Reforzado", "valueNumeric": 5 },
-{ "id": 133, "inputCode": "RDD", "valueText": "Régimen General", "valueNumeric": 2 },
-
-  { "id": 134, "inputCode": "PEP", "valueText": "SI", "valueNumeric": 5 },
-  { "id": 135, "inputCode": "PEP", "valueText": "NO", "valueNumeric": 2 },
-
-  { "id": 136, "inputCode": "ALB", "valueText": "SI", "valueNumeric": 5 },
-  { "id": 137, "inputCode": "ALB", "valueText": "NO", "valueNumeric": 2 },
-
-  { "id": 138, "inputCode": "EP", "valueText": "Simple", "valueNumeric": 2 },
-
-
-  { "id": 140, "inputCode": "TP2", "valueText": "Tarjeta", "valueNumeric": 2 },
-
-  { "id": 150, "inputCode": "CD", "valueText": "Santander Consumo", "valueNumeric": 1 },
-  
-  { "id": 156, "inputCode": "T", "valueText": "Transaccionalidad regular", "valueNumeric": 2 },
-  
-  { "id": 160, "inputCode": "M", "valueText": "DÓLAR ESTADOUNIDENSE", "valueNumeric": 5 },
-  { "id": 161, "inputCode": "M", "valueText": "SOLES", "valueNumeric": 2 },
-
-
-  { "id": 162, "inputCode": "P2", "valueText": "PERU", "valueNumeric": 5 },
-  { "id": 163, "inputCode": "R", "valueText": "PERU", "valueNumeric": 2 },
-
-  { "id": 162, "inputCode": "L", "valueText": "Lima", "valueNumeric": 4 },
-  { "id": 163, "inputCode": "PG", "valueText": "Nacional", "valueNumeric": 2 },
-]
+{
+  "AWS_TABLE11_NAME": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "100" },
+          "inputCode": { "S": "TC" },
+          "valueText": { "S": "Persona Natural (física)" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "102" },
+          "inputCode": { "S": "CL" },
+          "valueText": { "S": "1ra Categoría" },
+          "valueNumeric": { "N": "3" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "103" },
+          "inputCode": { "S": "CL" },
+          "valueText": { "S": "2da Categoría" },
+          "valueNumeric": { "N": "3" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "104" },
+          "inputCode": { "S": "CL" },
+          "valueText": { "S": "3ra Categoría" },
+          "valueNumeric": { "N": "3" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "105" },
+          "inputCode": { "S": "CL" },
+          "valueText": { "S": "4ta Categoría" },
+          "valueNumeric": { "N": "1" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "106" },
+          "inputCode": { "S": "CL" },
+          "valueText": { "S": "5ta Categoría" },
+          "valueNumeric": { "N": "1" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "115" },
+          "inputCode": { "S": "VALOR" },
+          "valueText": { "S": "Física" },
+          "valueNumeric": { "N": "3" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "117" },
+          "inputCode": { "S": "P" },
+          "valueText": { "S": "Técnico" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "118" },
+          "inputCode": { "S": "P" },
+          "valueText": { "S": "Administrador" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "119" },
+          "inputCode": { "S": "P" },
+          "valueText": { "S": "Medico" },
+          "valueNumeric": { "N": "4" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "120" },
+          "inputCode": { "S": "P" },
+          "valueText": { "S": "Psicólogo" },
+          "valueNumeric": { "N": "3" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "121" },
+          "inputCode": { "S": "P" },
+          "valueText": { "S": "Empleado" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "130" },
+          "inputCode": { "S": "SO" },
+          "valueText": { "S": "SI" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "131" },
+          "inputCode": { "S": "SO" },
+          "valueText": { "S": "NO" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "132" },
+          "inputCode": { "S": "RDD" },
+          "valueText": { "S": "Régimen Reforzado" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "133" },
+          "inputCode": { "S": "RDD" },
+          "valueText": { "S": "Régimen General" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "134" },
+          "inputCode": { "S": "PEP" },
+          "valueText": { "S": "SI" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "135" },
+          "inputCode": { "S": "PEP" },
+          "valueText": { "S": "NO" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "136" },
+          "inputCode": { "S": "ALB" },
+          "valueText": { "S": "SI" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "137" },
+          "inputCode": { "S": "ALB" },
+          "valueText": { "S": "NO" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "138" },
+          "inputCode": { "S": "EP" },
+          "valueText": { "S": "Simple" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "140" },
+          "inputCode": { "S": "TP2" },
+          "valueText": { "S": "Tarjeta" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "150" },
+          "inputCode": { "S": "CD" },
+          "valueText": { "S": "Santander Consumo" },
+          "valueNumeric": { "N": "1" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "156" },
+          "inputCode": { "S": "T" },
+          "valueText": { "S": "Transaccionalidad regular" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "160" },
+          "inputCode": { "S": "M" },
+          "valueText": { "S": "DÓLAR ESTADOUNIDENSE" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "161" },
+          "inputCode": { "S": "M" },
+          "valueText": { "S": "SOLES" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "162" },
+          "inputCode": { "S": "P2" },
+          "valueText": { "S": "PERU" },
+          "valueNumeric": { "N": "5" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "163" },
+          "inputCode": { "S": "R" },
+          "valueText": { "S": "PERU" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "164" },
+          "inputCode": { "S": "L" },
+          "valueText": { "S": "Lima" },
+          "valueNumeric": { "N": "4" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": { "S": "165" },
+          "inputCode": { "S": "PG" },
+          "valueText": { "S": "Nacional" },
+          "valueNumeric": { "N": "2" }
+        }
+      }
+    }
+  ]
+}
