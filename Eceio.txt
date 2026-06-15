@@ -1,71 +1,8 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa;
+   public List<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
 
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
-import lombok.Setter;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
-
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@DynamoDbBean
-public class OtpEntity {
-
-
-    private String id;
-    private String otp;
-
-    @DynamoDbPartitionKey
-    @DynamoDbAttribute("id")
-    public String getId() {
-        return id;
-    }
-
-    
-    @DynamoDbSortKey
-    @DynamoDbAttribute("otp")
-    public String getOtp() {
-        return otp;
-    }
-
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.adapters.output.jpa;
-
-
-import com.santander.cpe.nxhbsc.cpenxhbscbeemailboxes.infrastructure.config.BaseDynamoRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-import java.util.Optional;
-
-
-@Repository
-public class OtpRepository extends BaseDynamoRepository<OtpEntity> {
-
-    public OtpRepository(DynamoDbEnhancedClient enhancedClient, @Value("${aws.table}") String table){
-        super(enhancedClient, table, TableSchema.fromBean(OtpEntity.class),OtpEntity.class,"id","otp");
-    }
-}
-
-
-
-    public Optional<T> getByKey(String partitionKeyValue, @Nullable String sortKeyValue) {
-        Key key = (sortKeyAttr == null || sortKeyValue == null || sortKeyValue.isBlank())
-                ? Key.builder().partitionValue(partitionKeyValue).build()
-                : Key.builder().partitionValue(partitionKeyValue).sortValue(sortKeyValue).build();
-
-        T result = table.getItem(r->r.key(key));
-        return Optional.of(result);
+        return table.query(QueryConditional.keyEqualTo(
+                Key.builder()
+                        .partitionValue(partitionKeyValue)
+                        .build()
+        )).items().stream().toList();
     }
