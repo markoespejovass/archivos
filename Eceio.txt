@@ -1,792 +1,253 @@
+package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
 
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data;
 
-import java.net.URI;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchDocumentResponseDocumentPropertiesInner;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchDocumentResponseOwnersInner;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.springframework.lang.Nullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
-import java.util.*;
-import jakarta.annotation.Generated;
-
-/**
- * Data structure containing information about a document stored or intended to be stored in a document repository system such as Filenet
- */
-
-@Schema(name = "WrapperMyDocumentRequest", description = "Data structure containing information about a document stored or intended to be stored in a document repository system such as Filenet")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-14T19:01:47.543404300-05:00[America/Lima]", comments = "Generator version: 7.21.0")
-public class WrapperMyDocumentRequest implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  private @Nullable String mimeType;
-
-  private @Nullable String name;
-
-  private @Nullable String typeCode;
-
-  private @Nullable String folderReference;
-
-  private @Nullable String aclReference;
-
-  @Valid
-  private List<@Valid WrapperMySearchDocumentResponseOwnersInner> owners = new ArrayList<>();
-
-  @Valid
-  private List<@Valid WrapperMySearchDocumentResponseDocumentPropertiesInner> documentProperties = new ArrayList<>();
-
-  private @Nullable Object customMetadata;
-
-  public WrapperMyDocumentRequest mimeType(@Nullable String mimeType) {
-    this.mimeType = mimeType;
-    return this;
-  }
-
-  /**
-   * Multipurpose Internet Mail Extensions (MIME) type format for the document file.  The supported file extensions are: - gif - jpeg - jpg - png - pdf - doc - docx - xls - xlsx - htm - msg - rtf - pptx
-   * @return mimeType
-   */
-  
-  @Schema(name = "mimeType", example = "image/png", description = "Multipurpose Internet Mail Extensions (MIME) type format for the document file.  The supported file extensions are: - gif - jpeg - jpg - png - pdf - doc - docx - xls - xlsx - htm - msg - rtf - pptx", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("mimeType")
-  public @Nullable String getMimeType() {
-    return mimeType;
-  }
-
-  @JsonProperty("mimeType")
-  public void setMimeType(@Nullable String mimeType) {
-    this.mimeType = mimeType;
-  }
-
-  public WrapperMyDocumentRequest name(@Nullable String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * Document file name
-   * @return name
-   */
-  
-  @Schema(name = "name", example = "document.pdf", description = "Document file name", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("name")
-  public @Nullable String getName() {
-    return name;
-  }
-
-  @JsonProperty("name")
-  public void setName(@Nullable String name) {
-    this.name = name;
-  }
-
-  public WrapperMyDocumentRequest typeCode(@Nullable String typeCode) {
-    this.typeCode = typeCode;
-    return this;
-  }
-
-  /**
-   * Document type code
-   * @return typeCode
-   */
-  
-  @Schema(name = "typeCode", example = "Santdr-eDoc", description = "Document type code", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("typeCode")
-  public @Nullable String getTypeCode() {
-    return typeCode;
-  }
-
-  @JsonProperty("typeCode")
-  public void setTypeCode(@Nullable String typeCode) {
-    this.typeCode = typeCode;
-  }
-
-  public WrapperMyDocumentRequest folderReference(@Nullable String folderReference) {
-    this.folderReference = folderReference;
-    return this;
-  }
-
-  /**
-   * Reference to the repository folder in which the document is stored. This reference is a link to the folder location in the repository.
-   * @return folderReference
-   */
-  
-  @Schema(name = "folderReference", example = "12325425253523-af9873443-2356c", description = "Reference to the repository folder in which the document is stored. This reference is a link to the folder location in the repository.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("folderReference")
-  public @Nullable String getFolderReference() {
-    return folderReference;
-  }
-
-  @JsonProperty("folderReference")
-  public void setFolderReference(@Nullable String folderReference) {
-    this.folderReference = folderReference;
-  }
-
-  public WrapperMyDocumentRequest aclReference(@Nullable String aclReference) {
-    this.aclReference = aclReference;
-    return this;
-  }
-
-  /**
-   * Reference for the access control list (ACL) artefact that defines a set of permissions for the document in the repository
-   * @return aclReference
-   */
-  
-  @Schema(name = "aclReference", example = "RestrictedToVIP", description = "Reference for the access control list (ACL) artefact that defines a set of permissions for the document in the repository", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("aclReference")
-  public @Nullable String getAclReference() {
-    return aclReference;
-  }
-
-  @JsonProperty("aclReference")
-  public void setAclReference(@Nullable String aclReference) {
-    this.aclReference = aclReference;
-  }
-
-  public WrapperMyDocumentRequest owners(List<@Valid WrapperMySearchDocumentResponseOwnersInner> owners) {
-    this.owners = owners;
-    return this;
-  }
-
-  public WrapperMyDocumentRequest addOwnersItem(WrapperMySearchDocumentResponseOwnersInner ownersItem) {
-    if (this.owners == null) {
-      this.owners = new ArrayList<>();
-    }
-    this.owners.add(ownersItem);
-    return this;
-  }
-
-  /**
-   * Array of the document's owners
-   * @return owners
-   */
-  @Valid 
-  @Schema(name = "owners", description = "Array of the document's owners", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("owners")
-  public List<@Valid WrapperMySearchDocumentResponseOwnersInner> getOwners() {
-    return owners;
-  }
-
-  @JsonProperty("owners")
-  public void setOwners(List<@Valid WrapperMySearchDocumentResponseOwnersInner> owners) {
-    this.owners = owners;
-  }
-
-  public WrapperMyDocumentRequest documentProperties(List<@Valid WrapperMySearchDocumentResponseDocumentPropertiesInner> documentProperties) {
-    this.documentProperties = documentProperties;
-    return this;
-  }
-
-  public WrapperMyDocumentRequest addDocumentPropertiesItem(WrapperMySearchDocumentResponseDocumentPropertiesInner documentPropertiesItem) {
-    if (this.documentProperties == null) {
-      this.documentProperties = new ArrayList<>();
-    }
-    this.documentProperties.add(documentPropertiesItem);
-    return this;
-  }
-
-  /**
-   * Array of the document's properties. A minimum of one property must be provided.
-   * @return documentProperties
-   */
-  @Valid 
-  @Schema(name = "documentProperties", description = "Array of the document's properties. A minimum of one property must be provided.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("documentProperties")
-  public List<@Valid WrapperMySearchDocumentResponseDocumentPropertiesInner> getDocumentProperties() {
-    return documentProperties;
-  }
-
-  @JsonProperty("documentProperties")
-  public void setDocumentProperties(List<@Valid WrapperMySearchDocumentResponseDocumentPropertiesInner> documentProperties) {
-    this.documentProperties = documentProperties;
-  }
-
-  public WrapperMyDocumentRequest customMetadata(@Nullable Object customMetadata) {
-    this.customMetadata = customMetadata;
-    return this;
-  }
-
-  /**
-   * Data structure containing metadata for the custom data stored with the document.  The metadata is provided in JSON format agreed between the app sending the request and the local services called from the API. The JSON content can be a maximum of 8,000 char long.
-   * @return customMetadata
-   */
-  
-  @Schema(name = "customMetadata", description = "Data structure containing metadata for the custom data stored with the document.  The metadata is provided in JSON format agreed between the app sending the request and the local services called from the API. The JSON content can be a maximum of 8,000 char long.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("customMetadata")
-  public @Nullable Object getCustomMetadata() {
-    return customMetadata;
-  }
-
-  @JsonProperty("customMetadata")
-  public void setCustomMetadata(@Nullable Object customMetadata) {
-    this.customMetadata = customMetadata;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    WrapperMyDocumentRequest wrapperMyDocumentRequest = (WrapperMyDocumentRequest) o;
-    return Objects.equals(this.mimeType, wrapperMyDocumentRequest.mimeType) &&
-        Objects.equals(this.name, wrapperMyDocumentRequest.name) &&
-        Objects.equals(this.typeCode, wrapperMyDocumentRequest.typeCode) &&
-        Objects.equals(this.folderReference, wrapperMyDocumentRequest.folderReference) &&
-        Objects.equals(this.aclReference, wrapperMyDocumentRequest.aclReference) &&
-        Objects.equals(this.owners, wrapperMyDocumentRequest.owners) &&
-        Objects.equals(this.documentProperties, wrapperMyDocumentRequest.documentProperties) &&
-        Objects.equals(this.customMetadata, wrapperMyDocumentRequest.customMetadata);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(mimeType, name, typeCode, folderReference, aclReference, owners, documentProperties, customMetadata);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class WrapperMyDocumentRequest {\n");
-    sb.append("    mimeType: ").append(toIndentedString(mimeType)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    typeCode: ").append(toIndentedString(typeCode)).append("\n");
-    sb.append("    folderReference: ").append(toIndentedString(folderReference)).append("\n");
-    sb.append("    aclReference: ").append(toIndentedString(aclReference)).append("\n");
-    sb.append("    owners: ").append(toIndentedString(owners)).append("\n");
-    sb.append("    documentProperties: ").append(toIndentedString(documentProperties)).append("\n");
-    sb.append("    customMetadata: ").append(toIndentedString(customMetadata)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(@Nullable Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-}
-
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data;
-
-import java.net.URI;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.springframework.lang.Nullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
-import java.util.*;
-import jakarta.annotation.Generated;
-
-/**
- * Data structure containing information about an owner
- */
-
-@Schema(name = "WrapperMySearchDocumentResponse_owners_inner", description = "Data structure containing information about an owner")
-@JsonTypeName("WrapperMySearchDocumentResponse_owners_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-14T19:01:47.543404300-05:00[America/Lima]", comments = "Generator version: 7.21.0")
-public class WrapperMySearchDocumentResponseOwnersInner implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  private @Nullable String ownerId;
-
-  public WrapperMySearchDocumentResponseOwnersInner ownerId(@Nullable String ownerId) {
-    this.ownerId = ownerId;
-    return this;
-  }
-
-  /**
-   * ID for the owner
-   * @return ownerId
-   */
-  
-  @Schema(name = "ownerId", example = "123456789", description = "ID for the owner", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("ownerId")
-  public @Nullable String getOwnerId() {
-    return ownerId;
-  }
-
-  @JsonProperty("ownerId")
-  public void setOwnerId(@Nullable String ownerId) {
-    this.ownerId = ownerId;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    WrapperMySearchDocumentResponseOwnersInner wrapperMySearchDocumentResponseOwnersInner = (WrapperMySearchDocumentResponseOwnersInner) o;
-    return Objects.equals(this.ownerId, wrapperMySearchDocumentResponseOwnersInner.ownerId);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(ownerId);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class WrapperMySearchDocumentResponseOwnersInner {\n");
-    sb.append("    ownerId: ").append(toIndentedString(ownerId)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(@Nullable Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data;
-
-import java.net.URI;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.springframework.lang.Nullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
-import java.util.*;
-import jakarta.annotation.Generated;
-
-/**
- * Data structure containing search criteria
- */
-
-@Schema(name = "WrapperMySearchFilterRequest", description = "Data structure containing search criteria")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-14T19:01:47.543404300-05:00[America/Lima]", comments = "Generator version: 7.21.0")
-public class WrapperMySearchFilterRequest implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  private @Nullable String discriminator;
-
-  @Valid
-  private List<@Valid WrapperMySearchFilterRequestSearchPropertiesInner> searchProperties = new ArrayList<>();
-
-  private @Nullable String sortOrder;
-
-  private @Nullable String sortBy;
-
-  public WrapperMySearchFilterRequest discriminator(@Nullable String discriminator) {
-    this.discriminator = discriminator;
-    return this;
-  }
-
-  /**
-   * Discriminator used to determine the search conditions
-   * @return discriminator
-   */
-  
-  @Schema(name = "discriminator", example = "AND", description = "Discriminator used to determine the search conditions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("discriminator")
-  public @Nullable String getDiscriminator() {
-    return discriminator;
-  }
-
-  @JsonProperty("discriminator")
-  public void setDiscriminator(@Nullable String discriminator) {
-    this.discriminator = discriminator;
-  }
-
-  public WrapperMySearchFilterRequest searchProperties(List<@Valid WrapperMySearchFilterRequestSearchPropertiesInner> searchProperties) {
-    this.searchProperties = searchProperties;
-    return this;
-  }
-
-  public WrapperMySearchFilterRequest addSearchPropertiesItem(WrapperMySearchFilterRequestSearchPropertiesInner searchPropertiesItem) {
-    if (this.searchProperties == null) {
-      this.searchProperties = new ArrayList<>();
-    }
-    this.searchProperties.add(searchPropertiesItem);
-    return this;
-  }
-
-  /**
-   * Array of search criteria keys
-   * @return searchProperties
-   */
-  @Valid 
-  @Schema(name = "searchProperties", description = "Array of search criteria keys", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("searchProperties")
-  public List<@Valid WrapperMySearchFilterRequestSearchPropertiesInner> getSearchProperties() {
-    return searchProperties;
-  }
-
-  @JsonProperty("searchProperties")
-  public void setSearchProperties(List<@Valid WrapperMySearchFilterRequestSearchPropertiesInner> searchProperties) {
-    this.searchProperties = searchProperties;
-  }
-
-  public WrapperMySearchFilterRequest sortOrder(@Nullable String sortOrder) {
-    this.sortOrder = sortOrder;
-    return this;
-  }
-
-  /**
-   * Sort order for the search keys
-   * @return sortOrder
-   */
-  
-  @Schema(name = "sortOrder", example = "ASC", description = "Sort order for the search keys", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("sortOrder")
-  public @Nullable String getSortOrder() {
-    return sortOrder;
-  }
-
-  @JsonProperty("sortOrder")
-  public void setSortOrder(@Nullable String sortOrder) {
-    this.sortOrder = sortOrder;
-  }
-
-  public WrapperMySearchFilterRequest sortBy(@Nullable String sortBy) {
-    this.sortBy = sortBy;
-    return this;
-  }
-
-  /**
-   * Indicator by which the search keys are sorted
-   * @return sortBy
-   */
-  
-  @Schema(name = "sortBy", example = "columnA", description = "Indicator by which the search keys are sorted", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("sortBy")
-  public @Nullable String getSortBy() {
-    return sortBy;
-  }
-
-  @JsonProperty("sortBy")
-  public void setSortBy(@Nullable String sortBy) {
-    this.sortBy = sortBy;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    WrapperMySearchFilterRequest wrapperMySearchFilterRequest = (WrapperMySearchFilterRequest) o;
-    return Objects.equals(this.discriminator, wrapperMySearchFilterRequest.discriminator) &&
-        Objects.equals(this.searchProperties, wrapperMySearchFilterRequest.searchProperties) &&
-        Objects.equals(this.sortOrder, wrapperMySearchFilterRequest.sortOrder) &&
-        Objects.equals(this.sortBy, wrapperMySearchFilterRequest.sortBy);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(discriminator, searchProperties, sortOrder, sortBy);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class WrapperMySearchFilterRequest {\n");
-    sb.append("    discriminator: ").append(toIndentedString(discriminator)).append("\n");
-    sb.append("    searchProperties: ").append(toIndentedString(searchProperties)).append("\n");
-    sb.append("    sortOrder: ").append(toIndentedString(sortOrder)).append("\n");
-    sb.append("    sortBy: ").append(toIndentedString(sortBy)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(@Nullable Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-}
-
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data;
-
-import java.net.URI;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import org.springframework.lang.Nullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-
-import java.util.*;
-import jakarta.annotation.Generated;
-
-/**
- * Data structure containing information about an app
- */
-
-@Schema(name = "App", description = "Data structure containing information about an app")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-14T19:01:47.543404300-05:00[America/Lima]", comments = "Generator version: 7.21.0")
-public class App implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  private @Nullable String appId;
-
-  private @Nullable String name;
-
-  public App appId(@Nullable String appId) {
-    this.appId = appId;
-    return this;
-  }
-
-  /**
-   * Unique app ID.  Each mobile app has a unique app ID similar to a Java package name, such as 'com.example.myapp'. This ID can be used to identify the app on the device and in the app store from which the app is downloaded.  The value is the ID for the requester's system.
-   * @return appId
-   */
-  
-  @Schema(name = "appId", example = "13403", description = "Unique app ID.  Each mobile app has a unique app ID similar to a Java package name, such as 'com.example.myapp'. This ID can be used to identify the app on the device and in the app store from which the app is downloaded.  The value is the ID for the requester's system.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("appId")
-  public @Nullable String getAppId() {
-    return appId;
-  }
-
-  @JsonProperty("appId")
-  public void setAppId(@Nullable String appId) {
-    this.appId = appId;
-  }
-
-  public App name(@Nullable String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * App name.  The value is the name of the app that sent the request.
-   * @return name
-   */
-  
-  @Schema(name = "name", example = "Fraud Ops Comms", description = "App name.  The value is the name of the app that sent the request.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("name")
-  public @Nullable String getName() {
-    return name;
-  }
-
-  @JsonProperty("name")
-  public void setName(@Nullable String name) {
-    this.name = name;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    App app = (App) o;
-    return Objects.equals(this.appId, app.appId) &&
-        Objects.equals(this.name, app.name);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(appId, name);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class App {\n");
-    sb.append("    appId: ").append(toIndentedString(appId)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(@Nullable Object o) {
-    return o == null ? "null" : o.toString().replace("\n", "\n    ");
-  }
-}
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileField;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileSearchMapper;
 import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.Operator;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.RequestOperator;
-import org.apache.logging.log4j.util.Strings;
+import org.springframework.lang.Nullable;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.*;
 
-import java.util.List;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.application.ports.output.DocumentManagementRepositoryPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
+import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class FileSearchMapper {
-
-    public static FileSearch toSearch(WrapperMySearchFilterRequest request) {
-
-        FileSearch.Builder builder = FileSearch.builder();
-
-        boolean isOr = "OR".equalsIgnoreCase(request.getDiscriminator());
-
-        for (WrapperMySearchFilterRequestSearchPropertiesInner prop : request.getSearchProperties()) {
-            String keyId = prop.getKeyId();
-
-            if(keyId == null){
-                keyId = "0";
-            }
-
-            String field = mapField(keyId);
-            if(field == null){
-                field="";
-            }
-            WrapperMySearchFilterRequestSearchPropertiesInner.KeyOperatorEnum keyOperator = prop.getKeyOperator();
-            if(keyOperator == null){
-                keyOperator = WrapperMySearchFilterRequestSearchPropertiesInner.KeyOperatorEnum.IN;
-            }
-            Operator operator = mapOperator(keyOperator.name());
-            Object value = castValue(keyId, prop.getKeyValue());
-            if (value == null){
-                value = prop.getKeyValue();
-            }
-            if (isOr) {
-                builder.or(field, operator, value);
-            } else {
-                builder.and(field, operator, value);
-            }
-        }
-
-        return builder.build();
-    }
-
-    private static String mapField(String keyId) {
-        try {
-            return FileField.valueOf(keyId.toUpperCase()).getDynamoField();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Campo no permitido: " + keyId);
-        }
-    }
-
-    private static Operator mapOperator(String op) {
-        try {
-            return RequestOperator
-                    .valueOf(op.toUpperCase())
-                    .toDomain(RequestOperator.valueOf(op.toUpperCase()));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Operador no permitido: " + op);
-        }
-    }
-
-    private static Object castValue(String keyId, String value) {
-
-        // Tipado básico (importante para DynamoDB)
-        return switch (keyId.toUpperCase()) {
-            case "VERSION" -> Integer.valueOf(value);
-            default -> value;
-        };
-    }
-}
-
-
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils;
-
-import lombok.Data;
-
+import java.io.ByteArrayInputStream;
+import java.time.Duration;
 import java.util.*;
 
-@Data
-public class FileSearch {
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.constants.Constant.PREFIJO_KEY;
+import static com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.util.UtilsFile.*;
 
-    List<Object> conditions = new ArrayList<>();
-    boolean useOr = false;
 
-    public static Builder builder() {
-        return new Builder();
+/**
+ * The class representative Otp adaptarer
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DocumentManagementAdapter implements DocumentManagementRepositoryPort {
+
+  private final S3Client s3Client;
+
+  private final S3Presigner s3Presigner;
+
+  private final DocumentMapper mapper;
+
+  private final FileEntityRepository repository;
+
+  @Value("${aws.bucket}")
+  public String bucketName;
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperGetDocumentsResponse downloadDocument(WrapperGetDocumentsRequest criteria) {
+    String documentId;
+    String url;
+    WrapperMyDocumentResponse documentResponse;
+    if(criteria.getDocument() == null){
+      return new WrapperGetDocumentsResponse();
+    }
+    documentResponse = criteria.getDocument();
+    if(documentResponse.getDocumentId() == null){
+      return new WrapperGetDocumentsResponse();
+    }
+    documentId = documentResponse.getDocumentId();
+    Optional<FileEntity> fileEntity = repository.getByKey(documentId,null);
+
+    if(fileEntity.isEmpty()){
+      return new WrapperGetDocumentsResponse();
+    }
+    url = generateDownloadUrl(fileEntity.get().getUrl());
+
+    return mapper.donwloadMapper(url);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostSearchDocumentsResponse searchDocuments(
+          WrapperPostSearchDocumentsRequest criteria) {
+    var paramters = criteria.getSearchParameters();
+    if (paramters == null){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    if(paramters.getSearchProperties() == null || paramters.getSearchProperties().isEmpty()){
+      return new WrapperPostSearchDocumentsResponse();
+    }
+    if(paramters.getDiscriminator() == null){
+      return new WrapperPostSearchDocumentsResponse();
     }
 
-    public static class Builder {
-        private final FileSearch search = new FileSearch();
+    FileSearch search = FileSearchMapper.toSearch(paramters);
+    var objectListing = repository.search(search);
+    return mapper.searchMapper(objectListing);
+  }
 
-        public Builder and(String field, Operator op, Object value) {
-            search.conditions.add(new Condition(field, op, value));
-            return this;
-        }
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param criteria valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
 
-        public Builder or(String field, Operator op, Object value) {
-            search.useOr = true;
-            search.conditions.add(new Condition(field, op, value));
-            return this;
-        }
 
-        public Builder in(String field, List<Object> values) {
-            search.conditions.add(new Condition(field, values));
-            return this;
-        }
 
-        public Builder andGroup(FileSearch group) {
-            search.conditions.add(group);
-            return this;
-        }
+    String documentId = UUID.randomUUID().toString();
 
-        public Builder orGroup(FileSearch group) {
-            search.useOr = true;
-            search.conditions.add(group);
-            return this;
-        }
 
-        public FileSearch build() {
-            return search;
-        }
+    try {
+      var document = criteria.getDocument();
+      if(document == null){
+        return new WrapperPostDocumentsResponse();
+      }
+      if (document.getFolderReference()==null){
+        return new WrapperPostDocumentsResponse();
+      }
+      if (document.getAclReference()==null){
+        return new WrapperPostDocumentsResponse();
+      }
+      byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
+      String typeData = "";
+      if("biometric".equals(criteria.getCallerInformation().getAppId())){
+        typeData = getMimeTypeOfBase64(fileBytes);
+      }
+      String userFolder = validateRequestAndGetFolderReference(criteria,documentId,typeData);
+      String key = PREFIJO_KEY+userFolder;
+              //generateKey(documentId, userFolder);
+      PutObjectRequest request = PutObjectRequest.builder()
+              .bucket(bucketName)
+              .key(key)
+              .contentType(document.getMimeType())
+              .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+
+      // ✅ mapear entity
+      FileEntity entity = mapper.toEntity(criteria, documentId, key);
+
+      // guardar
+      entity = repository.putIfAbsent(entity);
+
+      return mapper.toDTOUpload(entity);
+
+    } catch (Exception ex) {
+      log.error("Error uploading document", ex);
+      log.error(String.valueOf(ex));
+      throw new RuntimeException("Error uploading document to S3", ex);
     }
+  }
+
+  private String validateRequestAndGetFolderReference(WrapperPostDocumentsRequest criteria, String id, String typeData) {
+
+    if (criteria == null || criteria.getDocument() == null) {
+      throw new IllegalArgumentException("Document is required");
+    }
+
+    var doc = criteria.getDocument();
+    if (doc == null){
+      throw new IllegalArgumentException("File (base64) is required");
+    }
+
+    List<WrapperMySearchDocumentResponseOwnersInner> name = doc.getOwners();
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("File owner is required");
+    }
+    String dni = name.get(0).getOwnerId();
+    if (dni== null || dni.isEmpty()) {
+      throw new IllegalArgumentException("File owner is required");
+    }
+    if(typeData == null || typeData.isEmpty()){
+      return dni+"/"+doc.getName();
+    }
+    return dni+"/"+id+typeData;
+  }
+
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public WrapperMySearchDocumentResponse getDocument(String documentId) {
+    var objectMetadataOptional =repository.getByKey(documentId,null);
+    if(objectMetadataOptional.isEmpty()){
+      return new WrapperMySearchDocumentResponse();
+    }
+    var objectMetadata = objectMetadataOptional.get();
+    return mapper.getMapper(objectMetadata);
+  }
+
+  @Override
+  public List<WrapperMySearchDocumentVersionResponse> getDocumentVersion(String id) {
+    var objectMetadataOptional =repository.findAll();
+    return mapper.getVersions(objectMetadataOptional);
+  }
+
+  /**
+   * Metodo de salida para validar otp
+   *
+   * @param documentId valor del onjecto request
+   * @return WrapperClassifyEmail objecto de response valid
+   */
+  @Override
+  public Void deleteDocument(String documentId) {
+    Optional<FileEntity> fileEntityOptional = repository.getByKey(documentId,null);
+    if (fileEntityOptional.isEmpty()){
+      return null;
+    }
+    FileEntity fileEntity = fileEntityOptional.get();
+
+    String key = fileEntity.getUrl();
+    DeleteObjectRequest request = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build();
+
+    s3Client.deleteObject(request);
+    repository.delete(fileEntity);
+    return null;
+  }
+
+  private String generateDownloadUrl(String key) {
+
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build();
+
+    GetObjectPresignRequest presignRequest =
+            GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10)) // expira en 10 min
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+
+    PresignedGetObjectRequest presignedRequest =
+            s3Presigner.presignGetObject(presignRequest);
+
+    return presignedRequest.url().toString();
+  }
+
 }
