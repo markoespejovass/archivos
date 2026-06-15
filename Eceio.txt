@@ -1,1 +1,106 @@
 
+class UtilsFileTest {
+
+    @Test
+    void shouldGenerateFileName() {
+        assertEquals("test.pdf",
+                UtilsFile.generateFileName("test"));
+    }
+
+    @Test
+    void shouldGenerateKeyWithoutFolder() {
+        String result =
+                UtilsFile.generateKey("123", null);
+
+        assertTrue(result.contains("123"));
+    }
+
+    @Test
+    void shouldGenerateKeyWithFolder() {
+        String result =
+                UtilsFile.generateKey("123", "dni");
+
+        assertTrue(result.contains("dni"));
+        assertTrue(result.contains("123"));
+    }
+
+    @Test
+    void shouldGetDocumentId() {
+
+        String key = "documents/123.pdf";
+
+        String result = UtilsFile.getDocumentId(key);
+
+        assertEquals("123", result);
+    }
+
+    @Test
+    void shouldGetFileName() {
+
+        String key = "documents/123.pdf";
+
+        String result = UtilsFile.getFileName(key);
+
+        assertEquals("123.pdf", result);
+    }
+
+    @Test
+    void shouldDetectMimeTypePdf() {
+
+        byte[] pdf =
+                "%PDF-1.4".getBytes(StandardCharsets.UTF_8);
+
+        String mime =
+                UtilsFile.getMimeTypeOfBase64(pdf);
+
+        assertNotNull(mime);
+    }
+
+    @Test
+    void shouldInstantiatePrivateConstructor() throws Exception {
+
+        Constructor<UtilsFile> constructor =
+                UtilsFile.class.getDeclaredConstructor();
+
+        constructor.setAccessible(true);
+
+        assertNotNull(constructor.newInstance());
+    }
+}
+
+
+@ExtendWith(MockitoExtension.class)
+class S3ConfigTest {
+
+    private S3Config config;
+
+    @BeforeEach
+    void setup() throws Exception {
+
+        config = new S3Config();
+
+        ReflectionTestUtils.setField(config, "awsRegion", "us-east-1");
+        ReflectionTestUtils.setField(config, "dynamoRoleArn",
+                "arn:aws:iam::123456789:role/test-role");
+    }
+
+    @Test
+    void shouldCreateS3Client() {
+
+        StsClient stsClient = mock(StsClient.class);
+
+        S3Client client = config.s3Client(stsClient);
+
+        assertNotNull(client);
+    }
+
+    @Test
+    void shouldCreateS3Presigner() {
+
+        StsClient stsClient = mock(StsClient.class);
+
+        S3Presigner presigner = config.s3Presigner(stsClient);
+
+        assertNotNull(presigner);
+    }
+}
