@@ -1,134 +1,224 @@
-[
-   {
-      "id":1,
-      "factorCode":"SCORE",
-      "inputCode":"FACTOR_CLIENTE",
-      "weight":0.6
-   },
-   {
-      "id":2,
-      "factorCode":"SCORE",
-      "inputCode":"FACTOR_CANAL",
-      "weight":0.2
-   },
-   {
-      "id":3,
-      "factorCode":"SCORE",
-      "inputCode":"FACTOR_ZG",
-      "weight":0.2
-   },
-   {
-      "id":10,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"TC",
-      "weight":0.05
-   },
-   {
-      "id":11,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"CL",
-      "weight":0.05
-   },
-   {
-      "id":12,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"VALOR",
-      "weight":0.05
-   },
-   {
-      "id":13,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"P",
-      "weight":0.05
-   },
-   {
-      "id":14,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"SO",
-      "weight":0.1
-   },
-   {
-      "id":15,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"RDD",
-      "weight":0.2
-   },
-   {
-      "id":16,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"ALB",
-      "weight":0.2
-   },
-   {
-      "id":17,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"PEP",
-      "weight":0.2
-   },
-   {
-      "id":18,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"RE",
-      "weight":0.0
-   },
-   {
-      "id":19,
-      "factorCode":"FACTOR_CLIENTE",
-      "inputCode":"EP",
-      "weight":0.1
-   },
-   {
-      "id":30,
-      "factorCode":"FACTOR_CANAL",
-      "inputCode":"TP2",
-      "weight":0.25
-   },
-   {
-      "id":31,
-      "factorCode":"FACTOR_CANAL",
-      "inputCode":"CD",
-      "weight":0.25
-   },
-   {
-      "id":32,
-      "factorCode":"FACTOR_CANAL",
-      "inputCode":"T",
-      "weight":0.35
-   },
-   {
-      "id":33,
-      "factorCode":"FACTOR_CANAL",
-      "inputCode":"M",
-      "weight":0.15
-   },
-   {
-      "id":40,
-      "factorCode":"FACTOR_ZG",
-      "inputCode":"L",
-      "weight":0.2
-   },
-   {
-      "id":41,
-      "factorCode":"FACTOR_ZG",
-      "inputCode":"P2",
-      "weight":0.25
-   },
-   {
-      "id":42,
-      "factorCode":"FACTOR_ZG",
-      "inputCode":"R",
-      "weight":0.25
-   },
-   {
-      "id":43,
-      "factorCode":"FACTOR_ZG",
-      "inputCode":"PG",
-      "weight":0.1
-   },
-   {
-      "id":44,
-      "factorCode":"FACTOR_ZG",
-      "inputCode":"EXP",
-      "weight":0.2
-   }
-]
+{
+  "AWS_TABLE09_NAME": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {"S":"1"},
+          "factorCode":{"S":"SCORE"},
+          "inputCode":{"S":"FACTOR_CLIENTE"},
+          "weight":{"N":"0.6"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"2"},
+          "factorCode":{"S":"SCORE"},
+          "inputCode":{"S":"FACTOR_CANAL"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"3"},
+          "factorCode":{"S":"SCORE"},
+          "inputCode":{"S":"FACTOR_ZG"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"10"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"TC"},
+          "weight":{"N":"0.05"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"11"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"CL"},
+          "weight":{"N":"0.05"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"12"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"VALOR"},
+          "weight":{"N":"0.05"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"13"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"P"},
+          "weight":{"N":"0.05"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"14"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"SO"},
+          "weight":{"N":"0.1"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"15"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"RDD"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"16"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"ALB"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"17"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"PEP"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"18"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"RE"},
+          "weight":{"N":"0.0"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"19"},
+          "factorCode":{"S":"FACTOR_CLIENTE"},
+          "inputCode":{"S":"EP"},
+          "weight":{"N":"0.1"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"30"},
+          "factorCode":{"S":"FACTOR_CANAL"},
+          "inputCode":{"S":"TP2"},
+          "weight":{"N":"0.25"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"31"},
+          "factorCode":{"S":"FACTOR_CANAL"},
+          "inputCode":{"S":"CD"},
+          "weight":{"N":"0.25"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"32"},
+          "factorCode":{"S":"FACTOR_CANAL"},
+          "inputCode":{"S":"T"},
+          "weight":{"N":"0.35"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"33"},
+          "factorCode":{"S":"FACTOR_CANAL"},
+          "inputCode":{"S":"M"},
+          "weight":{"N":"0.15"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"40"},
+          "factorCode":{"S":"FACTOR_ZG"},
+          "inputCode":{"S":"L"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"41"},
+          "factorCode":{"S":"FACTOR_ZG"},
+          "inputCode":{"S":"P2"},
+          "weight":{"N":"0.25"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"42"},
+          "factorCode":{"S":"FACTOR_ZG"},
+          "inputCode":{"S":"R"},
+          "weight":{"N":"0.25"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"43"},
+          "factorCode":{"S":"FACTOR_ZG"},
+          "inputCode":{"S":"PG"},
+          "weight":{"N":"0.1"}
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id":{"S":"44"},
+          "factorCode":{"S":"FACTOR_ZG"},
+          "inputCode":{"S":"EXP"},
+          "weight":{"N":"0.2"}
+        }
+      }
+    }
+  ]
+}
