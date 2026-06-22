@@ -1,55 +1,65 @@
-  public List<WrapperConsentId> postConsent(
-          List<WrapperPostConsentRequestBody> criteria, String partyId) {
-    List<ConsentEntity> consentEntityList = criteria.stream()
-            .map(consent ->
-                    consentRepository.putIfAbsent(mapper.toEntityPost(consent,partyId,UUID.randomUUID()
-                            .toString()))).toList();
+public WrapperPostDocumentsResponse uploadDocument(WrapperPostDocumentsRequest criteria) {
+    
+    String documentId = UUID.randomUUID().toString();
+    
+    try {
+      var document = criteria.getDocument();
+      if(document == null){
+        throw new SantanderException("Error a vacio");
+      }
 
+      byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
+      String typeData = "";
+      if("biometric".equals(criteria.getCallerInformation().getAppId())){
+        typeData = getMimeTypeOfBase64(fileBytes);
+      }
+      String userFolder = validateRequestAndGetFolderReference(criteria,documentId,typeData);
+      String key = PREFIJO_KEY+userFolder;
 
-    return mapper.toDTOsPost(consentEntityList);
+      PutObjectRequest request = PutObjectRequest.builder()
+              .bucket(bucketName)
+              .key(key)
+              .contentType(document.getMimeType())
+              .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+
+      // ✅ mapear entity
+      FileEntity entity = mapper.toEntity(criteria, documentId, key);
+
+      // guardar
+      entity = repository.putIfAbsent(entity);
+
+      return mapper.toDTOUpload(entity);
+
+    } catch (Exception ex) {
+      log.error("Error uploading document", ex);
+      log.error(String.valueOf(ex));
+      throw new RuntimeException("Error uploading document to S3", ex);
+    }
   }
 
+  private String validateRequestAndGetFolderReference(WrapperPostDocumentsRequest criteria, String id, String typeData) {
 
+    if (criteria == null || criteria.getDocument() == null) {
+      throw new IllegalArgumentException("Document is required");
+    }
 
-    @Test
-    void shouldSaveConsent() {
-        List<WrapperPostConsentRequestBody> requests = new ArrayList<>();
-        WrapperPostConsentRequestBody request = new WrapperPostConsentRequestBody();
-        ConsentEntity entity = new ConsentEntity();
-        WrapperConsentId dto = new WrapperConsentId();
-
-        when(mapper.toEntityPost(eq(request), eq("123"),anyString())).thenReturn(entity);
-        when(repository.putIfAbsent(entity)).thenReturn(entity);
-        when(mapper.toDTOsPost(List.of(entity))).thenReturn(List.of(dto));
-
-        List<WrapperConsentId> result = adapter.postConsent(requests, "123");
-
-        assertEquals(1, result.size());
-        assertEquals(dto, result.get(0));
+    var doc = criteria.getDocument();
+    if (doc == null){
+      throw new IllegalArgumentException("File (base64) is required");
+    }
+    String dni;
+    List<WrapperMySearchDocumentResponseOwnersInner> name = doc.getOwners();
+    if (name == null || name.isEmpty()) {
+      dni = "";
+    } else {
+      dni = name.get(0).getOwnerId()+"/";
     }
 
 
-
-
-[ERROR] Errors: 
-[ERROR]   OTPServiceAdapterTest.shouldSaveConsent:73 » PotentialStubbingProblem 
-Strict stubbing argument mismatch. Please check:
- - this invocation of 'toDTOsPost' method:
-    mapper.toDTOsPost([]);
-    -> at com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.DataConsentManagementAdapter.postConsent(DataConsentManagementAdapter.java:49)
- - has following stubbing(s) with different arguments:
-    1. mapper.toDTOsPost(
-    [com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity@285ac40b]
-);
-      -> at com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.OTPServiceAdapterTest.shouldSaveConsent(OTPServiceAdapterTest.java:71)
-Typically, stubbing argument mismatch indicates user mistake when writing tests.
-Mockito fails early so that you can debug potential problem easily.
-However, there are legit scenarios when this exception generates false negative signal:
-  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
-    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
-  - stubbed method is intentionally invoked with different arguments by code under test
-    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
-For more information see javadoc for PotentialStubbingProblem class.
-[INFO] 
-[ERROR] Tests run: 26, Failures: 0, Errors: 1, Skipped: 0
-[INFO] 
+    if(typeData == null || typeData.isEmpty()){
+      return dni+doc.getName();
+    }
+    return dni+id+typeData;
+  }
