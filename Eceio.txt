@@ -1,1 +1,55 @@
--Djavax.net.ssl.trustStoreType=Windows-ROOT
+  public List<WrapperConsentId> postConsent(
+          List<WrapperPostConsentRequestBody> criteria, String partyId) {
+    List<ConsentEntity> consentEntityList = criteria.stream()
+            .map(consent ->
+                    consentRepository.putIfAbsent(mapper.toEntityPost(consent,partyId,UUID.randomUUID()
+                            .toString()))).toList();
+
+
+    return mapper.toDTOsPost(consentEntityList);
+  }
+
+
+
+    @Test
+    void shouldSaveConsent() {
+        List<WrapperPostConsentRequestBody> requests = new ArrayList<>();
+        WrapperPostConsentRequestBody request = new WrapperPostConsentRequestBody();
+        ConsentEntity entity = new ConsentEntity();
+        WrapperConsentId dto = new WrapperConsentId();
+
+        when(mapper.toEntityPost(eq(request), eq("123"),anyString())).thenReturn(entity);
+        when(repository.putIfAbsent(entity)).thenReturn(entity);
+        when(mapper.toDTOsPost(List.of(entity))).thenReturn(List.of(dto));
+
+        List<WrapperConsentId> result = adapter.postConsent(requests, "123");
+
+        assertEquals(1, result.size());
+        assertEquals(dto, result.get(0));
+    }
+
+
+
+
+[ERROR] Errors: 
+[ERROR]   OTPServiceAdapterTest.shouldSaveConsent:73 » PotentialStubbingProblem 
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'toDTOsPost' method:
+    mapper.toDTOsPost([]);
+    -> at com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.DataConsentManagementAdapter.postConsent(DataConsentManagementAdapter.java:49)
+ - has following stubbing(s) with different arguments:
+    1. mapper.toDTOsPost(
+    [com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.jpa.data.ConsentEntity@285ac40b]
+);
+      -> at com.santander.cpe.nxhbsc.cpenxhbscbedatacomangment.infrastructure.adapters.output.OTPServiceAdapterTest.shouldSaveConsent(OTPServiceAdapterTest.java:71)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+[INFO] 
+[ERROR] Tests run: 26, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
