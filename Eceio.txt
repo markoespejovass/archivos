@@ -1,6 +1,45 @@
-<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.15-SNAPSHOT</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+1. Coordinar los pdfs de TyC у tratamiento de datos personales para subirlo por el ep uplodad y compartir los id a conexa
+
+2 Invocar credit risk
+
+2.1. Vamos a modificar data consent managment para habilitar en el body flag de aceptación de TyC y tratamiento de datos (a nivel de bd se harán 2 insert). Esto se tendrá q invocar después de tener el dni
+
+3. El continuar de ¡Cual es tu documento? debería invocar al ep de data consent para el registro.
+
+4. El envió de correo OTP no sufrirá modificación
+
+5. Validación de OTP no sufrirá modificación
+
+6. Product Offer no sufrirá modificación
+
+7. Validación Biométrica, se modificar
+
+
+
+envio de correo
+
+creamos / reutlizamos tabla detalle en dynamodb para guardar id de plantilla de celmedia y ruta documento adjunto en s3
+
+id |
+
+ruta
+
+1 | s3:bienvenida.pdf
+
+1 |
+
+s3:contrato.pdf
+
+1 |
+
+s3:TyC.pdf
+
+2 |
+
+null
+
+3
+
+null
+
+modificamos servicio opt para que se conecte a la tabla y adjunte
