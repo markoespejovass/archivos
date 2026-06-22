@@ -1,4 +1,1 @@
-[ERROR] Failed to execute goal on project cpe-nxhbsc-becreditrisk: Could not resolve dependencies for project com.santander.cpe.nxhbsc:cpe-nxhbsc-becreditrisk:jar:1.0.3-SNAPSHOT: Failed to collect dependencies at org.postgresql:postgresql:jar:42.7.11: Failed to read artifact descriptor for org.postgresql:postgresql:jar:42.7.11: The following artifacts could not be resolved: org.postgresql:postgresql:pom:42.7.11 (absent): Could not transfer artifact org.postgresql:postgresql:pom:42.7.11 from/to central (https://gluonlatam.jfrog.io/artifactory/per-maven-public): (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target -> [Help 1]
-
-
-(https://gluonlatam.jfrog.io/artifactory/per-maven-public): (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+-Djavax.net.ssl.trustStoreType=Windows-ROOT
