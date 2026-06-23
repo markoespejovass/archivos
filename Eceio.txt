@@ -1,604 +1,78 @@
-[ERROR] Errors: 
-[ERROR]   DocumentManagementAdapterTest.shouldThrowRuntimeExceptionWhenMapperToDtoFails:527 » Mockito 
-Only void methods can doNothing()!
-Example of correct use of doNothing():
-    doNothing().
-    doThrow(new RuntimeException())
-    .when(mock).someVoidMethod();
-Above means:
-someVoidMethod() does nothing the 1st time but throws an exception the 2nd time is called
-[ERROR]   DocumentManagementAdapterTest.shouldThrowRuntimeExceptionWhenMapperToEntityFails:484 » Mockito 
-Only void methods can doNothing()!
-Example of correct use of doNothing():
-    doNothing().
-    doThrow(new RuntimeException())
-    .when(mock).someVoidMethod();
-Above means:
-someVoidMethod() does nothing the 1st time but throws an exception the 2nd time is called
-[ERROR]   DocumentManagementAdapterTest.shouldThrowRuntimeExceptionWhenRepositoryFails:504 » Mockito 
-Only void methods can doNothing()!
-Example of correct use of doNothing():
-    doNothing().
-    doThrow(new RuntimeException())
-    .when(mock).someVoidMethod();
-Above means:
-someVoidMethod() does nothing the 1st time but throws an exception the 2nd time is called
-[INFO] 
-[ERROR] Tests run: 61, Failures: 0, Errors: 3, Skipped: 0
-[INFO] 
+@Test
+void shouldThrowRuntimeExceptionWhenMapperToEntityFails() {
 
+    WrapperPostDocumentsRequest request = buildRequest();
 
+    when(s3Client.putObject(
+            any(PutObjectRequest.class),
+            any(RequestBody.class)))
+            .thenReturn(PutObjectResponse.builder().build());
 
+    when(mapper.toEntity(any(), anyString(), anyString()))
+            .thenThrow(new RuntimeException("Mapper error"));
 
+    RuntimeException ex = assertThrows(
+            RuntimeException.class,
+            () -> adapter.uploadDocument(request));
 
+    assertEquals("Error uploading document to S3", ex.getMessage());
+}
 
-package com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output;
 
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.utils.FileSearch;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.*;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntity;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.output.jpa.FileEntityRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequest;
-import com.santander.cpe.nxhbsc.cpenxhbscbedocmanagement.infrastructure.adapters.input.rest.data.WrapperMySearchFilterRequestSearchPropertiesInner;
-import java.io.ByteArrayInputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
 
-import org.mockito.junit.jupiter.MockitoExtension;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+@Test
+void shouldThrowRuntimeExceptionWhenRepositoryFails() {
 
-import java.util.*;
+    WrapperPostDocumentsRequest request = buildRequest();
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+    FileEntity entity = new FileEntity();
 
-@ExtendWith(MockitoExtension.class)
-class DocumentManagementAdapterTest {
+    when(s3Client.putObject(
+            any(PutObjectRequest.class),
+            any(RequestBody.class)))
+            .thenReturn(PutObjectResponse.builder().build());
 
-    @Mock
-    private S3Client s3Client;
+    when(mapper.toEntity(any(), anyString(), anyString()))
+            .thenReturn(entity);
 
-    @Mock
-    private S3Presigner s3Presigner;
+    when(repository.putIfAbsent(any()))
+            .thenThrow(new RuntimeException("DB Error"));
 
-    @Mock
-    private DocumentMapper mapper;
+    RuntimeException ex = assertThrows(
+            RuntimeException.class,
+            () -> adapter.uploadDocument(request));
 
-    @Mock
-    private FileEntityRepository repository;
+    assertEquals("Error uploading document to S3", ex.getMessage());
+}
 
-    @InjectMocks
-    private DocumentManagementAdapter adapter;
 
-    @BeforeEach
-    void setup() {
-        adapter.bucketName = "bucket-test";
-    }
 
-    // =========================
-    // uploadDocument
-    // =========================
 
-    @Test
-    void uploadDocument_ok() {
+@Test
+void shouldThrowRuntimeExceptionWhenMapperToDtoFails() {
 
-        WrapperPostDocumentsRequest request = buildRequest();
+    WrapperPostDocumentsRequest request = buildRequest();
 
-        FileEntity entity = new FileEntity();
-        entity.setCustomerId("123");
+    FileEntity entity = new FileEntity();
 
-        WrapperPostDocumentsResponse response =
-                new WrapperPostDocumentsResponse();
+    when(s3Client.putObject(
+            any(PutObjectRequest.class),
+            any(RequestBody.class)))
+            .thenReturn(PutObjectResponse.builder().build());
 
-        when(mapper.toEntity(any(), anyString(), anyString()))
-                .thenReturn(entity);
+    when(mapper.toEntity(any(), anyString(), anyString()))
+            .thenReturn(entity);
 
-        when(repository.putIfAbsent(any(FileEntity.class)))
-                .thenReturn(entity);
+    when(repository.putIfAbsent(any()))
+            .thenReturn(entity);
 
-        when(mapper.toDTOUpload(entity))
-                .thenReturn(response);
+    when(mapper.toDTOUpload(any()))
+            .thenThrow(new RuntimeException("DTO Error"));
 
-        WrapperPostDocumentsResponse result =
-                adapter.uploadDocument(request);
+    RuntimeException ex = assertThrows(
+            RuntimeException.class,
+            () -> adapter.uploadDocument(request));
 
-        assertNotNull(result);
-
-        verify(s3Client).putObject(
-                any(PutObjectRequest.class),
-                any(RequestBody.class));
-
-        verify(repository).putIfAbsent(any(FileEntity.class));
-        verify(mapper).toDTOUpload(entity);
-    }
-
-
-    // =========================
-    // getDocument
-    // =========================
-
-    @Test
-    void getDocument_found() {
-
-        String documentId = "123";
-
-        FileEntity entity = new FileEntity();
-
-        WrapperMySearchDocumentResponse expected =
-                new WrapperMySearchDocumentResponse();
-
-        when(repository.getByKey(documentId, null))
-                .thenReturn(Optional.of(entity));
-
-        when(mapper.getMapper(entity))
-                .thenReturn(expected);
-
-        WrapperMySearchDocumentResponse result =
-                adapter.getDocument(documentId);
-
-        assertSame(expected, result);
-    }
-
-    @Test
-    void getDocument_notFound_returnsEmptyResponse() {
-
-        when(repository.getByKey("123", null))
-                .thenReturn(Optional.empty());
-
-        WrapperMySearchDocumentResponse result =
-                adapter.getDocument("123");
-
-        assertNotNull(result);
-    }
-
-    // =========================
-    // getDocumentVersion
-    // =========================
-
-    @Test
-    void getDocumentVersion_ok() {
-
-        List<FileEntity> entities =
-                Collections.singletonList(new FileEntity());
-
-        List<WrapperMySearchDocumentVersionResponse> expected =
-                Collections.singletonList(
-                        new WrapperMySearchDocumentVersionResponse());
-
-        when(repository.findAll())
-                .thenReturn(entities);
-
-        when(mapper.getVersions(entities))
-                .thenReturn(expected);
-
-        List<WrapperMySearchDocumentVersionResponse> result =
-                adapter.getDocumentVersion("123");
-
-        assertEquals(1, result.size());
-    }
-
-    // =========================
-    // deleteDocument
-    // =========================
-
-    @Test
-    void deleteDocument_found() {
-
-        FileEntity entity = new FileEntity();
-        entity.setUrl("folder/file.pdf");
-
-        when(repository.getByKey("123", null))
-                .thenReturn(Optional.of(entity));
-
-        adapter.deleteDocument("123");
-
-        verify(s3Client).deleteObject(any(DeleteObjectRequest.class));
-        verify(repository).delete(entity);
-    }
-
-    @Test
-    void deleteDocument_notFound() {
-
-        when(repository.getByKey("123", null))
-                .thenReturn(Optional.empty());
-
-        adapter.deleteDocument("123");
-
-        verify(repository, never()).delete(any());
-        verify(s3Client, never()).deleteObject(any(DeleteObjectRequest.class));
-    }
-
-    // =========================
-    // downloadDocument
-    // =========================
-
-    @Test
-    void downloadDocument_documentNull_returnsEmptyResponse() {
-
-        WrapperGetDocumentsRequest request =
-                new WrapperGetDocumentsRequest();
-
-        WrapperGetDocumentsResponse result =
-                adapter.downloadDocument(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void downloadDocument_documentIdNull_returnsEmptyResponse() {
-
-        WrapperGetDocumentsRequest request =
-                new WrapperGetDocumentsRequest();
-
-        request.setDocument(new WrapperMyDocumentResponse());
-
-        WrapperGetDocumentsResponse result =
-                adapter.downloadDocument(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void downloadDocument_notFound_returnsEmptyResponse() {
-
-        WrapperGetDocumentsRequest request =
-                new WrapperGetDocumentsRequest();
-
-        WrapperMyDocumentResponse doc =
-                new WrapperMyDocumentResponse();
-
-        doc.setDocumentId("123");
-
-        request.setDocument(doc);
-
-        when(repository.getByKey("123", null))
-                .thenReturn(Optional.empty());
-
-        WrapperGetDocumentsResponse result =
-                adapter.downloadDocument(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void downloadDocument_ok() throws Exception {
-
-        WrapperGetDocumentsRequest request =
-                new WrapperGetDocumentsRequest();
-
-        WrapperMyDocumentResponse document =
-                new WrapperMyDocumentResponse();
-
-        document.setDocumentId("123");
-
-        request.setDocument(document);
-
-        FileEntity entity = new FileEntity();
-        entity.setUrl("folder/file.pdf");
-
-        WrapperGetDocumentsResponse response =
-                new WrapperGetDocumentsResponse();
-
-        PresignedGetObjectRequest presigned =
-                mock(PresignedGetObjectRequest.class);
-
-        when(repository.getByKey("123", null))
-                .thenReturn(Optional.of(entity));
-
-        when(presigned.url())
-                .thenReturn(new URL("https://test.com/file.pdf"));
-
-        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
-                .thenReturn(presigned);
-
-        when(mapper.donwloadMapper(anyString()))
-                .thenReturn(response);
-
-        WrapperGetDocumentsResponse result =
-                adapter.downloadDocument(request);
-
-        assertNotNull(result);
-
-        verify(mapper).donwloadMapper(anyString());
-    }
-
-    // =========================
-    // searchDocuments
-    // =========================
-
-    @Test
-    void searchDocuments_searchParametersNull_returnsEmptyResponse() {
-
-        WrapperPostSearchDocumentsRequest request =
-                new WrapperPostSearchDocumentsRequest();
-
-        WrapperPostSearchDocumentsResponse result =
-                adapter.searchDocuments(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void searchDocuments_searchPropertiesNull_returnsEmptyResponse() {
-
-        WrapperPostSearchDocumentsRequest request =
-                new WrapperPostSearchDocumentsRequest();
-
-        WrapperMySearchFilterRequest filter =
-                new WrapperMySearchFilterRequest();
-
-        request.setSearchParameters(filter);
-
-        WrapperPostSearchDocumentsResponse result =
-                adapter.searchDocuments(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void searchDocuments_searchPropertiesEmpty_returnsEmptyResponse() {
-
-        WrapperPostSearchDocumentsRequest request =
-                new WrapperPostSearchDocumentsRequest();
-
-        WrapperMySearchFilterRequest filter =
-                new WrapperMySearchFilterRequest();
-
-        filter.setSearchProperties(Collections.emptyList());
-
-        request.setSearchParameters(filter);
-
-        WrapperPostSearchDocumentsResponse result =
-                adapter.searchDocuments(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void searchDocuments_discriminatorNull_returnsEmptyResponse() {
-
-        WrapperPostSearchDocumentsRequest request =
-                new WrapperPostSearchDocumentsRequest();
-
-        WrapperMySearchFilterRequest filter =
-                new WrapperMySearchFilterRequest();
-
-        filter.setSearchProperties(
-                Collections.singletonList(
-                        new WrapperMySearchFilterRequestSearchPropertiesInner()));
-
-        request.setSearchParameters(filter);
-
-        WrapperPostSearchDocumentsResponse result =
-                adapter.searchDocuments(request);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void searchDocuments_ok() {
-
-        WrapperPostSearchDocumentsRequest request =
-                buildSearchRequest();
-
-        List<FileEntity> entities =
-                Collections.singletonList(new FileEntity());
-
-        WrapperPostSearchDocumentsResponse response =
-                new WrapperPostSearchDocumentsResponse();
-
-        when(repository.search(any(FileSearch.class)))
-                .thenReturn(entities);
-
-        when(mapper.searchMapper(entities))
-                .thenReturn(response);
-
-        WrapperPostSearchDocumentsResponse result =
-                adapter.searchDocuments(request);
-
-        assertNotNull(result);
-    }
-
-    // =========================
-    // builders
-    // =========================
-
-    private WrapperPostDocumentsRequest buildRequest() {
-
-        String base64 = Base64.getEncoder()
-                .encodeToString("contenido".getBytes());
-
-        WrapperMySearchDocumentResponseOwnersInner owner =
-                new WrapperMySearchDocumentResponseOwnersInner();
-
-        owner.setOwnerId("12345678");
-
-        WrapperMyDocumentRequest document =
-                new WrapperMyDocumentRequest();
-
-        document.setFolderReference(base64);
-        document.setAclReference("ACL");
-        document.setMimeType("application/pdf");
-        document.setName("file.pdf");
-        document.setOwners(List.of(owner));
-
-        App caller =
-                new App();
-
-        caller.setAppId("APP");
-
-        WrapperPostDocumentsRequest request =
-                new WrapperPostDocumentsRequest();
-
-        request.setDocument(document);
-        request.setCallerInformation(caller);
-
-        return request;
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionWhenDocumentIsNull() {
-
-        WrapperPostDocumentsRequest request = mock(WrapperPostDocumentsRequest.class);
-
-        when(request.getDocument()).thenReturn(null);
-
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> adapter.uploadDocument(request));
-
-        assertEquals("Error uploading document to S3", ex.getMessage());
-
-        verifyNoInteractions(s3Client, repository, mapper);
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionWhenBase64IsInvalid() {
-
-        WrapperPostDocumentsRequest request = mock(WrapperPostDocumentsRequest.class);
-        WrapperMyDocumentRequest document = mock(WrapperMyDocumentRequest.class);
-
-        when(request.getDocument()).thenReturn(document);
-        when(document.getFolderReference()).thenReturn("BASE64_INVALIDO");
-
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> adapter.uploadDocument(request));
-
-        assertEquals("Error uploading document to S3", ex.getMessage());
-
-        verifyNoInteractions(s3Client, repository, mapper);
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionWhenS3UploadFails() {
-
-        WrapperPostDocumentsRequest request = buildRequest();
-
-        doThrow(new RuntimeException("S3 Error"))
-                .when(s3Client)
-                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
-
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> adapter.uploadDocument(request));
-
-        assertEquals("Error uploading document to S3", ex.getMessage());
-
-        verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionWhenMapperToEntityFails() {
-
-        WrapperPostDocumentsRequest request = buildRequest();
-
-        doNothing().when(s3Client)
-                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
-
-        when(mapper.toEntity(any(), anyString(), anyString()))
-                .thenThrow(new RuntimeException("Mapper error"));
-
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> adapter.uploadDocument(request));
-
-        assertEquals("Error uploading document to S3", ex.getMessage());
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionWhenRepositoryFails() {
-
-        WrapperPostDocumentsRequest request = buildRequest();
-
-        FileEntity entity = new FileEntity();
-
-        doNothing().when(s3Client)
-                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
-
-        when(mapper.toEntity(any(), anyString(), anyString()))
-                .thenReturn(entity);
-
-        when(repository.putIfAbsent(any()))
-                .thenThrow(new RuntimeException("DB Error"));
-
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> adapter.uploadDocument(request));
-
-        assertEquals("Error uploading document to S3", ex.getMessage());
-    }
-
-    @Test
-    void shouldThrowRuntimeExceptionWhenMapperToDtoFails() {
-
-        WrapperPostDocumentsRequest request = buildRequest();
-
-        FileEntity entity = new FileEntity();
-
-        doNothing().when(s3Client)
-                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
-
-        when(mapper.toEntity(any(), anyString(), anyString()))
-                .thenReturn(entity);
-
-        when(repository.putIfAbsent(any()))
-                .thenReturn(entity);
-
-        when(mapper.toDTOUpload(any()))
-                .thenThrow(new RuntimeException("DTO Error"));
-
-        RuntimeException ex = assertThrows(
-                RuntimeException.class,
-                () -> adapter.uploadDocument(request));
-
-        assertEquals("Error uploading document to S3", ex.getMessage());
-    }
-
-
-    private WrapperPostSearchDocumentsRequest buildSearchRequest() {
-
-        WrapperMySearchFilterRequestSearchPropertiesInner property =
-                new WrapperMySearchFilterRequestSearchPropertiesInner();
-
-        property.setKeyId("NAME");
-        property.setKeyValue("123");
-        property.setKeyOperator(
-                WrapperMySearchFilterRequestSearchPropertiesInner
-                        .KeyOperatorEnum.EQUAL);
-
-        WrapperMySearchFilterRequest filter =
-                new WrapperMySearchFilterRequest();
-
-        filter.setDiscriminator("AND");
-        filter.setSearchProperties(List.of(property));
-
-        WrapperPostSearchDocumentsRequest request =
-                new WrapperPostSearchDocumentsRequest();
-
-        request.setSearchParameters(filter);
-
-        return request;
-    }
+    assertEquals("Error uploading document to S3", ex.getMessage());
 }
