@@ -1,1 +1,186 @@
 
+@ExtendWith(MockitoExtension.class)
+class UploadDocumentServiceTest {
+
+    @InjectMocks
+    private UploadDocumentService service;
+
+    @Mock
+    private S3Client s3Client;
+
+    @Mock
+    private FileRepository repository;
+
+    @Mock
+    private FileMapper mapper;
+
+    @BeforeEach
+    void setup() {
+        ReflectionTestUtils.setField(service, "bucketName", "test-bucket");
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionWhenDocumentIsNull() {
+
+        WrapperPostDocumentsRequest request = mock(WrapperPostDocumentsRequest.class);
+
+        when(request.getDocument()).thenReturn(null);
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.uploadDocument(request));
+
+        assertEquals("Error uploading document to S3", ex.getMessage());
+
+        verifyNoInteractions(s3Client, repository, mapper);
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionWhenBase64IsInvalid() {
+
+        WrapperPostDocumentsRequest request = mock(WrapperPostDocumentsRequest.class);
+        Document document = mock(Document.class);
+
+        when(request.getDocument()).thenReturn(document);
+        when(document.getFolderReference()).thenReturn("BASE64_INVALIDO");
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.uploadDocument(request));
+
+        assertEquals("Error uploading document to S3", ex.getMessage());
+
+        verifyNoInteractions(s3Client, repository, mapper);
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionWhenS3UploadFails() {
+
+        WrapperPostDocumentsRequest request = buildRequest();
+
+        doThrow(new RuntimeException("S3 Error"))
+                .when(s3Client)
+                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.uploadDocument(request));
+
+        assertEquals("Error uploading document to S3", ex.getMessage());
+
+        verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionWhenMapperToEntityFails() {
+
+        WrapperPostDocumentsRequest request = buildRequest();
+
+        doNothing().when(s3Client)
+                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
+
+        when(mapper.toEntity(any(), anyString(), anyString()))
+                .thenThrow(new RuntimeException("Mapper error"));
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.uploadDocument(request));
+
+        assertEquals("Error uploading document to S3", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionWhenRepositoryFails() {
+
+        WrapperPostDocumentsRequest request = buildRequest();
+
+        FileEntity entity = new FileEntity();
+
+        doNothing().when(s3Client)
+                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
+
+        when(mapper.toEntity(any(), anyString(), anyString()))
+                .thenReturn(entity);
+
+        when(repository.putIfAbsent(any()))
+                .thenThrow(new RuntimeException("DB Error"));
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.uploadDocument(request));
+
+        assertEquals("Error uploading document to S3", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowRuntimeExceptionWhenMapperToDtoFails() {
+
+        WrapperPostDocumentsRequest request = buildRequest();
+
+        FileEntity entity = new FileEntity();
+
+        doNothing().when(s3Client)
+                .putObject(any(PutObjectRequest.class), any(RequestBody.class));
+
+        when(mapper.toEntity(any(), anyString(), anyString()))
+                .thenReturn(entity);
+
+        when(repository.putIfAbsent(any()))
+                .thenReturn(entity);
+
+        when(mapper.toDTOUpload(any()))
+                .thenThrow(new RuntimeException("DTO Error"));
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.uploadDocument(request));
+
+        assertEquals("Error uploading document to S3", ex.getMessage());
+    }
+
+    private WrapperPostDocumentsRequest buildRequest() {
+
+        WrapperPostDocumentsRequest request = mock(WrapperPostDocumentsRequest.class);
+        Document document = mock(Document.class);
+        CallerInformation callerInformation = mock(CallerInformation.class);
+
+        when(request.getDocument()).thenReturn(document);
+        when(request.getCallerInformation()).thenReturn(callerInformation);
+
+        when(callerInformation.getAppId()).thenReturn("app");
+
+        when(document.getFolderReference())
+                .thenReturn(Base64.getEncoder().encodeToString("test".getBytes()));
+
+        when(document.getName()).thenReturn("file.pdf");
+        when(document.getMimeType()).thenReturn("application/pdf");
+        when(document.getOwners()).thenReturn(Collections.emptyList());
+
+        return request;
+    }
+}
+
+
+@Test
+void shouldHandleNullOwners() {
+    when(document.getOwners()).thenReturn(null);
+}
+
+@Test
+void shouldHandleEmptyOwners() {
+    when(document.getOwners()).thenReturn(Collections.emptyList());
+}
+
+@Test
+void shouldReturnDniPrefixWhenOwnerExists() {
+
+    WrapperMySearchDocumentResponseOwnersInner owner =
+            new WrapperMySearchDocumentResponseOwnersInner();
+
+    owner.setOwnerId("12345678");
+
+    when(document.getOwners()).thenReturn(List.of(owner));
+
+    // verificar que el key generado contiene:
+    // 12345678/
+}
