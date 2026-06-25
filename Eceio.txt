@@ -1,7 +1,322 @@
-{"timestamp":"2026-06-24T23:55:01.856Z","environment":"CERT","userId":"","logLevel":"WARN","log":"SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springdoc.core.events.SpringDocAppInitializer","contactPoint":""},"logType":"technical"} 
-{"timestamp":"2026-06-24T23:55:01.856Z","environment":"CERT","userId":"","logLevel":"WARN","log":"SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","threadId":"main","component":"org.springdoc.core.events.SpringDocAppInitializer","contactPoint":""},"logType":"technical"} 
-{"timestamp":"2026-06-24T23:55:03.753Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing Spring DispatcherServlet 'dispatcherServlet'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","threadId":"http-nio-8080-exec-1","component":"org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]","contactPoint":""},"logType":"technical"} 
-{"timestamp":"2026-06-24T23:55:03.753Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Initializing Servlet 'dispatcherServlet'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","threadId":"http-nio-8080-exec-1","component":"org.springframework.web.servlet.DispatcherServlet","contactPoint":""},"logType":"technical"} 
-{"timestamp":"2026-06-24T23:55:03.754Z","environment":"CERT","userId":"","logLevel":"INFO","log":"Completed initialization in 1 ms  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"","spanId":"","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","threadId":"http-nio-8080-exec-1","component":"org.springframework.web.servlet.DispatcherServlet","contactPoint":""},"logType":"technical"} 
-{"timestamp":"2026-06-25T00:23:10.764Z","environment":"CERT","userId":"","logLevel":"ERROR","log":"Received MethodArgumentNotValidException exception in the Santander Spring Boot framework org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public default org.springframework.http.ResponseEntity<com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.input.rest.data.CivilValidationResponse> com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.input.rest.OnboardingApi.civilValidation(com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.input.rest.data.CivilValidationRequest): [Field error in object 'civilValidationRequest' on field 'tokenOcr': rejected value [null]; codes [NotNull.civilValidationRequest.tokenOcr,NotNull.tokenOcr,NotNull.java.lang.String,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [civilValidationRequest.tokenOcr,tokenOcr]; arguments []; default message [tokenOcr]]; default message [must not be null]] \n\tat org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor.resolveArgument(RequestResponseBodyMethodProcessor.java:159)\n\tat org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181)\n\tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:991)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:896)\n\tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)\n\tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)\n\tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)\n\tat org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)\n\tat jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)\n\tat jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat com.santander.framework.springboot.logging.filter.ContactPointLoggingFilter.doFilterInternal(ContactPointLoggingFilter.java:73)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat com.santander.framework.springboot.omnichannel.filter.OmniChannelFilter.doFilterInternal(OmniChannelFilter.java:90)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)\n\tat org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)\n\tat org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:83)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:129)\n\tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125)\n\tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)\n\tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)\n\tat org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)\n\tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)\n\tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)\n\tat org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)\n\tat org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)\n\tat org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)\n\tat org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)\n\tat org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)\n\tat org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240)\n\tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)\n\tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat com.santander.framework.springboot.logging.filter.DistributedTracesFilter.doFilterInternal(DistributedTracesFilter.java:73)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat com.santander.framework.springboot.core.filter.ContextFilter.doFilterInternal(ContextFilter.java:121)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.springframework.web.filter.ForwardedHeaderFilter.doFilterInternal(ForwardedHeaderFilter.java:173)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)\n\tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)\n\tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)\n\tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:88)\n\tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492)\n\tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)\n\tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)\n\tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)\n\tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)\n\tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)\n\tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272)\n\tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1797)\n\tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)\n\tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:973)\n\tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:491)\n\tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)\n\tat java.base/java.lang.Thread.run(Thread.java:840)\n ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":false,"platform": "Santander","traceId":"20c375aa08a1fd50","spanId":"20c375aa08a1fd50","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"bruno-runtime/3.4.2","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","threadId":"http-nio-8080-exec-7","component":"com.santander.framework.springboot.core.exceptions.web.AbstractExceptionHandlerController","contactPoint":""},"logType":"technical"} 
-{"timestamp":"2026-06-25T00:23:11.056Z","environment":"CERT","userId":"","logLevel":"INFO","log":"'/v1/identity_biometric/onboarding/civilValidation'  ","appKey":"nxhbsc","serviceName": "cpe-nxhbsc-beidentbiometric","region": "us-east-1","entity": "ESP","error":true,"platform": "Santander","traceId":"20c375aa08a1fd50","spanId":"20c375aa08a1fd50","parentSpanId":"","trace_id":"","span_id":"","parent_id":"","tracestate":"","company":"cpe","componentName":"beidentbiometric","componentId":"CHANGEIT_CMPT_ID","componentType":"microservice","appName":"nxhbsc","appId":"CHANGEIT_APP_ID","gluon":"Y","isGluon":true,"componentVersion":"1.3.0","logVersion":"1.0.0","customLog":{"userId":"", "coreUserId":"","paasProject":"cpe-nexhub-tec-dev_us-east-1","sessionId":"","platformLog":"bruno-runtime/3.4.2","paasAppVersion": "1.3.0","appInit":"","serverId":"cpe-nxhbsc-beidentbiometric-micro-java-6f7f6f6dcb-tm5hq","businessReference":"","sessionReference":"","channel":"","contactPoint":"","threadId":"http-nio-8080-exec-7","clientId":"1232654","responseTime":"879"},"inputTimeStamp":"2026-06-25T00:23:10.176Z","method":"POST","url": "/v1/identity_biometric/onboarding/civilValidation","returnCode":"400","logType":"activity"} 
+package com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.rest;
+
+import java.util.Collections;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.application.ports.output.FacephiServiceOutputPort;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.authentication.AuthenticateUser;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.authentication.AuthenticateUserResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.authentication.UserTemplate;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.authentication.UserTemplateResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.biometric.AuthenticateFacial;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.biometric.AuthenticateFacialResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.biometric.EvaluatePassiveLiveness;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.biometric.EvaluatePassiveLivenessResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.biometric.Iad;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.biometric.IadResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.CivilValidation;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.CivilValidationResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.DocumentValidationData;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.DocumentValidationDataResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.DocumentValidationStart;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.DocumentValidationStatusResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.ExtractDocumentData;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.ExtractDocumentDataResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.ExtractDocumentDataWeb;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.Identity;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.onboarding.IdentityResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.signer.Signer;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.signer.SignerResult;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.domain.model.wrapper.WrapperExecution;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.authentication.FacephiAuthenticateUserResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.authentication.FacephiUserTemplateResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.biometric.FacephiAuthenticateFacialResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.biometric.FacephiEvaluatePassiveLivenessResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.biometric.FacephiIadResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.onboarding.FacephiCivilValidationResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.onboarding.FacephiDocumentValidationDataResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.onboarding.FacephiDocumentValidationStatusResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.onboarding.FacephiExtractDocumentDataResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.dto.onboarding.FacephiIdentityResponse;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.adapters.output.client.mapper.FacephiMapper;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.config.ApiProperties;
+import com.santander.cpe.nxhbsc.cpenxhbscbeidentbiometric.infrastructure.constants.Constant;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Component
+@Slf4j
+@RequiredArgsConstructor
+public class FacephiAdapter implements FacephiServiceOutputPort {
+
+  private final WebClient webClient;
+  private final FacephiMapper mapper;
+  private final ObjectMapper objectMapper;
+  private final ApiProperties apiProperties;
+
+  private String urlCallback;
+
+  @Override
+  public WrapperExecution<UserTemplateResult> postUserTemplateResult(UserTemplate userTemplate) {
+    var request = mapper.toFacephiUserTemplateRequest(userTemplate);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_SERVICES_UPDATE_USER_TEMPLATE)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiUserTemplateResponse.class)
+            .block();
+    return buildWrapperExecution(
+        mapper.toUserTemplateResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<IdentityResult> postIdentityResult(Identity identity) {
+    var request = mapper.toFacephiIdentityRequest(identity);
+    log.info("request: {}", request.toString());
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_ONBOARDING_V2_IDENTITY)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiIdentityResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toIdentityResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<IadResult> postIadResult(Iad iad) {
+    var request = iad.getResource();
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_IAD)
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiIadResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toIadResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<ExtractDocumentDataResult> postExtractDocumentDataResult(
+      ExtractDocumentData extractDocumentData) {
+    var request = mapper.toFacephiExtractDocumentDataRequest(extractDocumentData);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_SERVICES_EXTRACT_DOCUMENT_DATA)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiExtractDocumentDataResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toExtractDocumentDataResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<ExtractDocumentDataResult> postExtractDocumentDataWebResult(
+      ExtractDocumentDataWeb extractDocumentDataWeb) {
+    var request = mapper.toFacephiExtractDocumentDataWebRequest(extractDocumentDataWeb);
+    try {
+      log.info("extract web request: {}", objectMapper.writeValueAsString(request));
+    } catch (Exception e) {
+      log.error("Error en writable : {}", e.getMessage());
+    }
+
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_SERVICES_EXTRACT_DOCUMENT_DATA_WEB)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiExtractDocumentDataResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toExtractDocumentDataResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<DocumentValidationStatusResult> postDocumentValidationStatusResult(
+      DocumentValidationData documentValidationData) {
+    var request = mapper.toFacephiDocumentValidationDataRequest(documentValidationData);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_VERIFY_DOCUMENT_VALIDATION_V2_STATUS)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiDocumentValidationStatusResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toDocumentValidationStatusResult(response),
+        request,
+        response,
+        HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<DocumentValidationStatusResult> postDocumentValidationStartResult(
+      DocumentValidationStart documentValidationStart) {
+    var request = mapper.toFacephiDocumentValidationStartRequest(documentValidationStart);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_VERIFY_DOCUMENT_VALIDATION_V2_START)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiDocumentValidationStatusResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toDocumentValidationStatusResult(response),
+        request,
+        response,
+        HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<DocumentValidationDataResult> postDocumentValidationDataResult(
+      DocumentValidationData documentValidationData) {
+    var request = mapper.toFacephiDocumentValidationDataRequest(documentValidationData);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_VERIFY_DOCUMENT_VALIDATION_V2_DATA)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiDocumentValidationDataResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toDocumentValidationDataResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<AuthenticateUserResult> postAuthenticateUserResult(
+      AuthenticateUser authenticateUser) {
+    var request = mapper.toFacephiAuthenticateUserRequest(authenticateUser);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_SERVICES_AUTHENTICATE_USER_V2)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiAuthenticateUserResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toAuthenticateUserResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<SignerResult> postSignerResult(Signer signer) {
+    signer.setCallbackUrl(urlCallback);
+    var request = mapper.toFacephiSignerRequest(signer);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_SIGNER)
+            .bodyValue(request)
+            .retrieve()
+            .toBodilessEntity()
+            .block();
+    return buildWrapperExecution(
+        mapper.toSignerResult(1, ""), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<CivilValidationResult> postCivilValidationResult(
+      CivilValidation civilValidation) {
+    var request = mapper.toFacephiCivilValidationRequest(civilValidation);
+    var response =
+        webClient
+            .post()
+            .uri(Constant.POST_CIVIL_VALIDATION)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiCivilValidationResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toCivilValidationResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<AuthenticateFacialResult> postAuthenticateFacialResult(
+      AuthenticateFacial authenticateFacial) {
+    var request = mapper.toFacephiAuthenticateFacialRequest(authenticateFacial);
+    var response =
+        webClient
+            .mutate()
+            .defaultHeader(Constant.X_API_KEY, apiProperties.getApiKeyAuth())
+            .build()
+            .post()
+            .uri(Constant.POST_AUTHENTICATE_FACIAL)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiAuthenticateFacialResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toAuthenticateFacialResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  @Override
+  public WrapperExecution<EvaluatePassiveLivenessResult> postEvaluatePassiveLivenessResult(
+      EvaluatePassiveLiveness evaluatePassiveLiveness) {
+    var request = mapper.toFacephiEvaluatePassiveLivenessRequest(evaluatePassiveLiveness);
+    var response =
+        webClient
+            .mutate()
+            .defaultHeader(Constant.X_API_KEY, apiProperties.getApiKeyAuth())
+            .build()
+            .post()
+            .uri(Constant.POST_EVALUATE_PASSIVE_LIVENESS)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(FacephiEvaluatePassiveLivenessResponse.class)
+            .block();
+
+    return buildWrapperExecution(
+        mapper.toEvaluatePassiveLivenessResult(response), request, response, HttpStatus.OK.value());
+  }
+
+  private <T> WrapperExecution<T> buildWrapperExecution(
+      T data, Object request, Object response, Integer httpStatus) {
+    return WrapperExecution.<T>builder()
+        .data(data)
+        .request(toMap(request))
+        .response(toMap(response))
+        .httpStatus(httpStatus)
+        .build();
+  }
+
+  private Map<String, Object> toMap(Object object) {
+    if (object == null) {
+      return Collections.emptyMap();
+    }
+    return objectMapper.convertValue(object, new TypeReference<>() {});
+  }
+}
