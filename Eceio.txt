@@ -1,1 +1,58 @@
 
+<dependency>
+    <groupId>fr.opensagres.xdocreport</groupId>
+    <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
+    <version>2.0.4</version>
+</dependency>
+
+<dependency>
+    <groupId>fr.opensagres.xdocreport</groupId>
+    <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
+    <version>2.0.4</version>
+</dependency>
+
+
+
+
+import fr.opensagres.xdocreport.converter.Options;
+import fr.opensagres.xdocreport.converter.ConverterTypeTo;
+import fr.opensagres.xdocreport.converter.ConverterTypeVia;
+import fr.opensagres.xdocreport.document.IXDocReport;
+import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
+import fr.opensagres.xdocreport.template.IContext;
+import fr.opensagres.xdocreport.template.TemplateEngineKind;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class GeneradorReporte {
+
+    public static void main(String[] args) throws Exception {
+
+        InputStream in = new FileInputStream("plantillas/reporte.docx");
+
+        IXDocReport report = XDocReportRegistry.getRegistry()
+                .loadReport(in, TemplateEngineKind.Freemarker);
+
+        IContext context = report.createContext();
+
+        context.put("nombre", "Juan Pérez");
+        context.put("dni", "12345678");
+        context.put("fecha", "01/07/2026");
+
+        OutputStream out = new FileOutputStream("reporte.pdf");
+
+        Options options = Options.getTo(
+                ConverterTypeTo.PDF)
+                .via(ConverterTypeVia.XWPF);
+
+        report.convert(context, options, out);
+
+        out.close();
+        in.close();
+
+        System.out.println("PDF generado correctamente.");
+    }
+}
