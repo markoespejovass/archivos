@@ -30,3 +30,7 @@ const plainText = JSON.stringify(jsonData);
 
 const encryptedHex = encryptAES256CBC(plainText, key); 
 console.log(encryptedHex);
+
+
+
+nuevo metodo de encripty = AES/GCM/NoPadding
