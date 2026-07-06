@@ -1,6 +1,62 @@
 curl --request POST \
-  --url https://otpsantander.celmediamobile.pe/oauth/token \
-  --header 'authorization: Basic Y2xpXzI2NjNkZTE0OTM2MTQxMmFhODNkODExOGY0NDI3YzdkOnNlY19jNjZlOThjODZmZmI3YTY5YTQxNTA4NWVlNGRhY2UwMjAwZjc5NzBjM2NkMzkzZjU2NjYyMTI2YjhlMTZkOGM3' \
+  --url https://api-campaign-us-2.goacoustic.com/oauth/token \
   --header 'content-type: application/x-www-form-urlencoded' \
-  --data grant_type=client_credentials \
-  --data scope=otp:generate
+  --data grant_type=refresh_token \
+  --data client_id=da3996aa-0271-4ecb-a820-a7a784a0883e \
+  --data client_secret=86ecd30c-e681-4947-a54b-3faaf8a46e8c \
+  --data refresh_token=rMu4uG24_82eu-qGi-kGWSWx4V_4mQIETk67nckzvOXsS1
+
+
+
+curl --request POST \
+  --url http://transact-campaign-us-2.goacoustic.com/XTMail \
+  --header 'authorization: Bearer ao35blcp_RT7qa7gME6Vn9p7yNyU4tHNjONsMEakOhxYS1' \
+  --header 'content-type: text/xml' \
+  --data '<XTMAILING>
+    <CAMPAIGN_ID>25514100</CAMPAIGN_ID> <!--ID de grupo de mensaje automatizado (Campaign)-->
+    <TRANSACTION_ID>opcional</TRANSACTION_ID>
+    <SHOW_ALL_SEND_DETAIL>true</SHOW_ALL_SEND_DETAIL>
+    <SEND_AS_BATCH>false</SEND_AS_BATCH>
+    <NO_RETRY_ON_FAILURE>false</NO_RETRY_ON_FAILURE>
+    <RECIPIENT>
+        <EMAIL>marko04081216@gmail.com</EMAIL> <!--Correo-->
+        <!--<BCC> </BCC>--> <!--Con copia (Opcional)-->
+        <BODY_TYPE>HTML</BODY_TYPE>
+         <PERSONALIZATION>
+            <TAG_NAME>variable_1</TAG_NAME>
+            <VALUE>Variable 1</VALUE>
+        </PERSONALIZATION>
+        <PERSONALIZATION>
+            <TAG_NAME>subject</TAG_NAME>
+            <VALUE>Test</VALUE>
+        </PERSONALIZATION>
+        <PERSONALIZATION>
+            <TAG_NAME>variable_2</TAG_NAME>
+            <VALUE>API creada para Prueba</VALUE>
+        </PERSONALIZATION>
+        <PERSONALIZATION>
+            <TAG_NAME>variable_3</TAG_NAME>
+            <VALUE>Prueba de CELMEDIA...</VALUE>
+        </PERSONALIZATION>
+        <PERSONALIZATION>
+            <TAG_NAME>variable_4</TAG_NAME>
+            <VALUE>Informacion variable 4</VALUE>
+        </PERSONALIZATION>
+        <PERSONALIZATION>
+            <TAG_NAME>variable_5</TAG_NAME>
+            <VALUE>Esta es la 5ta variable de su transacción</VALUE>
+        </PERSONALIZATION>
+        <!--*****INICIO ADJUNTO*****-->
+        <ATTACHMENT> 
+			<NAME>Prueba_1.pdf</NAME>
+			<MIME_TYPE>text/plain</MIME_TYPE>
+			<DATA>JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwgL0xlbmd0aCA1IDAgUiAvRmlsdGVyIC9GbGF0ZURl</DATA> <!--Archivo adjunto, codificado en base 64-->
+		</ATTACHMENT>
+              <ATTACHMENT> 
+			<NAME>Prueba_2.pdf</NAME>
+			<MIME_TYPE>text/plain</MIME_TYPE>
+			<DATA>JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwgL0xlbmd0aCA1IDAgUiAvRmlsdGVyIC9GbGF0ZURl</DATA> <!--Archivo adjunto, codificado en base 64-->
+		</ATTACHMENT>
+		<!--*****FIN ADJUNTO*****-->
+    </RECIPIENT>
+</XTMAILING>'
