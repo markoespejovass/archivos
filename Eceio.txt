@@ -1,3 +1,67 @@
-curl --location --request GET 'https://development.api.sky-data-exchange.qurable.io/v1/users/43362687' \
---header 'accept: application/json' \
---header 'Authorization: Bearer fa86f0837dc9cdc1a97e'
+package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
+
+import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external.TokenService;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
+
+/**
+ * The class representative Web client
+ *
+ * @author Create by team Proyecto [NUBE] Pe
+ */
+@Configuration
+@RequiredArgsConstructor
+public class WebClientConfig {
+
+  private final ProxyProperties proxyProperties;
+
+  @Bean
+  public WebClient webClient(
+      TokenService tokenService) throws Exception{
+
+      SslContext sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+      var httpClient =
+              HttpClient.create()
+                      .proxy(proxy -> proxy
+                              .type(ProxyProvider.Proxy.HTTP)
+                              .host(proxyProperties.getHost())
+                              .port(Integer.parseInt(proxyProperties.getPort())))
+                      .secure(t ->
+                              t.sslContext(sslContext)
+                                      .handlerConfigurator((SslHandler sslHandler) -> {
+                                      }))
+                      .wiretap(true);
+    return WebClient.builder()
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .baseUrl("https://dev-api.skyairline.com/partners")
+        .filter(addTokenFilter(tokenService))
+        .build();
+  }
+
+  private ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
+    return (request, next) ->
+        tokenService
+            .getToken()
+            .flatMap(
+                token -> {
+                  ClientRequest authorizedRequest =
+                      ClientRequest.from(request)
+                          .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                          .build();
+                  return next.exchange(authorizedRequest);
+                });
+  }
+}
