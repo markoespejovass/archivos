@@ -1,67 +1,997 @@
-package com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.config;
-
-import com.santander.cpe.nxhbsc.cpenxhbscbecustombeprogrm.infrastructure.adapters.output.external.TokenService;
-import io.netty.channel.ChannelOption;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.transport.ProxyProvider;
-
-/**
- * The class representative Web client
- *
- * @author Create by team Proyecto [NUBE] Pe
- */
-@Configuration
-@RequiredArgsConstructor
-public class WebClientConfig {
-
-  private final ProxyProperties proxyProperties;
-
-  @Bean
-  public WebClient webClient(
-      TokenService tokenService) throws Exception{
-
-      SslContext sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-      var httpClient =
-              HttpClient.create()
-                      .proxy(proxy -> proxy
-                              .type(ProxyProvider.Proxy.HTTP)
-                              .host(proxyProperties.getHost())
-                              .port(Integer.parseInt(proxyProperties.getPort())))
-                      .secure(t ->
-                              t.sslContext(sslContext)
-                                      .handlerConfigurator((SslHandler sslHandler) -> {
-                                      }))
-                      .wiretap(true);
-    return WebClient.builder()
-        .clientConnector(new ReactorClientHttpConnector(httpClient))
-        .baseUrl("https://dev-api.skyairline.com/partners")
-        .filter(addTokenFilter(tokenService))
-        .build();
-  }
-
-  private ExchangeFilterFunction addTokenFilter(TokenService tokenService) {
-    return (request, next) ->
-        tokenService
-            .getToken()
-            .flatMap(
-                token -> {
-                  ClientRequest authorizedRequest =
-                      ClientRequest.from(request)
-                          .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                          .build();
-                  return next.exchange(authorizedRequest);
-                });
-  }
+{
+    "schemes": ["https"],
+    "swagger": "2.0",
+    "info": {
+        "description": "Web API for integration beetween Sky and external partners.",
+        "title": "Sky-Qurable Data Exchange API",
+        "contact": {
+            "name": "Qurable",
+            "url": "https://qurable.co",
+            "email": "hello@qurable.co"
+        },
+        "version": "1.5.7"
+    },
+    "host": "development.api.sky-data-exchange.qurable.io",
+    "basePath": "/v1",
+    "paths": {
+        "/client": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get client data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clients"
+                ],
+                "summary": "Get client data",
+                "responses": {
+                    "200": {
+                        "description": "Client data array wrapped in a envelope.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Client"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/countries": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get countries data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "countries"
+                ],
+                "summary": "Get countries data",
+                "responses": {
+                    "200": {
+                        "description": "Countries data array wrapped in a envelope.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Country"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/healthcheck": {
+            "get": {
+                "description": "Perform a health check on the API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "JSON with server status. If status is available, the server is healthy. Otherwise, the server is unresponsive."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/points": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Add a specified number of points to a user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "points"
+                ],
+                "summary": "Add points",
+                "parameters": [
+                    {
+                        "description": "Transaction data to add points.",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Point"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction data wrapped in a envelope.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Point"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Subtract a specified number of points from a user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "points"
+                ],
+                "summary": "Subtract points",
+                "parameters": [
+                    {
+                        "description": "Transaction data to subtract points.",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Point"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction data wrapped in a envelope.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Point"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/tiers": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Reset to Sky assigned tier for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiers"
+                ],
+                "summary": "Reset tier for a user",
+                "parameters": [
+                    {
+                        "description": "Transaction data to reset tier.",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Tier"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction data wrapped in a envelope.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Tier"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Change tier for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiers"
+                ],
+                "summary": "Change tier for a user",
+                "parameters": [
+                    {
+                        "description": "Transaction data to change tier.",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Tier"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction data wrapped in a envelope.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Tier"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "422": {
+                        "description": "Validation error."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/tiers/types": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get tier types data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiers"
+                ],
+                "summary": "Get tier types",
+                "responses": {
+                    "200": {
+                        "description": "Tier types data array wrapped in a envelope.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TierType"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/tiers/types/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get tier type name by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiers"
+                ],
+                "summary": "Get tier type name",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tier type Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tier type name wrapped in a envelope.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/transactions/client-tx-id/{client_tx_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get transactions by client transaction id (for current client)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get transactions by client transaction id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Client Transaction Id",
+                        "name": "client_tx_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transactions data wrapped in a envelope.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/transactions/date/{year}/{month}/{day}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all transactions by date",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get transactions by date",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Month, if \u003c 1 then all months are returned",
+                        "name": "month",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Day, if \u003c 1 then all days are returned",
+                        "name": "day",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transactions data wrapped in a envelope.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionReportItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/transactions/search": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get transactions by dates (for current client)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get transactions by dates",
+                "parameters": [
+                    {
+                        "description": "Parameters to get transactions by dates.",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionReportRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transactions data wrapped in a envelope. Includes total number of transactions, current page and page size.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionReport"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/transactions/types": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get transaction types data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get transaction types",
+                "responses": {
+                    "200": {
+                        "description": "Transaction types data array wrapped in a envelope.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionType"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/users/search": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get user data by key and country id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get user data",
+                "parameters": [
+                    {
+                        "description": "User parameters",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.UserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User data wrapped in a envelope.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "405": {
+                        "description": "Method not allowed."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/users/{key}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get user data by key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get user data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User key",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User data wrapped in a envelope.",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "405": {
+                        "description": "Method not allowed."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_qurable_sky-data-exchange-api_internal_data.Client": {
+            "type": "object",
+            "properties": {
+                "daily_points_limit": {
+                    "type": "integer"
+                },
+                "daily_points_remains": {
+                    "type": "integer"
+                },
+                "daily_points_reset_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.Country": {
+            "type": "object",
+            "properties": {
+                "document_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.Point": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "country_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "tx_id": {
+                    "type": "string"
+                },
+                "user_enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.Tier": {
+            "type": "object",
+            "properties": {
+                "country_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "tier_expires_at": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                },
+                "tier_id": {
+                    "type": "integer"
+                },
+                "tx_id": {
+                    "type": "string"
+                },
+                "user_enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TierType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.Transaction": {
+            "type": "object",
+            "properties": {
+                "client_tx_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "tx_data_request": {
+                    "type": "string"
+                },
+                "tx_data_response": {
+                    "type": "string"
+                },
+                "tx_data_user_id": {
+                    "type": "string"
+                },
+                "tx_dts": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                },
+                "tx_q_id": {
+                    "type": "string"
+                },
+                "tx_status": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionStatusCode"
+                        }
+                    ],
+                    "example": "ok or error"
+                },
+                "tx_type": {
+                    "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionTypeCode"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TransactionReport": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_transactions": {
+                    "type": "integer"
+                },
+                "transactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionReportItem"
+                    }
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TransactionReportItem": {
+            "type": "object",
+            "properties": {
+                "client_name": {
+                    "type": "string"
+                },
+                "client_tx_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "tx_data_request": {
+                    "type": "string"
+                },
+                "tx_data_response": {
+                    "type": "string"
+                },
+                "tx_data_user_id": {
+                    "type": "string"
+                },
+                "tx_dts": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                },
+                "tx_status": {
+                    "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionStatusCode"
+                },
+                "tx_type": {
+                    "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionTypeCode"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TransactionReportRequest": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "tx_from_date": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                },
+                "tx_to_date": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TransactionStatusCode": {
+            "type": "string",
+            "enum": [
+                "ok",
+                "error"
+            ],
+            "x-enum-varnames": [
+                "TransactionStatusCodeOk",
+                "TransactionStatusCodeError"
+            ]
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TransactionType": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/github_com_qurable_sky-data-exchange-api_internal_data.TransactionTypeCode"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.TransactionTypeCode": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-comments": {
+                "TransactionTypePointsSubtracted": "2",
+                "TransactionTypeTierChanged": "3",
+                "TransactionTypeTierReset": "4"
+            },
+            "x-enum-varnames": [
+                "TransactionTypePointsAdded",
+                "TransactionTypePointsSubtracted",
+                "TransactionTypeTierChanged",
+                "TransactionTypeTierReset"
+            ]
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.User": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "integer"
+                },
+                "country_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "1999-01-01T00:00:00.00Z"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "tier_expires_at": {
+                    "type": "string",
+                    "example": "1999-01-01"
+                },
+                "tier_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_qurable_sky-data-exchange-api_internal_data.UserRequest": {
+            "type": "object",
+            "properties": {
+                "country_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Enter your bearer token in the format **Bearer [token]**",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "headers"
+        }
+    }
 }
