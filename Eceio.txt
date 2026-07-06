@@ -1,18 +1,6 @@
-{
-  "id": {
-    "S": "123"
-  },
-  "atributos": {
-    "M": {
-      "nombre": {
-        "S": "Marko"
-      },
-      "pais": {
-        "S": "Perú"
-      },
-      "rol": {
-        "S": "ADMIN"
-      }
-    }
-  }
-}
+curl --request POST \
+  --url https://otpsantander.celmediamobile.pe/oauth/token \
+  --header 'authorization: Basic Y2xpXzI2NjNkZTE0OTM2MTQxMmFhODNkODExOGY0NDI3YzdkOnNlY19jNjZlOThjODZmZmI3YTY5YTQxNTA4NWVlNGRhY2UwMjAwZjc5NzBjM2NkMzkzZjU2NjYyMTI2YjhlMTZkOGM3' \
+  --header 'content-type: application/x-www-form-urlencoded' \
+  --data grant_type=client_credentials \
+  --data scope=otp:generate
