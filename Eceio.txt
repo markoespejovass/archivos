@@ -1,21 +1,14 @@
-
-@Component
-public class SkyAdapter implements SkyPort {
-
-    private final WebClient webClient;
-
-    public SkyAdapter(WebClientFactory factory,
-                      SkyTokenService tokenService,
-                      SkyProperties properties) {
-
-        this.webClient = factory.create(
-                new WebClientConfiguration(
-                        properties.getBaseUrl(),
-                        tokenService));
-    }
-
-    // métodos...
-}
-
-
--Djavax.net.ssl.trustStoreType=Windows-ROOT
+ return webClient
+                    .get()
+                    .uri(Constant.URI_API_SKY_TIER+"/types")
+                    .header("Content-Type", "application/json")
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::is4xxClientError,
+                            response -> response.bodyToMono(String.class).map(body ->{
+                                log.error("error: {}", body);
+                                throw new RuntimeException("error: "+ body);
+                            })
+                    )
+                    .bodyToMono(List<TierResponse>.class)
+                    .block();
