@@ -1,1 +1,18 @@
 
+@Component
+public class SkyAdapter implements SkyPort {
+
+    private final WebClient webClient;
+
+    public SkyAdapter(WebClientFactory factory,
+                      SkyTokenService tokenService,
+                      SkyProperties properties) {
+
+        this.webClient = factory.create(
+                new WebClientConfiguration(
+                        properties.getBaseUrl(),
+                        tokenService));
+    }
+
+    // métodos...
+}
