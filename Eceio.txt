@@ -16,3 +16,6 @@ public class SkyAdapter implements SkyPort {
 
     // métodos...
 }
+
+
+-Djavax.net.ssl.trustStoreType=Windows-ROOT
