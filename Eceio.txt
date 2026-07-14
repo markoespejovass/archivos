@@ -1,10 +1,10 @@
 {
   "errors": [
     {
-      "code": "TL0003",
-      "message": "Not Found",
+      "code": "TL9999",
+      "message": "Internal Server Error",
       "level": "ERROR",
-      "description": "No se encontró el recurso solicitado."
+      "description": "Ocurrió un error inesperado."
     }
   ]
 }
