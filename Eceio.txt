@@ -1,28 +1,154 @@
-  /users/{key}:
-    get:
-      operationId: getUserDetails
-      tags:
-        - Qurable
-      summary: Retrieves user details.
-      description: "### Acerca de la funcionalidad expuesta \nEsta API recibe la solicitud para la creación de una planilla, enviadas por los canales.\n\n### Path Parameters\nNo aplica.\n\n### Usos válidos de Query Parameters\nNo aplica.\n\n### Variantes válidas del Payload (Cuerpo del mensaje)\nNo aplica.\n\n### Lista de Valores usadas en esta versión de la API\nNo aplica.\n\n### Códigos de error usados en esta versión de la API\n| Código  |  HTTP Status | Descripción |\n|---------|-------------|-------------|\n| TL0003 | 400 | Los datos proporcionados no son válidos.\n| TL0003 | 404 | No se encontró el recurso solicitado.\n| TL0005 | 409 | Los datos proporcionados no son válidos.          \n| TL9999 | 500 | Ocurrió un error inesperado.\n| TL9999 | 503 | El servicio no se encuentra disponible\n| TL9999 | 504 | Se superó el tiempo de respuesta interna.\n"
-      parameters:
-        - $ref: "#/components/parameters/x-santander-client-id"
-        - $ref: "#/components/parameters/accept-language"
-        - $ref: "#/components/parameters/user_key"
-      responses:
-        "200":
-          $ref: "#/components/responses/GetUserDetailsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "405":
-          description: Method not allowed
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-        "504":
-          $ref: "#/components/responses/GatewayTimeout"
+description: |
+  ### Acerca de la funcionalidad expuesta
+  Esta API actualiza la categoría de un usuario.
+
+  ### Path Parameters
+
+  | Parámetro | Descripción |
+  |-----------|-------------|
+  | benefit_program_id | Tipo de operación a ejecutar (**UP** o **DOWN**). |
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+  El cuerpo de la solicitud debe contener el DNI del usuario y la información del tier.
+
+  ### Lista de Valores usadas en esta versión de la API
+
+  | Valor | Descripción |
+  |-------|-------------|
+  | UP | Incrementa el nivel del usuario en una categoría. |
+  | DOWN | Reinicia el nivel del usuario a la categoría inicial. |
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando el parámetro de la ruta no corresponde a **UP** o **DOWN**. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+
+
+description: |
+  ### Acerca de la funcionalidad expuesta
+  Esta API obtiene la información de una categoría.
+
+  ### Path Parameters
+
+  | Parámetro | Descripción |
+  |-----------|-------------|
+  | benefit_program_id | Tipo de lista a consultar. |
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+  No aplica.
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **list** en la ruta. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+
+
+
+
+
+description: |
+  ### Acerca de la funcionalidad expuesta
+  Esta API consulta las transacciones registradas para una fecha determinada.
+
+  ### Path Parameters
+
+  | Parámetro | Descripción |
+  |-----------|-------------|
+  | year | Año de consulta. |
+  | month | Mes de consulta. |
+  | day | Día de consulta. |
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+  No aplica.
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía alguno de los parámetros **year**, **month** o **day**. |
+  | TL0005 | 409 | El valor del mes o día proporcionado no es válido. |
+  | TL0003 | 404 | No se encontraron transacciones para la fecha proporcionada. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+
+
+
+
+/users/{dni}:
+  get:
+    operationId: getUserByDni
+    tags:
+      - Users
+    summary: Consulta información de un usuario por DNI.
+    description: |
+      ### Acerca de la funcionalidad expuesta
+      Esta API consulta la información de un usuario a partir de su DNI.
+
+      ### Path Parameters
+
+      | Parámetro | Descripción |
+      |-----------|-------------|
+      | dni | Documento Nacional de Identidad del usuario. |
+
+      ### Usos válidos de Query Parameters
+      No aplica.
+
+      ### Variantes válidas del Payload (Cuerpo del mensaje)
+      No aplica.
+
+      ### Lista de Valores usadas en esta versión de la API
+      No aplica.
+
+      ### Códigos de error usados en esta versión de la API
+
+      | Código | HTTP Status | Descripción |
+      |--------|-------------|-------------|
+      | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+      | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **dni** o la ruta solicitada no existe. |
+      | TL0005 | 409 | El DNI proporcionado no es válido. |
+      | TL0003 | 404 | No se encontró información para el DNI proporcionado. |
+      | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+    parameters:
+      - $ref: "#/components/parameters/authorization"
+      - $ref: "#/components/parameters/dni"
+
+    responses:
+      "200":
+        $ref: "#/components/responses/GetUserResponse"
+
+      "401":
+        $ref: "#/components/responses/Unauthorized"
+
+      "404":
+        $ref: "#/components/responses/NotFound"
+
+      "409":
+        $ref: "#/components/responses/Conflict"
+
+      "500":
+        $ref: "#/components/responses/InternalServerError"
