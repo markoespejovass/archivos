@@ -1,11 +1,28 @@
-{
-    "user": {
-        "key": "43362687",
-        "email": "warning-do-not-use.lesquivel_cusco@saludpol.gob.pe",
-        "created_at": "2024-02-05T17:07:58.413Z",
-        "tier_id": 2,
-        "tier_expires_at": null,
-        "balance": 0,
-        "enabled": true
-    }
-}
+  /users/{key}:
+    get:
+      operationId: getUserDetails
+      tags:
+        - Qurable
+      summary: Retrieves user details.
+      description: "### Acerca de la funcionalidad expuesta \nEsta API recibe la solicitud para la creación de una planilla, enviadas por los canales.\n\n### Path Parameters\nNo aplica.\n\n### Usos válidos de Query Parameters\nNo aplica.\n\n### Variantes válidas del Payload (Cuerpo del mensaje)\nNo aplica.\n\n### Lista de Valores usadas en esta versión de la API\nNo aplica.\n\n### Códigos de error usados en esta versión de la API\n| Código  |  HTTP Status | Descripción |\n|---------|-------------|-------------|\n| TL0003 | 400 | Los datos proporcionados no son válidos.\n| TL0003 | 404 | No se encontró el recurso solicitado.\n| TL0005 | 409 | Los datos proporcionados no son válidos.          \n| TL9999 | 500 | Ocurrió un error inesperado.\n| TL9999 | 503 | El servicio no se encuentra disponible\n| TL9999 | 504 | Se superó el tiempo de respuesta interna.\n"
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+        - $ref: "#/components/parameters/accept-language"
+        - $ref: "#/components/parameters/user_key"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetUserDetailsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "405":
+          description: Method not allowed
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
