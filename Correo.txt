@@ -1,69 +1,10 @@
-description: |-
-  ### Acerca de la funcionalidad expuesta
-  Este servicio permite descargar un documento previamente almacenado utilizando su identificador único (`documentId`).
+para v6/know_your_customer/create
+error 401
+si ocurre un error con guardar la info en dynamodb  da error 500 con mensaje error al momento de guardar la informacion
+error 500
 
-  El documento es recuperado desde el repositorio documental y devuelto como un archivo binario.
-
-  ### Path Parameters
-  No aplica.
-
-  ### Usos válidos de Query Parameters
-  No aplica.
-
-  ### Variantes válidas del Payload (Cuerpo del mensaje)
-
-  | Campo | Descripción |
-  |--------|-------------|
-  | documentId | Identificador único del documento a descargar. Es obligatorio. |
-
-  ### Lista de Valores usadas en esta versión de la API
-  No aplica.
-
-  ### Códigos de error usados en esta versión de la API
-
-  | Código | HTTP Status | Descripción |
-  |--------|-------------|-------------|
-  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-  | TL0002 | 400 | El campo **documentId** es obligatorio. |
-  | TL0003 | 404 | El archivo solicitado no existe. |
-  | TL0003 | 404 | No se encontró la información del documento en la base de datos. |
-  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
-
-
-
-
-
-description: |-
-  ### Acerca de la funcionalidad expuesta
-  Este servicio permite cargar un documento en el repositorio documental y registrar su información asociada en la base de datos.
-
-  El archivo y sus metadatos son almacenados para permitir su posterior consulta y descarga.
-
-  ### Path Parameters
-  No aplica.
-
-  ### Usos válidos de Query Parameters
-  No aplica.
-
-  ### Variantes válidas del Payload (Cuerpo del mensaje)
-
-  | Campo | Descripción |
-  |--------|-------------|
-  | mimeType | Tipo MIME del archivo. Obligatorio. |
-  | name | Nombre del archivo. Obligatorio. |
-  | folderReference | Referencia de la carpeta codificada en Base64 donde se almacenará el archivo. Obligatorio. |
-  | ownerId | Identificador del propietario del documento. Es opcional; si se envía, debe contener exactamente 8 caracteres numéricos. |
-
-  ### Lista de Valores usadas en esta versión de la API
-  No aplica.
-
-  ### Códigos de error usados en esta versión de la API
-
-  | Código | HTTP Status | Descripción |
-  |--------|-------------|-------------|
-  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-  | TL0002 | 400 | Los campos **mimeType**, **name** y **folderReference** son obligatorios. |
-  | TL0002 | 400 | El campo **ownerId** debe contener exactamente 8 caracteres numéricos cuando sea informado. |
-  | TL9999 | 500 | Ocurrió un error al momento de cargar el archivo. |
-  | TL9999 | 500 | Ocurrió un error al momento de guardar la información del archivo. |
-  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+para v6/know_your_customer/risk_score
+error 401
+si el valor del questionnaireId es vacio o null da error 400
+si ocurre un error al recuperar la info en dynamodb  da error 500 con mensaje error al momento de recupeara la informacion
+error 500
