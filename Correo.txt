@@ -1,24 +1,1529 @@
-description: |-
-  Envía un correo electrónico desde un buzón específico para entregar un reporte de actividad a un cliente. Esta operación solo puede ser utilizada por personal de Santander.
+openapi: 3.0.3
+info:
+  title: E-mailboxes
+  version: 1.3.0
+  description: |-
+    This API manages emails for an e-mailbox.
 
-  Para realizar la solicitud, se debe proporcionar el identificador del buzón (emailbox_id) en el path.
+    The API can be used to:
+      - Retrieve a list of emails for an e-mailbox.
+      - Retrieve an email's details.
+      - Classify an email.
+      - Download an email as an EML file.
+      - Download an email attachment.
+      - Create a group for an e-mailbox.
+      - Retrieve a list of groups for an e-mailbox.
+      - Update an email's group.
+      - Unlink a list of conversation references from a group.
+      - Create an AI model retraining request from e-mailbox emails.
+  contact:
+    email: scibapigovernance@gruposantander.com
+    url: https://gluon.gs.corp/community/docs/latest/
+  license:
+    name: Apache
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: /v1/emailboxes
+security:
+  - Authorization: []
+tags:
+  - name: Emails
+    description: Operations related to emails
+  - name: Groups
+    description: Operations related to groups
+  - name: Liveness / Readiness
+    description: Operations related to liveness and readiness of the API
+paths:
+  /health:
+    parameters:
+      - $ref: "#/components/parameters/X-Santander-Client-Id"
+      - $ref: "#/components/parameters/Accept-Language"
+    get:
+      operationId: retrieveHealth
+      tags:
+        - Liveness / Readiness
+      summary: Retrieves the liveness and the readiness of the API.
+      description: Retrieves the liveness and the readiness of the API.
+      responses:
+        "200":
+          $ref: "#/components/responses/RetrieveHealth"
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri: "ac7cb2f51f17e43919ffac5f9d3956ba-03662cbb457cbc98.elb.us-east-1.amazonaws.com//v1/biometric/token"
+        passthroughBehavior: "when_no_match"
+        connectionType: "VPC_LINK"
+        connectionId: "0lmk4e"
+        httpMethod: "GET"
+        type: "http_proxy"
+  /{emailbox_id}/emails/{email_id}/classify_email:
+    parameters:
+      - $ref: "#/components/parameters/Emailbox-Id"
+      - $ref: "#/components/parameters/Email-Id"
+      - $ref: "#/components/parameters/X-Santander-Client-Id"
+      - $ref: "#/components/parameters/Accept-Language"
+    post:
+      operationId: createEmailboxEmailClassify
+      tags:
+        - Emails
+      summary: Creates a classification for an email.
+      description: |-
+        Creates a classification for a specific email. 
 
-  En el cuerpo de la solicitud se debe enviar:
-  - Información del usuario que envía el correo.
-  - Identificador del centro desde el cual se envía el correo.
-  - Identificador del reporte.
-  - Información del correo electrónico.
+        To send this request, you must provide an e-mailbox ID and an email ID in the request path. 
 
-  #### Validaciones
+        A list of classifications to be applied to the email, each including the type code and category name, must be provided in the request body.
+      requestBody:
+        $ref: "#/components/requestBodies/CreateEmailboxEmailClassify"
+      responses:
+        "200":
+          $ref: "#/components/responses/ClassifyEmailboxEmail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri: "ac7cb2f51f17e43919ffac5f9d3956ba-03662cbb457cbc98.elb.us-east-1.amazonaws.com//v1/biometric/token"
+        passthroughBehavior: "when_no_match"
+        connectionType: "VPC_LINK"
+        connectionId: "0lmk4e"
+        httpMethod: "POST"
+        type: "http_proxy"
 
-  | Validación | Código HTTP | Descripción |
-  |------------|-------------|-------------|
-  | No se envía el token de autenticación o es inválido. | 401 | Unauthorized |
-  | No se envía el campo `emailAddress`. | 400 | Bad Request |
-  | El campo `emailAddress` tiene un formato inválido. | 409 | Conflict |
-  | El `emailbox_id` no corresponde a `otp` ni a un flujo de correo configurado. | 409 | Flujo de correo no soportado. |
-  | Ocurre un error interno durante el procesamiento de la solicitud. | 500 | Internal Server Error |
+  /{emailbox_id}/send_email:
+    parameters:
+      - $ref: "#/components/parameters/Emailbox-Id"
+      - $ref: "#/components/parameters/Accept-Language"
+      - $ref: "#/components/parameters/X-Santander-Client-Id"
+    post:
+      operationId: sendEmailReport
+      tags:
+        - Emails
+      summary: Sends an email from an e-mailbox.
+      description: |-
+        Envía un correo electrónico desde un buzón específico para entregar un reporte de actividad a un cliente. Esta operación solo puede ser utilizada por personal de Santander.
 
-  Si no se envía el parámetro de ruta `emailbox_id`, el API Gateway devolverá un HTTP 404 (Not Found).
+        Para realizar la solicitud, se debe proporcionar el identificador del buzón (emailbox_id) en el path.
 
-  La respuesta incluye el identificador del correo enviado.
+        En el cuerpo de la solicitud se debe enviar:
+        - Información del usuario que envía el correo.
+        - Identificador del centro desde el cual se envía el correo.
+        - Identificador del reporte.
+        - Información del correo electrónico.
+
+        #### Validaciones
+
+        | Validación | Código HTTP | Descripción |
+        |------------|-------------|-------------|
+        | No se envía el token de autenticación o es inválido. | 401 | Unauthorized |
+        | No se envía el campo `emailAddress`. | 400 | Bad Request |
+        | El campo `emailAddress` tiene un formato inválido. | 409 | Conflict |
+        | El `emailbox_id` no corresponde a `otp` ni a un flujo de correo configurado. | 409 | Flujo de correo no soportado. |
+        | Ocurre un error interno durante el procesamiento de la solicitud. | 500 | Internal Server Error |
+
+        Si no se envía el parámetro de ruta `emailbox_id`, el API Gateway devolverá un HTTP 404 (Not Found).
+
+        La respuesta incluye el identificador del correo enviado.
+      requestBody:
+        $ref: "#/components/requestBodies/SendEmailRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/SendEmail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+        uri: "ac7cb2f51f17e43919ffac5f9d3956ba-03662cbb457cbc98.elb.us-east-1.amazonaws.com//v1/biometric/token"
+        passthroughBehavior: "when_no_match"
+        connectionType: "VPC_LINK"
+        connectionId: "0lmk4e"
+        httpMethod: "POST"
+        type: "http_proxy"
+components:
+  parameters:
+    Accept-Language:
+      name: accept-language
+      in: header
+      required: false
+      schema:
+        type: string
+      description: |-
+        Language and country header.
+
+        The value is a 2-letter language code defined in ISO 639-1 alpha-2 followed by a 2-letter country code defined in ISO 3166-1 alpha-2, separated by a hyphen.
+      example: es-ES
+    Email-Id:
+      name: email_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Email ID to be used in the query
+      example: AAMkAGVmMDEzMTM4L
+    Emailbox-Id:
+      name: emailbox_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: E-mailbox ID to be used in the query
+      example: AAMkAGVmMDEzMTM4L
+    File-Id:
+      name: file_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: File ID to be used in the query
+      example: d0597efd-6094-4384-bf64-85a2e716a45a
+    Group-Id:
+      name: group_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Group ID to be used in the query
+      example: AAMkAGVmMDEzMTM4L
+    GroupName:
+      name: group_name
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full or partial name of the groups to be included in the response
+      example: Group A
+    Limit:
+      name: _limit
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: |-
+        Maximum number of rows to be included on each page in the response.
+
+        Fewer rows can be returned if the query does not yield that many.
+      example: 10
+    Offset:
+      name: _offset
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: |-
+        Pagination identifier that is returned to the app by the API response when this uses the HATEOAS '_prev' or '_next' links.
+
+        If no offset is specified, the app can navigate from the last returned page to the next page, the previous page, or the first page.
+      example: 1
+    Sort:
+      name: _sort
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |-
+        Sorting order for the emails to be included in the response.
+
+        The possible values are:
+        - +email_id = Ascending by email ID
+        - -email_id = Descending by email ID
+        - +classification_category_name = Ascending by classification category name
+        - -classification_category_name = Descending by classification category name
+        - +classification_type_code = Ascending by classification type code
+        - -classification_type_code = Descending by classification type code
+        - +from_email_address = Ascending by sender email address
+        - -from_email_address = Descending by sender email address
+        - +subject = Ascending by subject
+        - -subject = Descending by subject
+        - +received_date = Ascending by received date
+        - -received_date = Descending by received date
+        - +importance_code = Ascending by importance code
+        - -importance_code = Descending by importance code
+        - +status_code = Ascending by status code
+        - -status_code = Descending by status code
+        - +group_name = Ascending by group name
+        - -group_name = Descending by group name
+        - +conversation_reference = Ascending by conversation reference
+        - -conversation_reference = Descending by conversation reference
+
+        Multiple values can be provided as a comma-separated list.
+      example: +email_id,-group_name
+    X-Santander-Client-Id:
+      name: x-santander-client-id
+      in: header
+      required: true
+      schema:
+        type: string
+      description: Client ID header
+      example: a1b30a84-7bf3-442e-84a0-e935d8163b5a
+  requestBodies:
+    RetrieveEmailboxEmails:
+      description: Data structure containing the request details for retrieving a list of emails for an e-mailbox
+      content:
+        application/json:
+          schema:
+            description: Data structure containing the search criteria to filter the retrieved emails
+            allOf:
+              - $ref: "#/components/schemas/WrapperRequestEmail"
+              - $ref: "#/components/schemas/WrapperRequestPeriod"
+      required: true
+    CreateEmailboxEmailClassify:
+      description: Data structure containing the request details for classifying an email
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperRequestClassifyEmails"
+      required: true
+    SendEmailRequest:
+      description: Data structure containing the request details for sending an activity report email from an e-mailbox
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperRequestSendEmail"
+      required: true
+    UpdateEmailboxEmailGroup:
+      description: Data structure containing the request details for updating an email's group
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperRequestGroupEmails"
+      required: true
+    CreateEmailboxEmailAiRetrain:
+      description:
+        Data structure containing the request details for setting emails for AI model retraining in an e-mailbox
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperRetrainEmails"
+      required: true
+    CreateEmailboxGroup:
+      description: Data structure containing the request details for creating a group for an e-mailbox
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperCreateGroup"
+      required: true
+    UnlinkEmailboxGroupEmailConversationReference:
+      description:
+        Data structure containing the request details for unlinking a list of conversation references from a group
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperUnlinkGroupEmailConversationReferences"
+      required: true
+  responses:
+    RetrieveEmailboxEmails:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperRetrieveEmails"
+    ClassifyEmailboxEmail:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperClassifyEmail"
+    RetrieveEmailboxEmail:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperRetrieveEmail"
+    DownloadEmailboxEmail:
+      description: OK
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+            description: |-
+              Response to a request to download an email as an EML file.
+
+              The response is a file in binary format.
+            example: attachment; filename='file.eml'
+    RetrieveEmailboxEmailFile:
+      description: OK
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+            description: |-
+              Response to a request to download an email attachment.
+
+              The response is a file in binary format.
+            example: attachment; filename='file.media-type'
+    GroupEmailboxEmail:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperGroupsEmail"
+    CreateEmailboxGroup:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperCreateEmailGroup"
+    RetrieveEmailboxGroups:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperEmailGroups"
+    UnlinkEmailboxGroupConversationReferences:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperUnlinkConversationReference"
+    SendEmail:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperSendEmail"
+    RetrieveHealth:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HealthCheck"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: badRequest
+                message: Bad request
+                level: ERROR
+                description: Bad request
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: forbidden
+                message: Forbidden
+                level: ERROR
+                description: Forbidden
+    GatewayTimeout:
+      description: Gateway timeout
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: gatewayTimeout
+                message: Gateway timeout
+                level: ERROR
+                description: Gateway timeout
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: internalServerError
+                message: Internal server error
+                level: ERROR
+                description: Internal server error
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: notFound
+                message: Not found
+                level: ERROR
+                description: Not found
+    NoContent:
+      description: No content
+    NotAcceptable:
+      description: Not acceptable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: notAcceptable
+                message: Not acceptable
+                level: ERROR
+                description: Not acceptable
+    UnsupportedMediaType:
+      description: Unsupported media type
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: unsupportedMediaType
+                message: Unsupported media type
+                level: ERROR
+                description: Unsupported media type
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: tooManyRequests
+                message: Too many requests
+                level: ERROR
+                description: Too many requests
+    ServiceUnavailable:
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: serviceUnavailable
+                message: Service unavailable
+                level: ERROR
+                description: Service unavailable
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+          example:
+            errors:
+              - code: unauthorized
+                message: Unauthorized
+                level: ERROR
+                description: Unauthorized
+  schemas:
+    WrapperClassifyEmail:
+      type: object
+      description: Data structure containing the response details to a request to classify an email
+      properties:
+        email:
+          $ref: "#/components/schemas/Email"
+      minProperties: 1
+    WrapperRetrieveEmail:
+      type: object
+      description: Data structure containing the response details to a request to retrieve an email's details
+      properties:
+        email:
+          $ref: "#/components/schemas/Email"
+      minProperties: 1
+    WrapperGroupsEmail:
+      type: object
+      description: Data structure containing the response details to a request to update an email's group
+      properties:
+        email:
+          $ref: "#/components/schemas/Email"
+      minProperties: 1
+    Email:
+      type: object
+      description: Data structure containing information about an email
+      required:
+        - emailId
+        - subject
+        - from
+        - recipients
+        - sentDateTime
+        - receivedDateTime
+        - bodyPreview
+        - importanceCode
+        - hasAttachments
+        - statusInfo
+      properties:
+        emailId:
+          type: string
+          description: Unique email ID
+          example: AAMkAGVmMDEzMTM4L
+        subject:
+          type: string
+          description: Email subject
+          example: Better interest rate opportunity
+        from:
+          $ref: "#/components/schemas/ElectronicAddress"
+        recipients:
+          type: object
+          description: Data structure containing information about the email recipients
+          required:
+            - to
+          properties:
+            to:
+              type: array
+              description: Array of email addresses for the main recipients of the email
+              items:
+                $ref: "#/components/schemas/ElectronicAddress"
+            cc:
+              type: array
+              description: Array of email addresses for the carbon copy (CC) recipients of the email
+              items:
+                $ref: "#/components/schemas/ElectronicAddress"
+            bcc:
+              type: array
+              description: Array of email addresses for the blind carbon copy (BCC) recipients of the email
+              items:
+                $ref: "#/components/schemas/ElectronicAddress"
+        sentDateTime:
+          type: string
+          format: date-time
+          description: |-
+            Date and time when the email was sent.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+            - hh: 2-digit hour of the day (00 through 23)
+            - mm: 2-digit minute of the hour (00 through 59)
+            - ss.sss: 5-digit seconds and milliseconds, separated by a point
+            - TZD: Time zone indicator
+          example: "2024-03-14T17:32:28.123Z"
+        receivedDateTime:
+          type: string
+          format: date-time
+          description: |-
+            Date and time when the email was received.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+            - hh: 2-digit hour of the day (00 through 23)
+            - mm: 2-digit minute of the hour (00 through 59)
+            - ss.sss: 5-digit seconds and milliseconds, separated by a point
+            - TZD: Time zone indicator
+          example: "2024-03-14T17:33:28.123Z"
+        bodyPreview:
+          type: string
+          description: First 255 characters of the email body, provided as free text
+          example:
+            Hi, Megan Bowen, I hope this message finds you well. My name is Amelia Davies, and I am a customer service
+            representative at Santander. We are writing to inform you that we have noticed some unusual activity on your
+            account. As part of our commitment to ensuring the security of our customers' accounts, we have temporarily
+            suspe
+        importanceCode:
+          type: string
+          description: Code for the email importance level
+          enum:
+            - HIGH
+            - NORMAL
+            - LOW
+          example: NORMAL
+        hasAttachments:
+          type: boolean
+          description: Whether the email has attachments
+          example: true
+        attachments:
+          type: array
+          description: Array of files attached to the email
+          items:
+            $ref: "#/components/schemas/File"
+        statusInfo:
+          $ref: "#/components/schemas/StatusInfo"
+        conversationReference:
+          type: string
+          description: Conversation reference that identifies the email thread
+          example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+        groupName:
+          type: string
+          description: Name of the group to which the email belongs
+          example: Group A
+        classifications:
+          type: array
+          description: Array of email classifications
+          items:
+            $ref: "#/components/schemas/EmailClassification"
+        aiClassificationProposals:
+          type: array
+          description: Array of email classification proposals provided by an artificial intelligence (AI) model
+          items:
+            $ref: "#/components/schemas/AiClassificationProposal"
+        isRetrainingAi:
+          type: boolean
+          description: Whether the email is used for AI model retraining
+          example: true
+    WrapperRetrainEmail:
+      x-bizObjRef: Email
+      type: object
+      description: Data structure containing information about an email
+      required:
+        - emailId
+        - isRetrainingAi
+      properties:
+        isRetrainingAi:
+          type: boolean
+          description: Whether the email is used for AI model retraining
+          example: true
+        emailId:
+          type: string
+          description: Unique email ID
+          example: AAMkAGVmMDEzMTM4L
+    WrapperRetrainEmails:
+      type: object
+      description: Data structure containing a list of emails used for AI retraining
+      required:
+        - emails
+      properties:
+        emails:
+          type: array
+          description: Array of emails used for AI retraining
+          items:
+            $ref: "#/components/schemas/WrapperRetrainEmail"
+    ElectronicAddress:
+      type: object
+      description: Data structure containing information that identifies an electronic address
+      required:
+        - emailAddress
+      properties:
+        emailAddress:
+          type: string
+          description: Email address
+          minLength: 2
+          maxLength: 256
+          example: john.doe@santander.us
+        displayName:
+          type: string
+          description: Display name for the person or organization
+          readOnly: true
+          example: John Doe
+    StatusInfo:
+      type: object
+      description: Data structure containing information about an item's status
+      required:
+        - statusCode
+      properties:
+        statusCode:
+          type: string
+          description: Status code
+          enum:
+            - PENDING
+            - PROCESSING
+            - PROCESSED
+            - ERROR
+          example: PROCESSED
+    EmailClassification:
+      type: object
+      description: Data structure containing information about the classification of an email in a category
+      required:
+        - typeCode
+        - categoryName
+        - rating
+      properties:
+        typeCode:
+          type: string
+          description: |-
+            Code for the classification type.
+
+            The possible values are:
+            - 1 = Automatic
+            - 2 = Manual
+            - 3 = Fallback
+          enum:
+            - "1"
+            - "2"
+            - "3"
+          example: "1"
+        categoryName:
+          type: string
+          description: Name of the category
+          example: Amendments
+        rating:
+          type: number
+          description:
+            Rating from 0 to 100 indicating the likelihood that the email belongs to the category. Applies for all
+            classification types.
+          readOnly: true
+          example: 50
+        aiModel:
+          type: object
+          description:
+            Data structure containing information about an artificial intelligence (AI) model that classifies the email.
+            Applies only for the automatic classification type.
+          readOnly: true
+          required:
+            - modelId
+            - name
+          properties:
+            modelId:
+              type: string
+              description: Unique model ID
+              example: d0597efd-6094-4384-bf64-85a2e716a45a
+            name:
+              type: string
+              description: Name of the model
+              example: gtb_ecas
+    AiClassificationProposal:
+      type: object
+      description: Data structure containing a classification proposal provided by an artificial intelligence (AI) model
+      required:
+        - aiModel
+        - categoryName
+        - rating
+        - isSuggested
+      properties:
+        aiModel:
+          $ref: "#/components/schemas/AiModel"
+        categoryName:
+          type: string
+          description: Name of the category
+          example: Amendments
+        rating:
+          type: number
+          description:
+            Rating from 0 to 100 indicating the likelihood that the item to be classified belongs to the category
+          example: 50
+        isSuggested:
+          type: boolean
+          description: Whether the category rating exceeds the acceptance criteria to automatically classify the item
+          example: true
+    AiModel:
+      type: object
+      description: Data structure containing information about an artificial intelligence (AI) model
+      required:
+        - modelId
+        - name
+      properties:
+        modelId:
+          type: string
+          description: Unique model ID
+          example: d0597efd-6094-4384-bf64-85a2e716a45a
+        name:
+          type: string
+          description: Name of the model
+          example: gtb_ecas
+    WrapperRequestEmail:
+      x-bizObjRef: Email
+      type: object
+      description: Data structure containing information about an email
+      properties:
+        emailId:
+          type: string
+          description: Unique email ID
+          example: AAMkAGVmMDEzMTM4L
+        subject:
+          type: string
+          description: Email subject
+          example: Better interest rate opportunity
+        from:
+          $ref: "#/components/schemas/ElectronicAddress"
+        importanceCode:
+          type: string
+          description: Code for the email importance level
+          enum:
+            - HIGH
+            - NORMAL
+            - LOW
+          example: NORMAL
+        hasAttachments:
+          type: boolean
+          description: Whether the email has attachments
+          example: true
+        hasClassification:
+          type: boolean
+          description: Whether the email has a classification
+          example: true
+        statusInfo:
+          $ref: "#/components/schemas/StatusInfo"
+        conversationReference:
+          type: string
+          description: Conversation reference that identifies the email thread
+          example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+        groupName:
+          type: string
+          description: Name of the group to which the email belongs
+          example: Group A
+        classification:
+          $ref: "#/components/schemas/EmailClassification"
+      minProperties: 1
+    WrapperRequestPeriod:
+      type: object
+      description: Data structure containing received period information
+      properties:
+        receivedPeriod:
+          $ref: "#/components/schemas/Period"
+      minProperties: 1
+    Period:
+      type: object
+      description: Data structure containing information about a period
+      properties:
+        startDateTime:
+          type: string
+          format: date-time
+          description: |-
+            Date and time when the period starts.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+            - hh: 2-digit hour of the day (00 through 23)
+            - mm: 2-digit minute of the hour (00 through 59)
+            - ss.sss: 5-digit seconds and milliseconds, separated by a point
+            - TZD: Time zone indicator
+          example: "2024-04-07T17:32:28.123Z"
+        endDateTime:
+          type: string
+          format: date-time
+          description: |-
+            Date and time when the period ends.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+            - hh: 2-digit hour of the day (00 through 23)
+            - mm: 2-digit minute of the hour (00 through 59)
+            - ss.sss: 5-digit seconds and milliseconds, separated by a point
+            - TZD: Time zone indicator
+          example: "2024-04-14T17:32:28.123Z"
+      minProperties: 1
+    WrapperRequestClassifyEmails:
+      type: object
+      description: Data structure containing the required information to classify an email
+      required:
+        - classifications
+      properties:
+        classifications:
+          type: array
+          description: Array of classifications to be applied to the email
+          items:
+            $ref: "#/components/schemas/EmailClassification"
+    WrapperRequestSendEmail:
+      type: object
+      description: Data structure containing the required information to send an activity report email from an e-mailbox
+      minProperties: 1
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        center:
+          $ref: "#/components/schemas/Center"
+        report:
+          $ref: "#/components/schemas/Report"
+        email:
+          $ref: "#/components/schemas/WrapperEmail"
+    Report:
+      type: object
+      description: Data structure containing information about a report
+      required:
+        - reportId
+      properties:
+        reportId:
+          type: string
+          description: Unique report ID
+          example: "12345"
+    Center:
+      type: object
+      description: Data structure containing information about a bank centre
+      required:
+        - centerId
+      properties:
+        centerId:
+          type: string
+          description: Bank centre ID
+          example: "1001"
+    User:
+      type: object
+      description: Data structure containing information about a user
+      minProperties: 1
+      properties:
+        userId:
+          type: string
+          description: Unique user ID
+          example: Nxxxxx
+        displayName:
+          type: string
+          description: User name that can be displayed, for example, on a screen or in an app
+          example: Carl Jr
+        contactPoint:
+          $ref: "#/components/schemas/ContactPoint"
+    WrapperEmail:
+      x-bizObjRef: Email
+      type: object
+      description: Data structure containing information about an email
+      minProperties: 1
+      properties:
+        classification:
+          type: object
+          description: Data structure containing information about the classification of an email in a category
+          minProperties: 1
+          properties:
+            categoryName:
+              type: string
+              description: Name of the category
+              example: Subhome
+        subject:
+          type: string
+          description: Email subject
+          example: Better interest rate opportunity
+        recipients:
+          type: object
+          description: Data structure containing information about the email recipients
+          required:
+            - to
+          properties:
+            to:
+              type: array
+              description: Array of email addresses for the main recipients of the email
+              items:
+                $ref: "#/components/schemas/ElectronicAddress"
+            bcc:
+              type: array
+              description: Array of email addresses for the blind carbon copy (BCC) recipients of the email
+              items:
+                $ref: "#/components/schemas/ElectronicAddress"
+            cc:
+              type: array
+              description: Array of email addresses for the carbon copy (CC) recipients of the email
+              items:
+                $ref: "#/components/schemas/ElectronicAddress"
+        bodyPreview:
+          type: string
+          description: First 255 characters of the email body, provided as free text
+          example:
+            Hi, Megan Bowen, I hope this message finds you well. My name is Amelia Davies, and I am a customer service
+            representative at Santander. We are writing to inform you that we have noticed some unusual activity on your
+            account. As part of our commitment to ensuring the security of our customers' accounts, we have temporarily
+            suspe
+        body:
+          type: string
+          description: Email body
+          example: Dear all, we are pleased to inform you that your proposal has been accepted.
+    ContactPoint:
+      type: object
+      description:
+        Data structure containing information about a contact point. A contact point is a phone number, physical
+        address, or virtual address used for communication purposes.
+      minProperties: 1
+      properties:
+        electronicAddress:
+          $ref: "#/components/schemas/ElectronicAddress"
+    WrapperRequestGroupEmails:
+      x-bizObjRef: EmailGroup
+      type: object
+      description: Data structure containing information about an email group
+      required:
+        - groupId
+      properties:
+        groupId:
+          type: string
+          description: Unique email group ID
+          example: d0597efd-6094-4384-bf64-85a2e716a45a
+        groupName:
+          type: string
+          description: Email group name
+          example: Group A
+    WrapperUnlinkGroupEmailConversationReferences:
+      x-bizObjRef: EmailGroup
+      type: object
+      description: Data structure containing information about an email group
+      required:
+        - emails
+      properties:
+        emails:
+          type: array
+          description: Array of emails
+          items:
+            type: object
+            description:
+              Data structure containing information about an email, including the ID and conversation reference to be
+              unlinked from the group
+            required:
+              - emailId
+              - conversationReference
+            properties:
+              emailId:
+                type: string
+                description: Unique email ID
+                example: AAMkAGVmMDEzMTM4L
+              conversationReference:
+                type: string
+                description: Conversation reference that identifies the email thread
+                example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+    WrapperCreateGroup:
+      x-bizObjRef: EmailGroup
+      type: object
+      description: Data structure containing information about an email group
+      required:
+        - groupName
+        - emails
+      properties:
+        groupName:
+          type: string
+          description: Email group name
+          example: Group A
+        emails:
+          type: array
+          description: Array of emails to be added to the group
+          items:
+            type: object
+            description:
+              Data structure containing information about an email, including its ID and conversation reference
+            required:
+              - emailId
+              - conversationReference
+            properties:
+              emailId:
+                type: string
+                description: Unique email ID
+                example: AAMkAGVmMDEzMTM4L
+              conversationReference:
+                type: string
+                description: Conversation reference that identifies the email thread
+                example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+    EmailGroup:
+      type: object
+      description: Data structure containing information about an email group
+      required:
+        - groupId
+        - groupName
+        - emails
+      properties:
+        groupId:
+          type: string
+          description: Unique email group ID
+          example: d0597efd-6094-4384-bf64-85a2e716a45a
+        groupName:
+          type: string
+          description: Email group name
+          example: Group A
+        emails:
+          type: array
+          description: Array of emails
+          items:
+            type: object
+            description:
+              Data structure containing information about an email, including the conversation reference that belongs to
+              the group
+            required:
+              - conversationReference
+            properties:
+              conversationReference:
+                type: string
+                description: Conversation reference that identifies the email thread
+                example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+    WrapperEmailGroups:
+      type: object
+      description: Data structure containing the response details to a request to retrieve a list of groups for an e-mailbox
+      required:
+        - groups
+      properties:
+        groups:
+          type: array
+          description: Array of email groups
+          items:
+            $ref: "#/components/schemas/EmailGroup"
+    WrapperCreateEmailGroup:
+      x-bizObjRef: EmailGroup
+      type: object
+      description: |-
+        Data structure containing information about an email group.
+
+        This data structure is the response to a request to create a group for an e-mailbox.
+      required:
+        - groupId
+        - groupName
+        - emails
+      properties:
+        groupId:
+          type: string
+          description: Unique email group ID
+          example: d0597efd-6094-4384-bf64-85a2e716a45a
+        groupName:
+          type: string
+          description: Email group name
+          example: Group A
+        emails:
+          type: array
+          description: Array of emails
+          items:
+            type: object
+            description:
+              Data structure containing information about an email, including the conversation reference that belongs to
+              the group
+            required:
+              - conversationReference
+            properties:
+              conversationReference:
+                type: string
+                description: Conversation reference that identifies the email thread
+                example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+    WrapperUnlinkConversationReference:
+      x-bizObjRef: EmailGroup
+      type: object
+      description: |-
+        Data structure containing information about an email group.
+
+        This data structure is the response to a request to unlink a list of conversation references from a group.
+      required:
+        - groupId
+        - groupName
+        - emails
+      properties:
+        groupId:
+          type: string
+          description: Unique email group ID
+          example: d0597efd-6094-4384-bf64-85a2e716a45a
+        groupName:
+          type: string
+          description: Email group name
+          example: Group A
+        emails:
+          type: array
+          description: Array of emails
+          items:
+            type: object
+            description:
+              Data structure containing information about an email, including the conversation reference that belongs to
+              the group
+            required:
+              - conversationReference
+            properties:
+              conversationReference:
+                type: string
+                description: Conversation reference that identifies the email thread
+                example: 426d89d5-7b88-4aaa-960e-57ed410d2909
+    WrapperSendEmail:
+      x-bizObjRef: Email
+      type: object
+      description: |-
+        Data structure containing information about an email.
+
+        This data structure is the response to a request to send an activity report email from an e-mailbox.
+      minProperties: 1
+      properties:
+        emailId:
+          type: string
+          description: Unique email ID
+          example: AAMkAGVmMDEzMTM4L
+    File:
+      type: object
+      description: Data structure containing information about a file
+      required:
+        - fileId
+        - mimeType
+        - name
+        - size
+      properties:
+        fileId:
+          type: string
+          description: Unique file ID
+          example: d0597efd-6094-4384-bf64-85a2e716a45a
+        name:
+          type: string
+          description: File name
+          example: file.pdf
+        mimeType:
+          type: string
+          description: Multipurpose Internet mail extensions (MIME) type format for the file
+          example: text
+        size:
+          type: number
+          format: double
+          description: Amount of data contained in the file, expressed in megabytes
+          example: 24.5
+    Links:
+      type: object
+      description: Data structure containing the links for moving between pages
+      properties:
+        _first:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the first page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v1/emailboxes/emails/search_emails?_offset=1&_limit=10
+          minProperties: 1
+        _prev:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the previous page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v1/emailboxes/emails/search_emails?_offset=2&_limit=10
+          minProperties: 1
+        _next:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the next page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v1/emailboxes/emails/search_emails?_offset=4&_limit=10
+          minProperties: 1
+        _last:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the last page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v1/emailboxes/emails/search_emails?_offset=10&_limit=10
+          minProperties: 1
+        self:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the current page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v1/emailboxes/emails/search_emails?_offset=3&_limit=10
+          minProperties: 1
+        _count:
+          type: string
+          description: Number of pages included in the pagination
+          example: "10"
+      minProperties: 1
+    Errors:
+      type: object
+      description: Data structure containing the details for errors
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          description: Array of errors
+          items:
+            $ref: "#/components/schemas/Error"
+    Error:
+      type: object
+      description: Data structure containing the error details
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Unique alphanumeric human readable error code
+          example: badRequest
+        message:
+          type: string
+          description: Brief summary of the reported issue
+          example: Message
+        level:
+          type: string
+          description: Level of the reported issue
+          enum:
+            - ERROR
+            - FATAL
+            - INFO
+            - WARNING
+          example: ERROR
+        description:
+          type: string
+          description: Detailed description of the reported issue
+          example: Information about the returned error, used to resolve it
+    HealthCheck:
+      type: object
+      description: Data structure containing health check information for an API.
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: |
+            Calculated global status of the API. Possible values are:
+
+              - UP: Status indicating that the component or subsystem is functioning as expected.
+
+              - DOWN: Status indicating that the component or subsystem has suffered an unexpected failure.
+
+              - OUT_OF_SERVICE: Status indicating that the component or subsystem has been taken out of service and should not be used.
+
+              - UNKNOWN: Status indicating that the component or subsystem is in an unknown state.
+          enum:
+            - UP
+            - DOWN
+            - OUT_OF_SERVICE
+            - UNKNOWN
+          example: UP
+        components:
+          description: Array of status components.
+          items:
+            type: object
+            description: Data structure containing information about a status component.
+            required:
+              - name
+              - type
+              - status
+            properties:
+              name:
+                type: string
+                description: Component name.
+                example: Oracle
+              type:
+                type: string
+                description: Component type.
+                example: Database
+              status:
+                type: string
+                description: |
+                  Component status. Possible values are:
+
+                    - UP: Status indicating that the component or subsystem is functioning as expected.
+
+                    - DOWN: Status indicating that the component or subsystem has suffered an unexpected failure.
+
+                    - OUT_OF_SERVICE: Status indicating that the component or subsystem has been taken out of service and should not be used.
+
+                    - UNKNOWN: Status indicating that the component or subsystem is in an unknown state.
+                enum:
+                  - UP
+                  - DOWN
+                  - OUT_OF_SERVICE
+                  - UNKNOWN
+                example: UP
+          type: array
+    WrapperRetrieveEmails:
+      type: object
+      description: Data structure containing the response details to a request to retrieve a list of emails for an e-mailbox.
+      properties:
+        emails:
+          type: array
+          description: Array of emails
+          items:
+            $ref: "#/components/schemas/Email"
+        _links:
+          $ref: "#/components/schemas/Links"
+      minProperties: 1
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-amazon-apigateway-integration:
+  responses:
+    default:
+      statusCode: "200"
+  uri: "ac7cb2f51f17e43919ffac5f9d3956ba-03662cbb457cbc98.elb.us-east-1.amazonaws.com//v1/biometric/token"
+  passthroughBehavior: "when_no_match"
+  connectionType: "VPC_LINK"
+  connectionId: "0lmk4e"
+  httpMethod: "POST"
+  type: "http_proxy"
