@@ -1,28 +1,90 @@
-|
-        ### Acerca de la funcionalidad expuesta
-        Esta API consulta la información de un usuario a partir de su DNI.
+description: |-
+  ### Acerca de la funcionalidad expuesta
 
-        ### Path Parameters
+  Esta API permite enviar un correo electrónico desde un buzón específico para entregar un reporte de actividad a un cliente. Esta operación solo puede ser utilizada por personal autorizado de Santander.
 
-        | Parámetro | Descripción |
-        |-----------|-------------|
-        | dni | Documento Nacional de Identidad del usuario. |
+  ### Path Parameters
 
-        ### Usos válidos de Query Parameters
-        No aplica.
+  | Parámetro | Descripción |
+  |-----------|-------------|
+  | emailbox_id | Identificador del buzón desde el cual se enviará el correo electrónico. Actualmente solo se admite el flujo **otp**. |
 
-        ### Variantes válidas del Payload (Cuerpo del mensaje)
-        No aplica.
+  ### Usos válidos de Query Parameters
 
-        ### Lista de Valores usadas en esta versión de la API
-        No aplica.
+  No aplica.
 
-        ### Códigos de error usados en esta versión de la API
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
 
-        | Código | HTTP Status | Descripción |
-        |--------|-------------|-------------|
-        | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-        | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **dni** o la ruta solicitada no existe. |
-        | TL0005 | 409 | El DNI proporcionado no es válido. |
-        | TL0003 | 404 | No se encontró información para el DNI proporcionado. |
-        | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+  El cuerpo de la solicitud debe contener la siguiente información:
+
+  | Campo | Descripción |
+  |--------|-------------|
+  | user | Información del usuario que envía el correo. |
+  | center | Identificador del centro desde el cual se realiza el envío. |
+  | report | Identificador del reporte que será enviado. |
+  | email | Información del correo electrónico, incluyendo destinatarios, asunto y contenido. |
+
+  ### Lista de Valores usadas en esta versión de la API
+
+  | Campo | Valores permitidos |
+  |--------|--------------------|
+  | emailbox_id | otp |
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0002 | 400 | No se envía el campo **emailAddress** en la solicitud. |
+  | TL0004 | 409 | El valor del campo **emailAddress** tiene un formato inválido. |
+  | TL0005 | 409 | El **emailbox_id** no corresponde a un flujo de correo soportado. Actualmente solo se admite **otp**. |
+  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **emailbox_id** o la ruta solicitada no existe. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+  La respuesta de la operación contiene el identificador único del correo electrónico enviado.
+
+
+
+
+description: |-
+  ### Acerca de la funcionalidad expuesta
+
+  Esta API permite registrar una o más clasificaciones para un correo electrónico perteneciente a un buzón específico.
+
+  Para realizar la operación se debe proporcionar el identificador del buzón (**emailbox_id**) y el identificador del correo (**email_id**) como parámetros de la ruta.
+
+  ### Path Parameters
+
+  | Parámetro | Descripción |
+  |-----------|-------------|
+  | emailbox_id | Identificador del buzón al que pertenece el correo electrónico. |
+  | email_id | Identificador único del correo electrónico que será clasificado. |
+
+  ### Usos válidos de Query Parameters
+
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+
+  El cuerpo de la solicitud debe contener la siguiente información:
+
+  | Campo | Descripción |
+  |--------|-------------|
+  | classifications | Lista de clasificaciones que serán asociadas al correo electrónico. Cada clasificación debe incluir el tipo de clasificación y el nombre de la categoría. |
+
+  ### Lista de Valores usadas en esta versión de la API
+
+  | Campo | Valores permitidos |
+  |--------|--------------------|
+  | classifications.typeCode | 1 = Automática, 2 = Manual, 3 = Fallback. |
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0002 | 400 | La solicitud contiene parámetros inválidos o el cuerpo del mensaje no cumple con el formato esperado. |
+  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado cuando el **emailbox_id**, el **email_id** o la ruta solicitada no existen. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+  La respuesta devuelve la información actualizada del correo electrónico con las clasificaciones registradas.
