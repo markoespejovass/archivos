@@ -1,10 +1,69 @@
-para v6/know_your_customer/create
-error 401
-si ocurre un error con guardar la info en dynamodb  da error 500 con mensaje error al momento de guardar la informacion
-error 500
+description: |-
+  ### Acerca de la funcionalidad expuesta
+  Este servicio permite procesar la información KYC del cliente para determinar su nivel de riesgo asociado.
 
-para v6/know_your_customer/risk_score
-error 401
-si el valor del questionnaireId es vacio o null da error 400
-si ocurre un error al recuperar la info en dynamodb  da error 500 con mensaje error al momento de recupeara la informacion
-error 500
+  El servicio valida la existencia de alertas HIT, identifica si el cliente es nuevo o existente y obtiene el nivel de riesgo correspondiente mediante las fuentes definidas para cada escenario.
+
+  Para clientes nuevos, el servicio solicita el nivel de riesgo a CRR y registra la información obtenida en People mediante las transacciones correspondientes. Para clientes existentes, consulta el nivel de riesgo almacenado en People mediante la transacción ODP1.
+
+  ### Path Parameters
+  No aplica.
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+
+  | Campo | Descripción |
+  |--------|-------------|
+  | questionnaireId | Identificador del cuestionario KYC asociado al proceso. Obligatorio. No debe enviarse vacío ni nulo. |
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0002 | 400 | El campo **questionnaireId** es obligatorio y no debe enviarse vacío o nulo. |
+  | TL9999 | 500 | Ocurrió un error al momento de recuperar la información desde DynamoDB. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+
+
+description: |-
+  ### Acerca de la funcionalidad expuesta
+  Este servicio permite iniciar el proceso de evaluación Know Your Customer (KYC) para un nuevo cliente.
+
+  El servicio recibe la información necesaria del cliente, productos asociados, cuestionario KYC, propósito de la relación con el banco, fuentes de ingreso y estado AML, con la finalidad de iniciar el análisis de riesgo correspondiente.
+
+  Como resultado del proceso se genera la resolución KYC del cliente, incluyendo la información asociada al nivel de riesgo calculado y los documentos requeridos según la evaluación realizada.
+
+  ### Path Parameters
+  No aplica.
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+
+  | Campo | Descripción |
+  |--------|-------------|
+  | party | Información del cliente que inicia el proceso KYC. Obligatorio. |
+  | products | Lista de productos asociados al cliente. Obligatorio. |
+  | questionnaire | Información correspondiente al cuestionario KYC. Obligatorio. |
+  | relationshipPurpose | Propósito de la relación del cliente con el banco. Obligatorio. |
+  | incomeSources | Lista de fuentes de ingreso del cliente. Obligatorio. |
+  | amlStatus | Estado AML del cliente. Obligatorio. |
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL9999 | 500 | Ocurrió un error al momento de guardar la información en DynamoDB. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
