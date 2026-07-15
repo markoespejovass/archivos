@@ -1,15 +1,69 @@
+description: |-
+  ### Acerca de la funcionalidad expuesta
+  Este servicio permite descargar un documento previamente almacenado utilizando su identificador único (`documentId`).
 
-para el document_management/download_document
-error 401
-el documentId es obligatorio de no mandarlo da erorr 400
-si se manda un documentId valido y el archivo no existe da error 404 con el mensaje el archivo no existe
-si se manda un documentId valido y la info no esta guardada en dybamo da error 404 con el mensaje el archivo no se ha encontrada en la bd
-error 500
+  El documento es recuperado desde el repositorio documental y devuelto como un archivo binario.
 
-para el document_management/upload_document
-error 401
-el mimeType, name, folderReference(base64) son obligatorios de no mandarlo da error 400
-si ocurre un error con la carga del archivo da error 500 con mensaje error al momento de cargar el archivo
-si ocurre un error con guardar la info en dynamodb  da error 500 con mensaje error al momento de guardar la informacion del archivo
-el valor de ownerId es opcional pero si se manda este tiene que tener el valor de 8 caracteres y numericos si no cumple ese formato da error 400
-error 500
+  ### Path Parameters
+  No aplica.
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+
+  | Campo | Descripción |
+  |--------|-------------|
+  | documentId | Identificador único del documento a descargar. Es obligatorio. |
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0002 | 400 | El campo **documentId** es obligatorio. |
+  | TL0003 | 404 | El archivo solicitado no existe. |
+  | TL0003 | 404 | No se encontró la información del documento en la base de datos. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+
+
+
+
+description: |-
+  ### Acerca de la funcionalidad expuesta
+  Este servicio permite cargar un documento en el repositorio documental y registrar su información asociada en la base de datos.
+
+  El archivo y sus metadatos son almacenados para permitir su posterior consulta y descarga.
+
+  ### Path Parameters
+  No aplica.
+
+  ### Usos válidos de Query Parameters
+  No aplica.
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+
+  | Campo | Descripción |
+  |--------|-------------|
+  | mimeType | Tipo MIME del archivo. Obligatorio. |
+  | name | Nombre del archivo. Obligatorio. |
+  | folderReference | Referencia de la carpeta codificada en Base64 donde se almacenará el archivo. Obligatorio. |
+  | ownerId | Identificador del propietario del documento. Es opcional; si se envía, debe contener exactamente 8 caracteres numéricos. |
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0002 | 400 | Los campos **mimeType**, **name** y **folderReference** son obligatorios. |
+  | TL0002 | 400 | El campo **ownerId** debe contener exactamente 8 caracteres numéricos cuando sea informado. |
+  | TL9999 | 500 | Ocurrió un error al momento de cargar el archivo. |
+  | TL9999 | 500 | Ocurrió un error al momento de guardar la información del archivo. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
