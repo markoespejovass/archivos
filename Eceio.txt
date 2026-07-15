@@ -1,90 +1,1251 @@
-description: |-
-  ### Acerca de la funcionalidad expuesta
+openapi: 3.0.1
+info:
+  title: Data Consent Management
+  version: 7.1.0
+  description: |-
+    This API manages consent agreements for parties (persons or organizations) and contact points (communication methods by which parties can be contacted). Consent agreements give the bank permission to handle data from customers and other parties with whom they have a relationship.
 
-  Esta API permite enviar un correo electrónico desde un buzón específico para entregar un reporte de actividad a un cliente. Esta operación solo puede ser utilizada por personal autorizado de Santander.
+    The API can be used for:
+    - Consent agreements for parties:
+      - Create a consent agreement for a party.
+      - Retrieve a list of consent agreements for a party.
+      - Update a consent agreement's details for a party.
+    - Consent agreements for contact points:
+      - Create a consent agreement for a contact point.
+      - Retrieve a list of consent agreements for a contact point.
+      - Update a consent agreement's details for a contact point.
+    - Consent relationships:
+      - Create a consent relationship.
+      - Retrieve a list of consent relationships.
+  contact:
+    email: apiglobalgovernance@gruposantander.com
+  license:
+    name: Apache
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: /v7/data_consents_management
+security:
+  - Authorization: []
+tags:
+  - name: Consent agreements for parties
+    description: Operations related to consent agreements for parties
+  - name: Consent agreements for contact points
+    description: Operations related to consent agreements for contact points
+  - name: Consent relationships
+    description: Operations related to consent relationships
+paths:
+  /consent_relationships:
+    post:
+      operationId: ConsentRelationshipCreate
+      tags:
+        - Consent relationships
+      summary: Creates a consent relationship.
+      description: |-
+        Creates a consent relationship between a purpose for which consent is given and a treatment indicating what the consent allows the bank to do. Relationships define the possible treatment and purpose combinations for consent agreements.
 
-  ### Path Parameters
+        The following must be provided in the request body:
+        - Treatment code and category code
+        - Purpose code
+        - List of party type codes defining the combination of customers, prospects, and non-customers for which the relationship is valid
 
-  | Parámetro | Descripción |
-  |-----------|-------------|
-  | emailbox_id | Identificador del buzón desde el cual se enviará el correo electrónico. Actualmente solo se admite el flujo **otp**. |
+        The response includes the ID for the created consent relationship.
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+      requestBody:
+        $ref: "#/components/requestBodies/Post_CreateConsentRelationship"
+      responses:
+        "201":
+          $ref: "#/components/responses/Post201_CreateConsentRelationship"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+    get:
+      operationId: ConsentRelationshipGet
+      tags:
+        - Consent relationships
+      summary: Retrieves a list of consent relationships.
+      description: |-
+        Retrieves a list of consent relationships to be used for validation during consent agreement creation.
 
-  ### Usos válidos de Query Parameters
+        The consent relationships included in the response can be filtered by the following criteria:
+        - Bank
+        - Treatment category
+        - Treatment
+        - Purpose
+        - Party type
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+        - $ref: "#/components/parameters/bank_id"
+        - $ref: "#/components/parameters/legitimate_code"
+        - $ref: "#/components/parameters/treatment_code"
+        - $ref: "#/components/parameters/purpose_code"
+        - $ref: "#/components/parameters/party_type_code"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          $ref: "#/components/responses/Get200_ConsentRelationshipList"
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /create_consent_agreements_contact:
+    post:
+      operationId: ConsentsContactCreation
+      tags:
+        - Consent agreements for contact points
+      summary: Creates a consent agreement for a contact point.
+      description: |-
+        Creates a consent agreement for a specific contact point.
 
-  No aplica.
+        The phone number, mobile number, or email address for which the consent agreement is to be created must be provided in the request body. Only one contact point can be provided.
 
-  ### Variantes válidas del Payload (Cuerpo del mensaje)
+        The response includes the ID for the created consent agreement.
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+      requestBody:
+        $ref: "#/components/requestBodies/Post_CreateConsentContact"
+      responses:
+        "201":
+          $ref: "#/components/responses/Post201_CreateConsent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /list_consent_agreements_contact:
+    post:
+      operationId: ConsentsContactList
+      tags:
+        - Consent agreements for contact points
+      summary: Retrieves a list of consent agreements for a contact point.
+      description: |-
+        Retrieves a list of consent agreements for a specific contact point.
 
-  El cuerpo de la solicitud debe contener la siguiente información:
+        The phone number, mobile number, or email address for which consent agreements are to be retrieved must be provided in the request body. Only one contact point can be provided.
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      requestBody:
+        $ref: "#/components/requestBodies/Post_ConsentsContactList"
+      responses:
+        "200":
+          $ref: "#/components/responses/Post200_ConsentsContactList"
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /modify_consent_agreements_contact:
+    post:
+      operationId: ConsentsContactUpdate
+      tags:
+        - Consent agreements for contact points
+      summary: Updates a consent agreement's details for a contact point.
+      description: |-
+        Updates a specific consent agreement's details for a contact point. The consent agreement's status can be updated.
 
-  | Campo | Descripción |
-  |--------|-------------|
-  | user | Información del usuario que envía el correo. |
-  | center | Identificador del centro desde el cual se realiza el envío. |
-  | report | Identificador del reporte que será enviado. |
-  | email | Información del correo electrónico, incluyendo destinatarios, asunto y contenido. |
+        The following must be provided in the request body:
+        - Consent agreement ID
+        - Updated status
+        - One contact point for which the consent agreement's status is to be updated: phone number, mobile number, or email address
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+      requestBody:
+        $ref: "#/components/requestBodies/Post_UpdateConsentContact"
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /parties/{party_id}/consent_agreements:
+    get:
+      operationId: ConsentsGet
+      tags:
+        - Consent agreements for parties
+      summary: Retrieves a list of consent agreements for a party.
+      description: |-
+        Retrieves a list of consent agreements for a specific party.
 
-  ### Lista de Valores usadas en esta versión de la API
+        To send this request, you must provide a party ID in the request path.
 
-  | Campo | Valores permitidos |
-  |--------|--------------------|
-  | emailbox_id | otp |
+        The consent agreements included in the response can be filtered by the following criteria:
+        - Treatment category
+        - Treatment
+        - Purpose
+        - Status
+        - Bank
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+        - $ref: "#/components/parameters/party_id"
+        - $ref: "#/components/parameters/legitimate_code"
+        - $ref: "#/components/parameters/treatment_code"
+        - $ref: "#/components/parameters/purpose_code"
+        - $ref: "#/components/parameters/status_code"
+        - $ref: "#/components/parameters/bank_id"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          $ref: "#/components/responses/Get200_ConsentsList"
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+    post:
+      operationId: ConsentsCreation
+      tags:
+        - Consent agreements for parties
+      summary: Creates a consent agreement for a party.
+      description: |-
+        Creates a consent agreement for a specific party. If the consent agreement to be created is a parent agreement, all its child agreements are also created automatically.
 
-  ### Códigos de error usados en esta versión de la API
+        To send this request, you must provide a party ID in the request path.
 
-  | Código | HTTP Status | Descripción |
-  |--------|-------------|-------------|
-  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-  | TL0002 | 400 | No se envía el campo **emailAddress** en la solicitud. |
-  | TL0004 | 409 | El valor del campo **emailAddress** tiene un formato inválido. |
-  | TL0005 | 409 | El **emailbox_id** no corresponde a un flujo de correo soportado. Actualmente solo se admite **otp**. |
-  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **emailbox_id** o la ruta solicitada no existe. |
-  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+        Details of the consent agreement to be created must be provided in the request body.
 
-  La respuesta de la operación contiene el identificador único del correo electrónico enviado.
+        The response includes the list of IDs for the created consent agreements.
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+        - $ref: "#/components/parameters/party_id"
+      requestBody:
+        $ref: "#/components/requestBodies/Post_CreateConsent"
+      responses:
+        "201":
+          $ref: "#/components/responses/Post201_CreateConsent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+  /parties/{party_id}/consent_agreements/{consent_id}:
+    patch:
+      operationId: ConsentsUpdate
+      tags:
+        - Consent agreements for parties
+      summary: Updates a consent agreement's details for a party.
+      description: |-
+        Updates a specific consent agreement's details for a party.
 
+        To send this request, you must provide a party ID and a consent agreement ID in the request path.
 
+        Updated details for the consent agreement must be provided in the request body.
+      parameters:
+        - $ref: "#/components/parameters/x-santander-client-id"
+        - $ref: "#/components/parameters/party_id"
+        - $ref: "#/components/parameters/consent_id"
+      requestBody:
+        $ref: "#/components/requestBodies/Patch_UpdateConsent"
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+        "504":
+          $ref: "#/components/responses/GatewayTimeout"
+components:
+  parameters:
+    bank_id:
+      name: bank_id
+      in: query
+      schema:
+        type: string
+      description: ID of the bank associated with the consent agreements or relationships to be included in the response
+      example: "0049"
+    consent_id:
+      name: consent_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Consent agreement ID to be used in the query
+      example: "031702002001"
+    legitimate_code:
+      name: legitimate_code
+      in: query
+      schema:
+        type: string
+      description: Treatment category code for the consent agreements or relationships to be included in the response
+      example: "02"
+    limit:
+      name: _limit
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |-
+        Maximum number of rows to be included on each page in the response.
 
+        Fewer rows can be returned if the query does not yield that many.
+      example: "10"
+      allowEmptyValue: false
+    offset:
+      name: _offset
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |-
+        Pagination identifier that is returned to the app by the API response when this uses the HATEOAS '_prev' or '_next' links.
 
-description: |-
-  ### Acerca de la funcionalidad expuesta
+        If no offset is specified, the app can navigate from the last returned page to the next page, the previous page, or the first page.
+      example: "2"
+      allowEmptyValue: false
+    party_id:
+      name: party_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Party ID to be used in the query
+      example: F692520712
+    party_type_code:
+      name: party_type_code
+      in: query
+      schema:
+        type: string
+      description: Type code for the parties for whom the consent relationships to be included in the response are valid
+      example: F
+    purpose_code:
+      name: purpose_code
+      in: query
+      schema:
+        type: string
+      description:
+        Code indicating the purpose for which consent is given for the consent agreements or relationships to be
+        included in the response
+      example: "001"
+    status_code:
+      name: status_code
+      in: query
+      schema:
+        type: string
+      description: Status for the consent agreements to be included in the response
+      example: "01"
+    treatment_code:
+      name: treatment_code
+      in: query
+      schema:
+        type: string
+      description: Treatment code for the consent agreements or relationships to be included in the response
+      example: "002"
+    x-santander-client-id:
+      name: x-santander-client-id
+      in: header
+      required: true
+      schema:
+        type: string
+      description: Client ID header
+      example: a1b30a84-7bf3-442e-84a0-e935d8163b5a
+  requestBodies:
+    Post_CreateConsent:
+      required: true
+      description: Data structure containing the request details for creating a consent agreement for a party
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentRequestBodyArray"
+    Post_CreateConsentContact:
+      required: true
+      description: Data structure containing the request details for creating a consent agreement for a contact point
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentContactRequestBody"
+    Post_CreateConsentRelationship:
+      required: true
+      description: Data structure containing the request details for creating a consent relationship
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentRelationshipRequestBody"
+    Post_ConsentsContactList:
+      required: true
+      description:
+        Data structure containing the request details for retrieving a list of consent agreements for a contact point
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentListRequestBody"
+    Post_UpdateConsentContact:
+      required: true
+      description:
+        Data structure containing the request details for updating a consent agreement's details for a contact point
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostModifyConsentContactRequestBody"
+    Patch_UpdateConsent:
+      required: true
+      description: Data structure containing the request details for updating a consent agreement's details for a party
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPatchConsentRequestBody"
+  responses:
+    Get200_ConsentRelationshipList:
+      description: |-
+        OK.
 
-  Esta API permite registrar una o más clasificaciones para un correo electrónico perteneciente a un buzón específico.
+        Response to a request to retrieve a list of consent relationships.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperGetConsentRelationshipsOutput"
+    Get200_ConsentsList:
+      description: |-
+        OK.
 
-  Para realizar la operación se debe proporcionar el identificador del buzón (**emailbox_id**) y el identificador del correo (**email_id**) como parámetros de la ruta.
+        Response to a request to retrieve a list of consent agreements for a party.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperGetConsentsOutput"
+    Post200_ConsentsContactList:
+      description: |-
+        OK.
 
-  ### Path Parameters
+        Response to a request to retrieve a list of consent agreements for a contact point.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentsContactOutput"
+    Post201_CreateConsent:
+      description: |-
+        Created.
 
-  | Parámetro | Descripción |
-  |-----------|-------------|
-  | emailbox_id | Identificador del buzón al que pertenece el correo electrónico. |
-  | email_id | Identificador único del correo electrónico que será clasificado. |
+        Response to a request to create a consent agreement for a party or a contact point.
 
-  ### Usos válidos de Query Parameters
+        The response is an array of consent agreement IDs. For a party where the consent agreement is a parent agreement, the IDs for the parent and all child agreements are provided. For a contact point, and for a party where the consent agreement is not a parent agreement, only one ID is provided.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentResponseBody"
+    Post201_CreateConsentRelationship:
+      description: |-
+        Created.
 
-  No aplica.
+        Response to a request to create a consent relationship.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WrapperPostConsentRelationshipsOutput"
+    NoContent:
+      description: No content
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    UnsupportedMediaType:
+      description: Unsupported media type
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    ServiceUnavailable:
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    GatewayTimeout:
+      description: Gateway timeout
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+  schemas:
+    WrapperGetConsentRelationshipsOutput:
+      type: object
+      description: Data structure containing the response information for retrieving a list of consent relationships
+      properties:
+        consentRelationships:
+          $ref: "#/components/schemas/WrapperConsentRelationshipList"
+        _links:
+          $ref: "#/components/schemas/WrapperLinks"
+    WrapperGetConsentsOutput:
+      type: object
+      description:
+        Data structure containing the response information for retrieving a list of consent agreements for a party
+      properties:
+        consents:
+          $ref: "#/components/schemas/WrapperConsentList"
+        _links:
+          $ref: "#/components/schemas/Links"
+    Links:
+      type: object
+      description: Data structure containing the links for moving between pages
+      properties:
+        _first:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
 
-  ### Variantes válidas del Payload (Cuerpo del mensaje)
+                This link is to the first page of the list.
 
-  El cuerpo de la solicitud debe contener la siguiente información:
+                The exact value depends on the data to be accessed.
 
-  | Campo | Descripción |
-  |--------|-------------|
-  | classifications | Lista de clasificaciones que serán asociadas al correo electrónico. Cada clasificación debe incluir el tipo de clasificación y el nombre de la categoría. |
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/parties/{party_id}/consent_agreements?_offset=0&_limit=10
+        _prev:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
 
-  ### Lista de Valores usadas en esta versión de la API
+                This link is to the previous page of the list.
 
-  | Campo | Valores permitidos |
-  |--------|--------------------|
-  | classifications.typeCode | 1 = Automática, 2 = Manual, 3 = Fallback. |
+                The exact value depends on the data to be accessed.
 
-  ### Códigos de error usados en esta versión de la API
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/parties/{party_id}/consent_agreements?_offset=3&_limit=10
+        _next:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
 
-  | Código | HTTP Status | Descripción |
-  |--------|-------------|-------------|
-  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-  | TL0002 | 400 | La solicitud contiene parámetros inválidos o el cuerpo del mensaje no cumple con el formato esperado. |
-  | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado cuando el **emailbox_id**, el **email_id** o la ruta solicitada no existen. |
-  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+                This link is to the next page of the list.
 
-  La respuesta devuelve la información actualizada del correo electrónico con las clasificaciones registradas.
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/parties/{party_id}/consent_agreements?_offset=5&_limit=10
+        _last:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the last page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/parties/{party_id}/consent_agreements?_offset=10&_limit=10
+    WrapperLinks:
+      x-bizObjRef: Links
+      type: object
+      description: Data structure containing the links for moving between pages
+      properties:
+        _first:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the first page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/consent_relationships?_offset=0&_limit=10
+        _prev:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the previous page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/consent_relationships?_offset=3&_limit=10
+        _next:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the next page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/consent_relationships?_offset=5&_limit=10
+        _last:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the last page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/consent_relationships?_offset=10&_limit=10
+    WrapperConsentList:
+      type: array
+      description: Array of consent agreements
+      items:
+        $ref: "#/components/schemas/WrapperConsentDetails"
+    WrapperConsentRelationshipList:
+      type: array
+      description: Array of consent relationships
+      items:
+        $ref: "#/components/schemas/WrapperConsentRelationship"
+    WrapperConsentRelationship:
+      type: object
+      description: Data structure containing information about a consent relationship
+      properties:
+        consentAgreement:
+          $ref: "#/components/schemas/WrapperConsentAgreementDetails"
+        partyTypes:
+          type: array
+          description: Array of party types for which the relationship is valid
+          items:
+            $ref: "#/components/schemas/PartyType"
+    Consent:
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        consentId:
+          type: string
+          description: Unique consent agreement ID
+          example: "004902002001"
+        statusInfo:
+          type: object
+          description: Data structure containing information about an item's status
+          properties:
+            statusCode:
+              type: string
+              description: Status code
+              example: "01"
+            statusDescription:
+              type: string
+              description: Status description
+              example: Authorized
+        validityPeriod:
+          $ref: "#/components/schemas/Period"
+        bank:
+          $ref: "#/components/schemas/Bank"
+        legitimateCode:
+          type: string
+          description: Treatment category code
+          example: "02"
+        legitimateDescription:
+          type: string
+          description: Treatment category description
+          example: Legitimate interest
+        treatmentCode:
+          type: string
+          description: Code for the treatment
+          example: "002"
+        treatmentDescription:
+          type: string
+          description: Description of the treatment
+          example:
+            Sending of communications via email about products and services similar to those that the customer has
+            already purchased, catered to the customer's profile
+        purposeCode:
+          type: string
+          description: Code indicating the purpose for which consent is given
+          example: "001"
+        purposeDescription:
+          type: string
+          description: Description of the purpose for which consent is given
+          example: Marketing to customers
+    WrapperConsentAgreementDetails:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        bank:
+          type: object
+          description: Data structure containing information about a bank
+          properties:
+            bankId:
+              type: string
+              description: Unique bank ID
+              example: AAOZ
+        legitimateCode:
+          type: string
+          description: Treatment category code
+          example: "02"
+        legitimateDescription:
+          type: string
+          description: Treatment category description
+          example: Legitimate interest
+        treatmentCode:
+          type: string
+          description: Code for the treatment
+          example: "002"
+        treatmentDescription:
+          type: string
+          description: Description of the treatment
+          example:
+            Sending of communications via email about products and services similar to those that the customer has
+            already purchased, catered to the customer's profile
+        purposeCode:
+          type: string
+          description: Code indicating the purpose for which consent is given
+          example: "001"
+        purposeDescription:
+          type: string
+          description: Description of the purpose for which consent is given
+          example: Marketing to customers
+    WrapperConsentDetails:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        consentId:
+          type: string
+          description: Unique consent agreement ID
+          example: "004902002001"
+        statusInfo:
+          type: object
+          description: Data structure containing information about an item's status
+          properties:
+            statusCode:
+              type: string
+              description: Status code
+              example: CANC
+            statusDescription:
+              type: string
+              description: Status description
+              example: Cancelled
+        bank:
+          type: object
+          description: Data structure containing information about a bank
+          properties:
+            bankId:
+              type: string
+              description: Unique bank ID
+              example: AAOZ
+        legitimateCode:
+          type: string
+          description: Treatment category code
+          example: "02"
+        legitimateDescription:
+          type: string
+          description: Treatment category description
+          example: Legitimate interest
+        treatmentCode:
+          type: string
+          description: Code for the treatment
+          example: "002"
+        treatmentDescription:
+          type: string
+          description: Description of the treatment
+          example:
+            Sending of communications via email about products and services similar to those that the customer has
+            already purchased, catered to the customer's profile
+        purposeCode:
+          type: string
+          description: Code indicating the purpose for which consent is given
+          example: "001"
+        purposeDescription:
+          type: string
+          description: Description of the purpose for which consent is given
+          example: Marketing to customers
+        validityPeriod:
+          $ref: "#/components/schemas/Period"
+    WrapperConsentContact:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        bank:
+          $ref: "#/components/schemas/Bank"
+        statusInfo:
+          $ref: "#/components/schemas/StatusInfo"
+        legitimateCode:
+          type: string
+          description: Treatment category code
+          example: "02"
+        treatmentCode:
+          type: string
+          description: Code for the treatment
+          example: "002"
+        purposeCode:
+          type: string
+          description: Code indicating the purpose for which consent is given
+          example: "001"
+    WrapperPatchConsentRequestBody:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        statusInfo:
+          $ref: "#/components/schemas/StatusInfo"
+        validityPeriod:
+          $ref: "#/components/schemas/Period"
+        changeReasonCode:
+          type: string
+          description: Code for the reason why the consent agreement is to be changed
+          example: "01"
+    WrapperPostConsentContactRequestBody:
+      type: object
+      description: |-
+        Data structure containing the required information to create a consent agreement for a contact point.
+
+        Only one of 'phoneAddress.phoneNumber', 'phoneAddress.mobileNumber', or 'electronicAddress.emailAddress' must be provided.
+      properties:
+        phoneAddress:
+          $ref: "#/components/schemas/PhoneAddress"
+        electronicAddress:
+          $ref: "#/components/schemas/ElectronicAddress"
+        consent:
+          $ref: "#/components/schemas/WrapperConsentContact"
+    WrapperPostConsentRelationshipRequestBody:
+      type: object
+      description: Data structure containing the required information to create a consent relationship
+      properties:
+        consentAgreement:
+          $ref: "#/components/schemas/WrapperConsentAgreement"
+        partyTypes:
+          type: array
+          description: Array of party types for which the relationship is valid
+          items:
+            $ref: "#/components/schemas/PartyType"
+    PartyType:
+      type: object
+      description: Data structure containing party type details. A party is an entity that is involved in an activity.
+      properties:
+        code:
+          type: string
+          description: Party type code
+          example: F
+    WrapperConsentAgreement:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        bank:
+          $ref: "#/components/schemas/Bank"
+        legitimateCode:
+          type: string
+          description: Treatment category code
+          example: "02"
+        treatmentCode:
+          type: string
+          description: Code for the treatment
+          example: "002"
+        purposeCode:
+          type: string
+          description: Code indicating the purpose for which consent is given
+          example: "001"
+    WrapperPostConsentRequestBodyArray:
+      type: array
+      description: Data structure containing information about a consent agreement array
+      items:
+        $ref: "#/components/schemas/WrapperPostConsentRequestBody"
+    WrapperPostConsentRequestBody:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        statusInfo:
+          $ref: "#/components/schemas/StatusInfo"
+        validityPeriod:
+          $ref: "#/components/schemas/Period"
+        bank:
+          $ref: "#/components/schemas/Bank"
+        legitimateCode:
+          type: string
+          description: Treatment category code
+          example: "02"
+        treatmentCode:
+          type: string
+          description: Code for the treatment
+          example: "002"
+        purposeCode:
+          type: string
+          description: Code indicating the purpose for which consent is given
+          example: "001"
+    WrapperPostConsentsContactOutput:
+      type: object
+      description:
+        Data structure containing the response information for retrieving a list of consent agreements for a contact
+        point
+      properties:
+        consents:
+          type: array
+          description: Array of consent agreements
+          items:
+            $ref: "#/components/schemas/Consent"
+        _links:
+          $ref: "#/components/schemas/WrapperLinks2"
+    WrapperLinks2:
+      x-bizObjRef: Links
+      type: object
+      description: Data structure containing the links for moving between pages
+      properties:
+        _first:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the first page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/list_consent_agreements_contact?_offset=0&_limit=10
+        _prev:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the previous page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/list_consent_agreements_contact?_offset=3&_limit=10
+        _next:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the next page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/list_consent_agreements_contact?_offset=5&_limit=10
+        _last:
+          type: object
+          description: Data structure containing link information
+          properties:
+            href:
+              type: string
+              description: |-
+                Reference link that can be used to navigate to the specified URI.
+
+                This link is to the last page of the list.
+
+                The exact value depends on the data to be accessed.
+
+                The exact content of the page depends on the input parameters provided in the request, such as the offset.
+              example: https://www.hostname.com/v7/data_consent_management/list_consent_agreements_contact?_offset=10&_limit=10
+    WrapperPostConsentListRequestBody:
+      type: object
+      description: |-
+        Data structure containing the required information to retrieve a list of consent agreements for a contact point.
+
+        Only one of 'phoneAddress.phoneNumber', 'phoneAddress.mobileNumber', or 'electronicAddress.emailAddress' must be provided.
+      properties:
+        phoneAddress:
+          $ref: "#/components/schemas/PhoneAddress"
+        electronicAddress:
+          $ref: "#/components/schemas/ElectronicAddress"
+    WrapperPostModifyConsentContactRequestBody:
+      type: object
+      description: |-
+        Data structure containing the required information to update a consent agreement's details for a contact point.
+
+        Only one of 'phoneAddress.phoneNumber', 'phoneAddress.mobileNumber', or 'electronicAddress.emailAddress' must be provided.
+      properties:
+        consent:
+          $ref: "#/components/schemas/WrapperConsentId"
+        phoneAddress:
+          $ref: "#/components/schemas/PhoneAddress"
+        electronicAddress:
+          $ref: "#/components/schemas/ElectronicAddress"
+        statusInfo:
+          $ref: "#/components/schemas/StatusInfo"
+    WrapperPostConsentResponseBody:
+      type: array
+      description: Array of consent agreement IDs
+      items:
+        $ref: "#/components/schemas/WrapperConsentId"
+    WrapperPostConsentRelationshipsOutput:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        relationshipId:
+          type: string
+          description:
+            Unique ID for the consent relationship between the purpose for which consent is given and the treatment
+            indicating what the consent allows the bank to do. Relationships define the possible treatment and purpose
+            combinations for consent agreements.
+          example: "01"
+    WrapperConsentId:
+      x-bizObjRef: Consent
+      type: object
+      description: Data structure containing information about a consent agreement
+      properties:
+        consentId:
+          type: string
+          description: Unique consent agreement ID
+          example: "004902002001"
+    PhoneAddress:
+      type: object
+      description: Data structure containing information that identifies a phone address
+      properties:
+        mobileNumber:
+          type: string
+          description: Mobile phone number, as defined by a telecom service
+          maxLength: 35
+          example: "+34627987345"
+        phoneNumber:
+          type: string
+          description: Phone number, as defined by a telecom service
+          maxLength: 35
+          example: "+34913459876"
+    ElectronicAddress:
+      type: object
+      description: Data structure containing information that identifies an electronic address
+      properties:
+        emailAddress:
+          type: string
+          description: Email address
+          maxLength: 256
+          example: john.doe@santander.us
+    Bank:
+      type: object
+      description: Data structure containing information about a bank
+      properties:
+        bankId:
+          type: string
+          description: Unique bank ID
+          example: AAOZ
+    Period:
+      type: object
+      description: Data structure containing information about a period
+      properties:
+        startDate:
+          type: string
+          format: date
+          description: |-
+            Date when the period starts.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+          example: "2025-05-01"
+        endDate:
+          type: string
+          format: date
+          description: |-
+            Date when the period ends.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+          example: "2025-08-01"
+    StatusInfo:
+      type: object
+      description: Data structure containing information about an item's status
+      required:
+        - statusCode
+      properties:
+        statusCode:
+          type: string
+          description: Status code
+          example: "01"
+    Errors:
+      type: object
+      description: Data structure containing the details for errors
+      properties:
+        errors:
+          type: array
+          description: Array of errors
+          items:
+            $ref: "#/components/schemas/Error"
+    Error:
+      type: object
+      description: Data structure containing the error details
+      properties:
+        code:
+          type: string
+          description: Unique alphanumeric human readable error code
+          example: XXX
+        message:
+          type: string
+          description: Brief summary of the reported issue
+          example: Invalid action
+        level:
+          type: string
+          description: Level of the reported issue
+          enum:
+            - info
+            - warning
+            - error
+          example: error
+        description:
+          type: string
+          description: Detailed description of the reported issue
+          example: Information about the returned error, used to resolve it
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
