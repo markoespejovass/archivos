@@ -1,12 +1,24 @@
-para emailboxes
-para el get emailboxes/{emailbox_id}/send_email
-para un error de no authorizado es 401
-si no manda correo(campo emailAddress)  error de 400
-si manda un correo(campo emailAddress) no valido 409
-para un error interno 500 
-el path param emailbox_id puede tomar los valore otp o cualquier otro de bd si no esta en bd se devolvera error 409, con el mensaje flujo de correo no soportado
-de no enviarse el path param emailbox_id se devuelve error 404 (por gateway)
+description: |-
+  Envía un correo electrónico desde un buzón específico para entregar un reporte de actividad a un cliente. Esta operación solo puede ser utilizada por personal de Santander.
 
-para post emailboxes/{emailbox_id}/emails/{email_id}/classify_email
-el path param emailbox_id solo puede tomar los valore otp y el path param email_id solo puede asumir un valor de cadena de 6 caracteres y todo numericos en cualquier otro caso se devuelve error 409
-si no se envia path param emailbox_id o path param email_id deuelve error 404(por gateway)
+  Para realizar la solicitud, se debe proporcionar el identificador del buzón (emailbox_id) en el path.
+
+  En el cuerpo de la solicitud se debe enviar:
+  - Información del usuario que envía el correo.
+  - Identificador del centro desde el cual se envía el correo.
+  - Identificador del reporte.
+  - Información del correo electrónico.
+
+  #### Validaciones
+
+  | Validación | Código HTTP | Descripción |
+  |------------|-------------|-------------|
+  | No se envía el token de autenticación o es inválido. | 401 | Unauthorized |
+  | No se envía el campo `emailAddress`. | 400 | Bad Request |
+  | El campo `emailAddress` tiene un formato inválido. | 409 | Conflict |
+  | El `emailbox_id` no corresponde a `otp` ni a un flujo de correo configurado. | 409 | Flujo de correo no soportado. |
+  | Ocurre un error interno durante el procesamiento de la solicitud. | 500 | Internal Server Error |
+
+  Si no se envía el parámetro de ruta `emailbox_id`, el API Gateway devolverá un HTTP 404 (Not Found).
+
+  La respuesta incluye el identificador del correo enviado.
