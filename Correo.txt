@@ -1,6 +1,28 @@
-para card position
-para un error de no authorizado es 401
-si no manda el custimerId como query paraam da error 400
-si manda un customerId que invalido da error 409
-si envia un customerId valido pero no se encuentra data da error 404
-para un error interno 500 
+description: |
+  ### Acerca de la funcionalidad expuesta
+  Esta API consulta la posición de tarjetas asociadas a un cliente a partir de su Customer ID.
+
+  ### Path Parameters
+  No aplica.
+
+  ### Usos válidos de Query Parameters
+
+  | Parámetro | Descripción |
+  |-----------|-------------|
+  | customer_id | Identificador del cliente para el cual se consulta la posición de tarjetas. |
+
+  ### Variantes válidas del Payload (Cuerpo del mensaje)
+  No aplica.
+
+  ### Lista de Valores usadas en esta versión de la API
+  No aplica.
+
+  ### Códigos de error usados en esta versión de la API
+
+  | Código | HTTP Status | Descripción |
+  |--------|-------------|-------------|
+  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
+  | TL0003 | 400 | El parámetro **customer_id** es obligatorio y no fue enviado en la solicitud. |
+  | TL0005 | 409 | El **customer_id** proporcionado no es válido. |
+  | TL0003 | 404 | No se encontró información para el **customer_id** proporcionado. |
+  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
