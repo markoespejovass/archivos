@@ -1,54 +1,54 @@
 openapi: 3.0.1
 info:
-  title: Customer Benefit Programs
-  version: 1.4.0
+  title: Customer Card Position
+  version: 1.6.0
   description: |-
-    This API manages customer benefit programs and their associated benefit packages.
+    This API retrieves information about a customer's card position. The card position is the collective term for the customer's card contracts and contract balances.
 
-    The API can be used for:
-    - Benefit programs:
-      - Register a customer in a benefit program.
-    - Qurable:
-      - Retrieve a list of categories
-      - Update category info
-      - Retrieve a list of transactions of a specific day
-      - Retrieve a list of users
+    The API can be used to retrieve a customer's card position.
   contact:
     email: apiglobalgovernance@gruposantander.com
-    url: https://gluon.corp/community/docs/latest/
   license:
-    name: Apache
-    url: https://www.apache.org/licenses/LICENSE-2.0
+    name: Copyright
+    url: https://gluon.gs.corp/community/docs/latest/getting-started/about-gluon/terms-conditions/
 servers:
-  - url: /v1/customer_benefit_programs
+  - url: /v1/customer_card_position
 security:
   - Authorization: []
 tags:
-  - name: Benefit programs
-    description: Operations related to customer benefit programs
-  - name: Qurable
-    description: Operations related to qurable
+  - name: Customer card position
+    description: Operations related to a customer's card position
 paths:
-  /register_customer:
-    post:
-      operationId: registerCustomer
+  /list:
+    get:
+      operationId: GetCardPosition
       tags:
-        - Benefit programs
-      summary: Registers a customer in a benefit program.
+        - Customer card position
+      summary: Retrieves a customer's card position.
       description: |-
-        Initiates the registration process to enrol a specific customer in a provided benefit program. This operation is used by an agent on the customer's behalf to create the activation request and onboard the customer into the selected benefit package so that they can access the program's features and benefits.
+        Retrieves a specific customer's card position.
 
-        The benefit program code must be provided in the request body.
+        If the logged-in person sending the request is a customer, the response includes their information. If the logged-in person sending the request is Santander staff, the customer ID of the customer for whom information is to be retrieved must be provided.
 
-        The response includes the ID and status for the created request.
+        The card contract data included in the response can be filtered by type and status. The retrieved card contract data can also be grouped by card type or combined.
+
+        Fields to be excluded from the retrieved card contract data can be indicated with the '_fields' parameter.
+
+        The response includes the card customer contract's credit and capability level details, the customer's available credit and credit limit amounts, and the lists of customer cards, including their contracts and balances.
       parameters:
         - $ref: "#/components/parameters/x-santander-client-id"
         - $ref: "#/components/parameters/accept-language"
-      requestBody:
-        $ref: "#/components/requestBodies/RegisterCustomerRequest"
+        - $ref: "#/components/parameters/device-information"
+        - $ref: "#/components/parameters/type_code"
+        - $ref: "#/components/parameters/group_by_type_code"
+        - $ref: "#/components/parameters/filtering_status_code"
+        - $ref: "#/components/parameters/customer_id"
+        - $ref: "#/components/parameters/fields"
       responses:
-        "201":
-          $ref: "#/components/responses/RegisterCustomerResponse"
+        "200":
+          $ref: "#/components/responses/Get200_CustomerPosition"
+        "204":
+          $ref: "#/components/responses/NoContent"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -57,302 +57,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "415":
-          $ref: "#/components/responses/UnsupportedMediaType"
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "429":
-          $ref: "#/components/responses/TooManyRequests"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-        "504":
-          $ref: "#/components/responses/GatewayTimeout"
-  /categories/{benefit_program_id}:
-    get:
-      operationId: getBenefitProgramDetails
-      tags:
-        - Qurable
-      summary: Retrieves a benefit program's details.
-      description: |
-        ### Acerca de la funcionalidad expuesta
-        Esta API obtiene la información de una categoría.
-
-        ### Path Parameters
-
-        | Parámetro | Descripción |
-        |-----------|-------------|
-        | benefit_program_id | Tipo de lista a consultar. |
-
-        ### Usos válidos de Query Parameters
-        No aplica.
-
-        ### Variantes válidas del Payload (Cuerpo del mensaje)
-        No aplica.
-
-        ### Lista de Valores usadas en esta versión de la API
-        No aplica.
-
-        ### Códigos de error usados en esta versión de la API
-
-        | Código | HTTP Status | Descripción |
-        |--------|-------------|-------------|
-        | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-        | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **list** en la ruta. |
-        | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
-
-      parameters:
-        - $ref: "#/components/parameters/x-santander-client-id"
-        - $ref: "#/components/parameters/accept-language"
-        - $ref: "#/components/parameters/benefit_program_id"
-      responses:
-        "200":
-          $ref: "#/components/responses/GetBenefitProgramDetailsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-        "504":
-          $ref: "#/components/responses/GatewayTimeout"
-    patch:
-      operationId: updateBenefitProgramDetails
-      tags:
-        - Qurable
-      summary: Updates a benefit program's details.
-
-      description: |
-        ### Acerca de la funcionalidad expuesta
-        Esta API actualiza la categoría de un usuario.
-
-        ### Path Parameters
-
-        | Parámetro | Descripción |
-        |-----------|-------------|
-        | benefit_program_id | Tipo de operación a ejecutar (**UP** o **DOWN**). |
-
-        ### Usos válidos de Query Parameters
-        No aplica.
-
-        ### Variantes válidas del Payload (Cuerpo del mensaje)
-        El cuerpo de la solicitud debe contener el DNI del usuario y la información del tier.
-
-        ### Lista de Valores usadas en esta versión de la API
-
-        | Valor | Descripción |
-        |-------|-------------|
-        | UP | Incrementa el nivel del usuario en una categoría. |
-        | DOWN | Reinicia el nivel del usuario a la categoría inicial. |
-
-        ### Códigos de error usados en esta versión de la API
-
-        | Código | HTTP Status | Descripción |
-        |--------|-------------|-------------|
-        | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-        | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando el parámetro de la ruta no corresponde a **UP** o **DOWN**. |
-        | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
-        
-        
-        Operation behavior:
-        
-        - UP: Sube un nivel de tier o categoria.
-        - DOWN: Remueve todos los avances de nivel y deja en el nivel 1.
-        
-        Examples:
-        
-        Upgrade a user to a tier:
-        
-        PATCH /categories/UP
-        
-        Request body:
-        
-        {
-          "key": "43362687",
-          "tier_id": 2,
-          "tier_expires_at": "2050-01-01"
-        }
-        
-        Response:
-        
-        {
-          "tier": {
-            "key": "43362687",
-            "tier_id": 3,
-            "tier_expires_at": "2050-01-01"
-          }
-        }
-        
-        Remove a user's tier:
-        
-        PATCH /categories/DOWN
-        
-        Request body:
-        
-        {
-          "key": "43362687",
-          "tier_id": 5,
-          "tier_expires_at": "2050-01-01"
-        }
-        
-        Response:
-        
-        {
-          "tier": {
-            "key": "43362687",
-            "tier_id": 1,
-            "tier_expires_at": null
-          }
-        }
-
-      parameters:
-        - $ref: "#/components/parameters/x-santander-client-id"
-        - $ref: "#/components/parameters/accept-language"
-        - $ref: "#/components/parameters/benefit_program_id"
-      requestBody:
-        $ref: "#/components/requestBodies/UpdateTierRequest"
-      responses:
-        "200":
-          $ref: "#/components/responses/UpdateTierResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "415":
-          $ref: "#/components/responses/UnsupportedMediaType"
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "429":
-          $ref: "#/components/responses/TooManyRequests"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-        "504":
-          $ref: "#/components/responses/GatewayTimeout"
-
-  /transactions/date/{year}/{month}/{day}:
-    get:
-      operationId: getTransactionsByDate
-      tags:
-        - Qurable
-      summary: Retrieves transactions by date.
-      description: |
-        ### Acerca de la funcionalidad expuesta
-        Esta API consulta las transacciones registradas para una fecha determinada.
-
-        ### Path Parameters
-
-        | Parámetro | Descripción |
-        |-----------|-------------|
-        | year | Año de consulta. |
-        | month | Mes de consulta. |
-        | day | Día de consulta. |
-
-        ### Usos válidos de Query Parameters
-        No aplica.
-
-        ### Variantes válidas del Payload (Cuerpo del mensaje)
-        No aplica.
-
-        ### Lista de Valores usadas en esta versión de la API
-        No aplica.
-
-        ### Códigos de error usados en esta versión de la API
-
-        | Código | HTTP Status | Descripción |
-        |--------|-------------|-------------|
-        | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-        | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía alguno de los parámetros **year**, **month** o **day**. |
-        | TL0005 | 409 | El valor del mes o día proporcionado no es válido. |
-        | TL0003 | 404 | No se encontraron transacciones para la fecha proporcionada. |
-        | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
-
-      parameters:
-        - $ref: "#/components/parameters/x-santander-client-id"
-        - $ref: "#/components/parameters/accept-language"
-        - $ref: "#/components/parameters/year"
-        - $ref: "#/components/parameters/month"
-        - $ref: "#/components/parameters/day"
-      responses:
-        "200":
-          $ref: "#/components/responses/GetTransactionListResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-        "504":
-          $ref: "#/components/responses/GatewayTimeout"
-
-  /users/{key}:
-    get:
-      operationId: getUserDetails
-      tags:
-        - Qurable
-      summary: Retrieves user details.
-      description: |
-        ### Acerca de la funcionalidad expuesta
-        Esta API consulta la información de un usuario a partir de su DNI.
-
-        ### Path Parameters
-
-        | Parámetro | Descripción |
-        |-----------|-------------|
-        | dni | Documento Nacional de Identidad del usuario. |
-
-        ### Usos válidos de Query Parameters
-        No aplica.
-
-        ### Variantes válidas del Payload (Cuerpo del mensaje)
-        No aplica.
-
-        ### Lista de Valores usadas en esta versión de la API
-        No aplica.
-
-        ### Códigos de error usados en esta versión de la API
-
-        | Código | HTTP Status | Descripción |
-        |--------|-------------|-------------|
-        | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-        | TL0003 | 404 | No se encontró el recurso solicitado. Este error es generado por el API Gateway cuando no se envía el parámetro **dni** o la ruta solicitada no existe. |
-        | TL0005 | 409 | El DNI proporcionado no es válido. |
-        | TL0003 | 404 | No se encontró información para el DNI proporcionado. |
-        | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
-
-      parameters:
-        - $ref: "#/components/parameters/x-santander-client-id"
-        - $ref: "#/components/parameters/accept-language"
-        - $ref: "#/components/parameters/user_key"
-      responses:
-        "200":
-          $ref: "#/components/responses/GetUserDetailsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "405":
-          description: Method not allowed
         "500":
           $ref: "#/components/responses/InternalServerError"
         "503":
@@ -361,84 +65,6 @@ paths:
           $ref: "#/components/responses/GatewayTimeout"
 components:
   parameters:
-    year:
-      name: year
-      in: path
-      required: true
-      schema:
-        type: integer
-      description: Year
-      example: 2025
-    month:
-      name: month
-      in: path
-      required: true
-      schema:
-        type: integer
-      description: Month. If less than 1, all months are returned.
-      example: 10
-    day:
-      name: day
-      in: path
-      required: true
-      schema:
-        type: integer
-      description: Day. If less than 1, all days are returned.
-      example: 15
-    user_key:
-      name: key
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Es el DNI de un cliente
-      example: USER12345
-    _limit:
-      name: _limit
-      in: query
-      required: false
-      schema:
-        type: string
-      description: |-
-        Maximum number of rows to be included on each page in the response.
-
-        Fewer rows can be returned if the query does not yield that many.
-      example: "10"
-      allowEmptyValue: false
-    _offset:
-      name: _offset
-      in: query
-      required: false
-      schema:
-        type: string
-      description: |-
-        Pagination identifier that is returned to the app by the API response when this uses the HATEOAS '_prev' or '_next' links.
-
-        If no offset is specified, the app can navigate from the last returned page to the next page, the previous page, or the first page.
-      example: "2"
-      allowEmptyValue: false
-    _sort:
-      name: _sort
-      in: query
-      required: false
-      schema:
-        type: string
-      description: |-
-        Sorting order for the benefit programs to be included in the response.
-
-        The possible values are:
-        - +code = Ascending by benefit program ID
-        - -code = Descending by benefit program ID
-        - +name = Ascending by summary
-        - -name = Descending by summary
-        - +startDate = Ascending by validity period start date
-        - -startDate = Descending by validity period start date
-        - +endDate = Ascending by validity period end date
-        - -endDate = Descending by validity period end date
-
-        Multiple values can be provided as a comma-separated list.
-      example: +code,-startDate
-      allowEmptyValue: false
     accept-language:
       name: accept-language
       in: header
@@ -448,109 +74,89 @@ components:
       description: |-
         Language and country header.
 
-        The value is a 2-letter language code defined in ISO 639-1 alpha-2 followed by a 3-letter country code defined in ISO 3166-1 alpha-3, separated by a hyphen.
-      example: es-ESP
-    benefit_program_id:
-      name: benefit_program_id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Benefit program ID to be used in the query
-      example: "788013"
-    benefit_program_id_query:
-      name: benefit_program_id
-      in: query
-      required: false
-      schema:
-        type: string
-      description: ID of the benefit program to be included in the response
-      example: "788001"
-    benefit_type_code:
-      name: benefit_type_code
-      in: query
-      required: false
-      schema:
-        type: string
-      description: Code for the type of benefit to be included in the response
-      example: "001"
-    customer_id_path:
-      name: customer_id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Customer ID to be used in the query
-      example: F1234567
-    customer_id_query:
+        The value is a 2-letter language code defined in ISO 639-1 alpha-2 followed by a 2-letter country code defined in ISO 3166-1 alpha-2, separated by a hyphen.
+      example: es-ES
+    customer_id:
       name: customer_id
       in: query
       required: false
       schema:
         type: string
-      description: ID of the customer whose available benefit programs are to be included in the response
+      description: |-
+        Customer ID associated with the contracts to be included in the response.
+
+        If the logged-in person is not the customer whose card position is to be retrieved, this parameter must be provided.
       example: F1234567
-    end_date:
-      name: end_date
+    device-information:
+      name: device-information
+      in: header
+      schema:
+        type: string
+      description:
+        Device information header containing identification data from the logged-in person's device. The data can be
+        used to personalize the user experience.
+      example: ISO 639-2/retail/iPhone13/iOS/Darwin/16.3.0
+    fields:
+      name: _fields
       in: query
       required: false
       schema:
         type: string
       description: |-
-        End date for the validity period from which benefit programs are to be included in the response.
+        Fields to be excluded from the retrieved card contract data.
 
-        The value uses the complete data format defined in ISO 8601:
+        The possible values are the field, data structure, and array names in the response.
 
-        'YYYY-MM-DD'
-
-        Where:
-        - YYYY: 4-digit year
-        - MM: 2-digit month (for example, 01 = January)
-        - DD: 2-digit day of the month (01 through 31)
-      example: "2026-01-10"
-    offering_status_code:
-      name: offering_status_code
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - marketable
-          - not_marketable
-          - under_study
-          - all
-      description: Offering status code for the benefit programs to be included in the response
-      example: marketable
-    start_date:
-      name: start_date
-      in: query
-      required: false
-      schema:
-        type: string
-      description: |-
-        Start date for the validity period from which benefit programs are to be included in the response.
-
-        The value uses the complete data format defined in ISO 8601:
-
-        'YYYY-MM-DD'
-
-        Where:
-        - YYYY: 4-digit year
-        - MM: 2-digit month (for example, 01 = January)
-        - DD: 2-digit day of the month (01 through 31)
-      example: "2026-01-01"
-    status_code:
-      name: status_code
+        Multiple values can be provided as a comma-separated list.
+      example: statusInfo,balances,associatedAccount
+    filtering_status_code:
+      name: filtering_status_code
       in: query
       required: false
       schema:
         type: string
         enum:
           - active
-          - inactive
+          - cancelled
           - all
-      description: Status code for the benefit programs to be included in the response
+      description:
+        Status code for the card contract data to be included in the response. If this parameter is omitted, card
+        contract data for all statuses is returned.
       example: active
+    group_by_type_code:
+      name: group_by_type_code
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: true
+      description: |-
+        Whether the card contract data to be included in the response is grouped by type.
+
+        The possible values are:
+        - true = Card contract data is grouped by type and returned in the 'debitCards.list', 'creditCards.list', and 'prepaidCards.list' arrays.
+        - false = Card contract data for all card types is returned in the 'cards.list' array.
+      example: true
+    type_code:
+      name: type_code
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - debit
+            - credit
+            - prepaid
+          description: Contract type code
+          example: debit
+      description:
+        Array of type codes for the card contract data to be included in the response. If this parameter is omitted,
+        card contract data for all card types is returned.
+      example:
+        - debit
+        - credit
     x-santander-client-id:
       name: x-santander-client-id
       in: header
@@ -559,163 +165,24 @@ components:
         type: string
       description: Client ID header
       example: a1b30a84-7bf3-442e-84a0-e935d8163b5a
-  requestBodies:
-    UpdateTierRequest:
-      description: Data structure containing the request details for updating a user's tier information
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/UpdateTierRequest"
-      required: true
-    RegisterCustomerRequest:
-      description: Data structure containing the request details for registering a customer in a benefit program
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/BenefitProgramActivationRequest"
-      required: true
-    CreateBenefitProgramRequest:
-      description: Data structure containing the request details for creating a benefit program
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperCreateBenefitProgramRequest"
-      required: true
-    UpdateBenefitProgamDetailsRequest:
-      description: Data structure containing the request details for updating a benefit program's details
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperUpdateBenefitProgramDetails"
-      required: true
-    SimulateContractRequest:
-      description:
-        Data structure containing the request details for simulating a customer's contract for a list of benefit
-        programs
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperSimulateContractRequest"
-      required: true
   responses:
-    UpdateTierResponse:
-      description: |-
-        OK.
-        Response to a request to update a user's tier information.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperTier"
-    GetTransactionListResponse:
-      description: |-
-        OK.
-        Response to a request to retrieve transactions by date.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperTransactionList"
-    GetUserDetailsResponse:
-      description: |-
-        OK.
-        Response to a request to retrieve a user's details.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperUser"
-    GetBenefitProgramListResponse:
-      description: |-
-        OK.
-        Response to a request to retrieve a list of benefit programs.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperGetBenefitProgramList"
-    GetBenefitProgramDetailsResponse:
+    Get200_CustomerPosition:
       description: |-
         OK.
 
-        Response to a request to retrieve a benefit program's details.
+        Response to a request to retrieve a customer's card position.
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/WrapperGetBenefitProgramDetails"
-    GetBenefitProgramHistoryResponse:
-      description: |-
-        OK.
-
-        Response to a request to retrieve a benefit program's history.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperGetBenefitProgramHistory"
-    GetBenefitListResponse:
-      description: |-
-        OK.
-
-        Response to a request to retrieve a list of benefits for a benefit program.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperGetBenefitList"
-    GetAvailableProductListResponse:
-      description: |-
-        OK.
-
-        Response to a request to retrieve a list of available products for a benefit program.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperGetAvailableProductList"
-    CheckCustomerEligibilityResponse:
-      description: |-
-        OK.
-
-        Response to a request to check a customer's benefit program eligibility.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperStatusInfoEligibility"
-    SimulateContractResponse:
-      description: |-
-        OK.
-
-        Response to a request to simulate a customer's contract for a list of benefit programs.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperSimulateContractResponse"
-    RegisterCustomerResponse:
-      description: |-
-        Created.
-
-        Response to a request to register a customer in a benefit program.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperRegisterCustomer"
-    CreateBenefitProgramResponse:
-      description: |-
-        Created.
-
-        Response to a request to create a benefit program.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/WrapperCreateBenefitProgramResponse"
+            $ref: "#/components/schemas/WrapperCustomerPositionResponse"
     NoContent:
       description: No content
     BadRequest:
-      description: TL0003 - Los datos proporcionados no son válidos.
+      description: Bad request
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - code: "TL0003"
-                message: "Bad Request"
-                level: "ERROR"
-                description: "Los datos proporcionados no son válidos."
+            $ref: "#/components/schemas/Errors"
     Unauthorized:
       description: Unauthorized
       content:
@@ -729,881 +196,895 @@ components:
           schema:
             $ref: "#/components/schemas/Errors"
     NotFound:
-      description: TL0003 - No se encontró el recurso solicitado.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - code: "TL0003"
-                message: "Not Found"
-                level: "ERROR"
-                description: "No se encontró el recurso solicitado."
-    Conflict:
-      description: TL0005 - Los datos ingresados no son válidos.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - code: "TL0005"
-                message: "Conflict"
-                level: "ERROR"
-                description: "Los datos ingresados no son válidos."
-    UnsupportedMediaType:
-      description: Unsupported media type
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Errors"
-    UnprocessableContent:
-      description: Unprocessable content
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Errors"
-    TooManyRequests:
-      description: Too many requests
+      description: Not found
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Errors"
     InternalServerError:
-      description: TL9999 - Ocurrió un error inesperado.
+      description: Internal server error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - code: "TL9999"
-                message: "Internal Server Error"
-                level: "ERROR"
-                description: "Ocurrió un error inesperado."
+            $ref: "#/components/schemas/Errors"
     ServiceUnavailable:
-      description: TL9999 - El servicio no se encuentra disponible.
+      description: Service unavailable
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - code: "TL9999"
-                message: "Service Unavailable"
-                level: "ERROR"
-                description: "El servicio no se encuentra disponible."
+            $ref: "#/components/schemas/Errors"
     GatewayTimeout:
-      description: TL9999 - Se superó el tiempo de respuesta interna.
+      description: Gateway timeout
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          example:
-            errors:
-              - code: "TL9999"
-                message: "Gateway Timeout"
-                level: "ERROR"
-                description: "Se superó el tiempo de respuesta interna."
+            $ref: "#/components/schemas/Errors"
   schemas:
-    WrapperTransactionList:
+    WrapperCustomerPositionResponse:
       type: object
-      description: Data structure containing the response information for retrieving transactions by date
+      description: Data structure containing the response information for retrieving a customer's card position
       properties:
-        transactions:
-          type: array
-          description: Array of transactions
-          items:
-            $ref: "#/components/schemas/Transaction"
-    Transaction:
+        customerCreditLimit:
+          $ref: "#/components/schemas/Amount"
+        customerCreditAvailable:
+          $ref: "#/components/schemas/Amount"
+        cardCustomerContract:
+          $ref: "#/components/schemas/CardCustomerContract"
+        cards:
+          $ref: "#/components/schemas/WrapperCardsInformation"
+        debitCards:
+          $ref: "#/components/schemas/WrapperDebitCardsInformation"
+        creditCards:
+          $ref: "#/components/schemas/WrapperCardsInformation"
+        prepaidCards:
+          $ref: "#/components/schemas/WrapperPrepaidCardsInformation"
+    CardCustomerContract:
       type: object
-      description: Data structure containing transaction information
+      description:
+        Data structure containing information about a card customer contract. This contract is a framework contract for
+        all of a customer's cards and contains their total credit limit. Each customer can have only one card customer
+        contract.
       properties:
-        client_name:
-          type: string
-          description: Client name
-          example: John Smith
-        client_tx_id:
-          type: string
-          description: Client transaction identifier
-          example: CLT123456
-        id:
-          type: string
-          description: Unique transaction identifier
-          example: TXN987654
-        tx_data_request:
-          type: string
-          description: Request payload associated with the transaction
-          example: "{...}"
-        tx_data_response:
-          type: string
-          description: Response payload associated with the transaction
-          example: "{...}"
-        tx_data_user_id:
-          type: string
-          description: User identifier associated with the transaction
-          example: USER001
-        tx_dts:
-          type: string
-          description: Transaction date
-          example: "1999-01-01"
-        tx_status:
-          type: string
-          description: Transaction status
-          example: ok
-        tx_type:
-          type: integer
-          description: Transaction type identifier
-          example: 1
-    TransactionList:
-      type: array
-      description: Array of transactions
-      items:
-        $ref: "#/components/schemas/Transaction"
-    WrapperUser:
-      type: object
-      description: Data structure containing user information
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-    User:
-      type: object
-      description: Data object containing user information
-      properties:
-        key:
-          type: string
-          description: Unique user key
-          example: "43362687"
-        email:
-          type: string
-          description: User email address
-          example: warning-do-not-use.lesquivel_cusco@saludpol.gob.pe
-        created_at:
-          type: string
-          format: date-time
-          description: User creation timestamp
-          example: "2024-02-05T17:07:58.413Z"
-        tier_id:
-          type: integer
-          description: User tier identifier
-          example: 2
-        tier_expires_at:
-          type: string
-          nullable: true
-          description: Expiration date of the user's tier
-          example: null
-        balance:
-          type: number
-          description: User balance
-          example: 0
-        enabled:
+        isCreditLimitAssigned:
           type: boolean
-          description: Indicates whether the user is enabled
+          description: Whether a credit limit is assigned to the card customer contract
           example: true
-    WrapperGetBenefitProgramList:
-      type: object
-      description: Data structure containing the response information for retrieving a list of benefit programs
-      properties:
-        benefitPrograms:
-          type: array
-          description: Array of benefit programs
-          items:
-            $ref: "#/components/schemas/BenefitProgram"
-        _links:
-          $ref: "#/components/schemas/Links"
-    WrapperGetBenefitProgramHistory:
-      type: object
-      description: Data structure containing the response information for retrieving a benefit program's history
-      properties:
-        benefitProgramInstances:
-          type: array
-          description: Array of the benefit program's instances, aggregated by date range
-          items:
-            $ref: "#/components/schemas/WrapperBenefitProgramDateRange"
-        _links:
-          $ref: "#/components/schemas/WrapperHistoryLinks"
-    Links:
-      type: object
-      description: Data structure containing the links for moving between pages
-      properties:
-        _first:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the first page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs?_offset=0&_limit=10
-        _prev:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the previous page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs?_offset=3&_limit=10
-        _next:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the next page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs?_offset=5&_limit=10
-        _last:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the last page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs?_offset=10&_limit=10
-    WrapperLinks:
-      x-bizObjRef: Links
-      type: object
-      description: Data structure containing the links for moving between pages
-      properties:
-        _first:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the first page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/benefits?_offset=0&_limit=10
-        _prev:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the previous page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/benefits?_offset=3&_limit=10
-        _next:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the next page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/benefits?_offset=5&_limit=10
-        _last:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the last page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/benefits?_offset=10&_limit=10
-    WrapperHistoryLinks:
-      x-bizObjRef: Links
-      type: object
-      description: Data structure containing the links for moving between pages
-      properties:
-        _first:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the first page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/retrieve_history?_offset=0&_limit=10
-        _prev:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the previous page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/retrieve_history?_offset=3&_limit=10
-        _next:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the next page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/retrieve_history?_offset=5&_limit=10
-        _last:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the last page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/retrieve_history?_offset=10&_limit=10
-    WrapperProductLinks:
-      x-bizObjRef: Links
-      type: object
-      description: Data structure containing the links for moving between pages
-      properties:
-        _first:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the first page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/products?_offset=0&_limit=10
-        _prev:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the previous page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/products?_offset=3&_limit=10
-        _next:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the next page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/products?_offset=5&_limit=10
-        _last:
-          type: object
-          description: Data structure containing link information
-          properties:
-            href:
-              type: string
-              description: |-
-                Reference link that can be used to navigate to the specified URI.
-
-                This link is to the last page of the list.
-
-                The exact value depends on the data to be accessed.
-
-                The exact content of the page depends on the input parameters provided in the request, such as the offset.
-              example: https://www.hostname.com/v1/customer_benefit_programs/{benefit_program_id}/products?_offset=10&_limit=10
-    WrapperGetBenefitList:
-      type: object
-      description:
-        Data structure containing the response information for retrieving a list of benefits for a benefit program
-      properties:
-        benefits:
-          type: array
-          description: Array of benefits
-          items:
-            $ref: "#/components/schemas/WrapperBenefit"
-        _links:
-          $ref: "#/components/schemas/WrapperLinks"
-    WrapperGetAvailableProductList:
-      type: object
-      description:
-        Data structure containing the response information for retrieving a list of available products for a benefit
-        program
-      properties:
-        availableProducts:
-          type: array
-          description: Array of products that are available to be associated with the benefit program
-          items:
-            $ref: "#/components/schemas/WrapperAvailableProduct"
-        _links:
-          $ref: "#/components/schemas/WrapperProductLinks"
-    WrapperAvailableProduct:
-      x-bizObjRef: Product
-      type: object
-      description: Data structure containing product information. Products can be services or goods.
-      properties:
-        productId:
+        capabilityLevel:
           type: string
-          description: Product ID
-          example: "0049300399"
-    WrapperBenefit:
-      x-bizObjRef: Benefit
+          description: |-
+            Level of capability that a back-end or the card processor can provide. The level determines the quick actions that the front-end can present to the customer. If the customer has multiple card contracts with different capability levels, the customer's overall capability level is considered mixed.
+
+            The possible values are:
+            - PA = PAMPA capability level
+            - PC = PCAS capability level
+            - PL = Plard capability level
+            - MX = Mixed capability level
+          enum:
+            - PA
+            - PC
+            - PL
+            - MX
+          example: PL
+        hasUnlimitedCredit:
+          type: boolean
+          description: Whether the card customer contract has unlimited credit
+          example: false
+    WrapperCardsInformation:
       type: object
-      description: Data structure containing information about a benefit
+      description: Data structure containing the list of cards for the card product family
       properties:
-        benefitId:
+        list:
+          type: array
+          description: Array of cards
+          items:
+            $ref: "#/components/schemas/WrapperCardWithLinks"
+    WrapperDebitCardsInformation:
+      type: object
+      description: Data structure containing the list of debit cards for the card product family
+      properties:
+        list:
+          type: array
+          description: Array of cards
+          items:
+            $ref: "#/components/schemas/WrapperDebitCardWithLinks"
+    WrapperPrepaidCardsInformation:
+      type: object
+      description: Data structure containing the list of prepaid cards for the card product family
+      properties:
+        list:
+          type: array
+          description: Array of cards
+          items:
+            $ref: "#/components/schemas/WrapperPrepaidCardWithLinks"
+    WrapperDebitCardWithLinks:
+      type: object
+      description: Data structure containing information about a debit card and the bank with which it is held
+      properties:
+        card:
+          $ref: "#/components/schemas/WrapperDebitCard"
+        bank:
+          $ref: "#/components/schemas/Bank"
+    WrapperPrepaidCardWithLinks:
+      type: object
+      description: Data structure containing information about a prepaid card and the bank with which it is held
+      properties:
+        card:
+          $ref: "#/components/schemas/WrapperPrepaidCard"
+        bank:
+          $ref: "#/components/schemas/Bank"
+    WrapperCardWithLinks:
+      type: object
+      description: Data structure containing information about a card and the bank with which it is held
+      properties:
+        card:
+          $ref: "#/components/schemas/Card"
+        bank:
+          $ref: "#/components/schemas/Bank"
+    WrapperDebitCard:
+      x-bizObjRef: Card
+      type: object
+      description: Data structure containing information about a card
+      properties:
+        cardId:
           type: string
-          description: Unique benefit ID
-          example: "0016"
-        summary:
+          description:
+            Card ID that is used to uniquely identify the card in card-related operations. For internal use, the value
+            does not require tokenization.
+          example: "4547420008209985"
+        cardIdentification:
+          type: object
+          description: Data structure containing identification information for a card
+          properties:
+            displayNumber:
+              type: string
+              description: |-
+                Displayed card number.
+
+                The value must be obfuscated.
+              example: xxxx-xxxx-xxxx-5643
+        type:
           type: string
-          description: Benefit summary
-          example: Digital protection
-        description:
-          type: string
-          description: Benefit description
-          example: Legal protection for your family
-        logo:
-          $ref: "#/components/schemas/Logo"
+          description: Card type that defines the operations for which it can be used
+          example: Credit card
         typeCode:
           type: string
-          description: Code for the benefit type
-          example: "001"
+          description: Card type code
+          example: "01"
         typeDescription:
           type: string
-          description: Description of the benefit type
-          example: Internal
-        order:
-          type: integer
-          description: Order of the benefit within the benefit program hierarchy
-          example: 1
-        maximumUses:
-          type: integer
-          description: Maximum number of times the benefit can be used
-          example: 5
-    WrapperCreateBenefitProgramResponse:
-      x-bizObjRef: BenefitProgram
-      type: object
-      description:
-        Data structure containing information about a benefit program. A benefit program defines the customer's benefit
-        package.
-      properties:
-        benefitProgramId:
+          description: Card type description
+          example: Visa Oro 123
+        product:
+          type: object
+          description: Data structure containing product information. Products can be services or goods.
+          properties:
+            productCode:
+              type: string
+              description: Product code
+              example: "0049300130"
+            productDescription:
+              type: string
+              description: Product description
+              example: Santander Checking Account
+        capabilityLevel:
           type: string
-          description: Unique benefit program ID
-          example: "788013"
-        status:
-          $ref: "#/components/schemas/StatusInfo"
-    WrapperUpdateBenefitProgramDetails:
-      x-bizObjRef: BenefitProgram
-      type: object
-      description:
-        Data structure containing information about a benefit program. A benefit program defines the customer's benefit
-        package.
-      properties:
-        summary:
-          type: string
-          description: Benefit program summary
-          example: Santander Iberia Plus premium plan for employees
-        description:
-          type: string
-          description: Benefit program description
-          example:
-            Get legal protection for yourself and your family, and legal advice on social networks and digital footprint
-            removal.
-        logo:
-          $ref: "#/components/schemas/Logo"
-        thirdPartyDataSharingIndicator:
-          type: boolean
-          description: Whether the benefit program shares data with third parties
-          example: true
-        status:
+          description: |-
+            Level of capability that a back-end or the card processor can provide. The level determines the quick actions that the front-end can present to the customer.
+
+            The possible values are:
+            - PA = PAMPA capability level
+            - PC = PCAS capability level
+            - PL = Plard capability level
+          enum:
+            - PA
+            - PC
+            - PL
+          example: PL
+        contract:
+          type: object
+          description: Data structure containing information about a card contract
+          properties:
+            cardContractId:
+              type: string
+              description: Unique card contract ID
+              example: "123454523"
+            cardContractIdentification:
+              type: object
+              description: Data structure containing information related to card contract identification
+              properties:
+                internalIdentification:
+                  type: string
+                  description: Internal card contract ID, such as the account number in Partenón or in Altair
+                  example: "031700015000501323"
+        statusInfo:
           type: object
           description: Data structure containing information about an item's status
           properties:
             statusCode:
               type: string
               description: Status code
-              example: "01"
-    WrapperCreateBenefitProgramRequest:
-      x-bizObjRef: BenefitProgram
-      type: object
-      description:
-        Data structure containing information about a benefit program. A benefit program defines the customer's benefit
-        package.
-      properties:
-        benefitProgramId:
-          type: string
-          description: Unique benefit program ID
-          example: "788013"
-        summary:
-          type: string
-          description: Benefit program summary
-          example: Santander Iberia Plus premium plan for employees
-        description:
-          type: string
-          description: Benefit program description
-          example:
-            Get legal protection for yourself and your family, and legal advice on social networks and digital footprint
-            removal.
-        logo:
-          $ref: "#/components/schemas/Logo"
-        thirdPartyDataSharingIndicator:
-          type: boolean
-          description: Whether the benefit program shares data with third parties
-          example: true
-    Date:
-      type: string
-      format: date
-      description: |-
-        Start or end date for the date range in which the benefit program instance is applicable.
-
-        The value uses the complete data format defined in ISO 8601:
-
-        'YYYY-MM-DD'
-
-        Where:
-        - YYYY: 4-digit year
-        - MM: 2-digit month (for example, 01 = January)
-        - DD: 2-digit day of the month (01 through 31)
-      example: "2026-01-02"
-    WrapperBenefitProgramDateRange:
-      type: object
-      description:
-        Data structure containing information about an instance of the benefit program and the date range in which its
-        details are applicable
-      properties:
-        startDate:
-          $ref: "#/components/schemas/Date"
-        endDate:
-          $ref: "#/components/schemas/Date"
-        benefitProgram:
-          $ref: "#/components/schemas/WrapperGetBenefitProgramDetails"
-    WrapperGetBenefitProgramDetails:
-      x-bizObjRef: BenefitProgram
-      type: object
-      description:
-        Data structure containing information about a benefit program. A benefit program defines the customer's benefit
-        package.
-      properties:
-        summary:
-          type: string
-          description: Benefit program summary
-          example: Santander Iberia Plus premium plan for employees
-        description:
-          type: string
-          description: Benefit program description
-          example:
-            Get legal protection for yourself and your family, and legal advice on social networks and digital footprint
-            removal.
-        logo:
-          $ref: "#/components/schemas/Logo"
-        status:
-          $ref: "#/components/schemas/StatusInfo"
-        offeringStatus:
-          $ref: "#/components/schemas/StatusInfo"
-        thirdPartyDataSharingIndicator:
-          type: boolean
-          description: Whether the benefit program shares data with third parties
-          example: true
-        validityPeriod:
-          $ref: "#/components/schemas/Period"
-        terms:
+              example: CANC
+            statusDescription:
+              type: string
+              description: Status description
+              example: Inactive
+            statusReasonCode:
+              type: string
+              description: Code for the status reason
+              example: DQUA
+            statusReasonDescription:
+              type: string
+              description: Description of the status reason
+              example: Stolen
+        blocks:
           type: array
-          description: Array of terms associated with the benefit program
-          items:
-            $ref: "#/components/schemas/Term"
-        instalmentPlan:
-          type: object
-          description: Data structure containing information about an instalment plan
-          properties:
-            periodicity:
-              $ref: "#/components/schemas/Periodicity"
-        summarizedValues:
-          $ref: "#/components/schemas/TotalSummary"
-    TotalSummary:
-      type: object
-      description: Data structure containing information about summarized results for the entire query
-      properties:
-        summarizedResults:
-          type: array
-          description: Array of summarized results for the query
+          description: Array of blocks associated with the card
           items:
             type: object
-            description: Data structure containing information about a summarized query result
+            description: Data structure containing information about a card block
             properties:
-              name:
+              code:
                 type: string
-                description: Summarized element name
-                example: Complete
-              type:
+                description: Card block code
+                example: "20"
+        embossing:
+          type: object
+          description: Data structure containing information about a card's embossing
+          properties:
+            embossingId:
+              type: string
+              description: Unique embossing ID
+              example: AE01066
+            cardArtCode:
+              type: string
+              description: Code for the image stamped on the card
+              maxLength: 3
+              example: "001"
+        cardholder:
+          type: object
+          description:
+            Data structure containing information about a cardholder. A cardholder is a person authorized to perform
+            operations with a specific card.
+          properties:
+            cardholderId:
+              type: string
+              description: Unique cardholder ID
+              example: F123456789
+            typeCode:
+              type: string
+              description:
+                Code for the cardholder type that represents either the attributes or the operability of the cardholder
+                with respect to their card. For example, the card has a limit that can be assigned to the cardholder in
+                either an independent or an aggregated way, where the code determines how the limit is managed.
+              example: "01"
+            typeDescription:
+              type: string
+              description:
+                Description of the cardholder type that represents either the attributes or the operability of the
+                cardholder with respect to their card
+              example: Independent
+        balances:
+          type: array
+          description: Array of balances
+          items:
+            type: object
+            description:
+              Data structure containing a numerical representation of the net increases and decreases in an account at a
+              specific point in time
+            properties:
+              amount:
+                $ref: "#/components/schemas/Amount"
+              typeCode:
                 type: string
-                description: Summarized element type
-                example: COMP
-              value:
+                description: |-
+                  Balance type code.
+
+                  The following value pairs show the mapping of the possible balance types to balance types used in other APIs:
+                  - Authorized = AUT
+                  - Available = AVL
+                  - Charged = AVL (for prepaid cards)
+                  - Drawn = CUR
+                  - Limit = CRL
+                  - Outstanding = OSB
+                  - Spent_Month = POS
+                enum:
+                  - Authorized
+                  - Available
+                  - Charged
+                  - Drawn
+                  - Limit
+                  - Outstanding
+                  - Spent_Month
+                example: Drawn
+              typeDescription:
                 type: string
-                description: Summarized element value
-                example: "11024711.21"
-    Period:
+                description: Balance type description
+                example: Drawn
+              lastUpdateDate:
+                type: string
+                format: date
+                description: |-
+                  Date when the balance was last updated.
+
+                  The value uses the complete data format defined in ISO 8601:
+
+                  'YYYY-MM-DD'
+
+                  Where:
+                  - YYYY: 4-digit year
+                  - MM: 2-digit month (for example, 01 = January)
+                  - DD: 2-digit day of the month (01 through 31)
+                example: "2026-02-01"
+              lastUpdateDateTime:
+                type: string
+                format: date-time
+                description: |-
+                  Date and time when the balance was last updated.
+
+                  The value uses the complete data format defined in ISO 8601:
+
+                  'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+                  Where:
+                  - YYYY: 4-digit year
+                  - MM: 2-digit month (for example, 01 = January)
+                  - DD: 2-digit day of the month (01 through 31)
+                  - hh: 2-digit hour of the day (00 through 23)
+                  - mm: 2-digit minute of the hour (00 through 59)
+                  - ss.sss: 5-digit seconds and milliseconds, separated by a point
+                  - TZD: Time zone indicator
+                example: "2026-02-01T17:32:28.123Z"
+              countervalueAmount:
+                $ref: "#/components/schemas/Amount"
+        associatedAccount:
+          type: object
+          description: Data structure containing information about an associated account
+          properties:
+            account:
+              type: object
+              description: Data structure containing information about an account
+              properties:
+                accountId:
+                  type: string
+                  description: Unique account ID
+                  example: "00491655300123456700"
+                accountIdentification:
+                  type: object
+                  description: Data structure containing information related to account identification
+                  properties:
+                    internationalIdentification:
+                      type: string
+                      description: International Bank Account Number (IBAN)
+                      example: ES9121000418450200051332
+                    nationalIdentification:
+                      type: string
+                      description: National bank account number
+                      example: "902127899967676767"
+    WrapperPrepaidCard:
+      x-bizObjRef: Card
       type: object
-      description: Data structure containing information about a period
+      description: Data structure containing information about a card
       properties:
-        startDate:
+        cardId:
           type: string
-          format: date
-          description: |-
-            Date when the period starts.
+          description:
+            Card ID that is used to uniquely identify the card in card-related operations. For internal use, the value
+            does not require tokenization.
+          example: "4547420008209985"
+        cardIdentification:
+          type: object
+          description: Data structure containing identification information for a card
+          properties:
+            displayNumber:
+              type: string
+              description: |-
+                Displayed card number.
 
-            The value uses the complete data format defined in ISO 8601:
-
-            'YYYY-MM-DD'
-
-            Where:
-            - YYYY: 4-digit year
-            - MM: 2-digit month (for example, 01 = January)
-            - DD: 2-digit day of the month (01 through 31)
-          example: "2026-01-01"
-        endDate:
+                The value must be obfuscated.
+              example: xxxx-xxxx-xxxx-5643
+        type:
           type: string
-          format: date
-          description: |-
-            Date when the period ends.
-
-            The value uses the complete data format defined in ISO 8601:
-
-            'YYYY-MM-DD'
-
-            Where:
-            - YYYY: 4-digit year
-            - MM: 2-digit month (for example, 01 = January)
-            - DD: 2-digit day of the month (01 through 31)
-          example: "2026-01-10"
-    BenefitProgram:
-      type: object
-      description:
-        Data structure containing information about a benefit program. A benefit program defines the customer's benefit
-        package.
-      properties:
-        benefitProgramId:
-          type: string
-          description: Unique benefit program ID
-          example: "788013"
-        summary:
-          type: string
-          description: Benefit program summary
-          example: Santander Iberia Plus premium plan for employees
-        description:
-          type: string
-          description: Benefit program description
-          example:
-            Get legal protection for yourself and your family, and legal advice on social networks and digital footprint
-            removal.
-        isCustomerEligible:
-          type: boolean
-          description: Whether the customer is eligible to participate in the benefit program
-          example: true
-        logo:
-          $ref: "#/components/schemas/Logo"
-        order:
-          type: integer
-          description: Order of the benefit program within the benefit program hierarchy
-          example: 1
-        product:
-          $ref: "#/components/schemas/Product"
+          description: Card type that defines the operations for which it can be used
+          example: Prepaid card
         typeCode:
           type: string
-          description: Code for the benefit program type
-          example: F
+          description: Card type code
+          example: "01"
         typeDescription:
           type: string
-          description: Description of the benefit program type
-          example: Employees
-        status:
-          $ref: "#/components/schemas/StatusInfo"
-        offeringStatus:
-          $ref: "#/components/schemas/StatusInfo"
-        validityPeriod:
-          $ref: "#/components/schemas/Period"
-        terms:
+          description: Card type description
+          example: Visa Oro 123
+        capabilityLevel:
+          type: string
+          description: |-
+            Level of capability that a back-end or the card processor can provide. The level determines the quick actions that the front-end can present to the customer.
+
+            The possible values are:
+            - PA = PAMPA capability level
+            - PC = PCAS capability level
+            - PL = Plard capability level
+          enum:
+            - PA
+            - PC
+            - PL
+          example: PL
+        product:
+          type: object
+          description: Data structure containing product information. Products can be services or goods.
+          properties:
+            productCode:
+              type: string
+              description: Product code
+              example: "0049300130"
+            productDescription:
+              type: string
+              description: Product description
+              example: Santander Checking Account
+        contract:
+          type: object
+          description: Data structure containing information about a card contract
+          properties:
+            cardContractId:
+              type: string
+              description: Unique card contract ID
+              example: "123454523"
+            cardContractIdentification:
+              type: object
+              description: Data structure containing information related to card contract identification
+              properties:
+                internalIdentification:
+                  type: string
+                  description: Internal card contract ID, such as the account number in Partenón or in Altair
+                  example: "031700015000501323"
+            nextStatementOpenDate:
+              type: string
+              format: date
+              description: |-
+                Opening date for the next statement period.
+
+                The value uses the complete data format defined in ISO 8601:
+
+                'YYYY-MM-DD'
+                Where:
+                - YYYY: 4-digit year
+                - MM: 2-digit month (for example, 01 = January)
+                - DD: 2-digit day of the month (01 through 31)
+              example: "2026-02-24"
+            statement:
+              $ref: "#/components/schemas/Statement"
+        statusInfo:
+          type: object
+          description: Data structure containing information about an item's status
+          properties:
+            statusCode:
+              type: string
+              description: Status code
+              example: CANC
+            statusDescription:
+              type: string
+              description: Status description
+              example: Inactive
+            statusReasonCode:
+              type: string
+              description: Code for the status reason
+              example: DQUA
+            statusReasonDescription:
+              type: string
+              description: Description of the status reason
+              example: Stolen
+        blocks:
           type: array
-          description: Array of terms associated with the benefit program
+          description: Array of blocks associated with the card
           items:
-            $ref: "#/components/schemas/Term"
-        instalmentPlan:
-          $ref: "#/components/schemas/InstalmentPlan"
-        benefits:
+            type: object
+            description: Data structure containing information about a card block
+            properties:
+              code:
+                type: string
+                description: Card block code
+                example: "10"
+        embossing:
+          type: object
+          description: Data structure containing information about a card's embossing
+          properties:
+            embossingId:
+              type: string
+              description: Unique embossing ID
+              example: AE01066
+            cardArtCode:
+              type: string
+              description: Code for the image stamped on the card
+              maxLength: 3
+              example: "001"
+        cardholder:
+          type: object
+          description:
+            Data structure containing information about a cardholder. A cardholder is a person authorized to perform
+            operations with a specific card.
+          properties:
+            cardholderId:
+              type: string
+              description: Unique cardholder ID
+              example: F123456789
+            typeCode:
+              type: string
+              description:
+                Code for the cardholder type that represents either the attributes or the operability of the cardholder
+                with respect to their card. For example, the card has a limit that can be assigned to the cardholder in
+                either an independent or an aggregated way, where the code determines how the limit is managed.
+              example: "01"
+            typeDescription:
+              type: string
+              description:
+                Description of the cardholder type that represents either the attributes or the operability of the
+                cardholder with respect to their card
+              example: Independent
+        balances:
           type: array
-          description: Array of benefits provided in the benefit program
+          description: Array of balances
           items:
-            $ref: "#/components/schemas/Benefit"
-    Benefit:
+            type: object
+            description:
+              Data structure containing a numerical representation of the net increases and decreases in an account at a
+              specific point in time
+            properties:
+              amount:
+                $ref: "#/components/schemas/Amount"
+              typeCode:
+                type: string
+                description: |-
+                  Balance type code.
+
+                  The following value pairs show the mapping of the possible balance types to balance types used in other APIs:
+                  - Authorized = AUT
+                  - Available = AVL
+                  - Charged = AVL (for prepaid cards)
+                  - Drawn = CUR
+                  - Limit = CRL
+                  - Outstanding = OSB
+                  - Spent_Month = POS
+                enum:
+                  - Authorized
+                  - Available
+                  - Charged
+                  - Drawn
+                  - Limit
+                  - Outstanding
+                  - Spent_Month
+                example: Drawn
+              typeDescription:
+                type: string
+                description: Balance type description
+                example: Drawn
+              lastUpdateDate:
+                type: string
+                format: date
+                description: |-
+                  Date when the balance was last updated.
+
+                  The value uses the complete data format defined in ISO 8601:
+
+                  'YYYY-MM-DD'
+
+                  Where:
+                  - YYYY: 4-digit year
+                  - MM: 2-digit month (for example, 01 = January)
+                  - DD: 2-digit day of the month (01 through 31)
+                example: "2026-02-01"
+              lastUpdateDateTime:
+                type: string
+                format: date-time
+                description: |-
+                  Date and time when the balance was last updated.
+
+                  The value uses the complete data format defined in ISO 8601:
+
+                  'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+                  Where:
+                  - YYYY: 4-digit year
+                  - MM: 2-digit month (for example, 01 = January)
+                  - DD: 2-digit day of the month (01 through 31)
+                  - hh: 2-digit hour of the day (00 through 23)
+                  - mm: 2-digit minute of the hour (00 through 59)
+                  - ss.sss: 5-digit seconds and milliseconds, separated by a point
+                  - TZD: Time zone indicator
+                example: "2026-02-01T17:32:28.123Z"
+              countervalueAmount:
+                $ref: "#/components/schemas/Amount"
+        associatedAccount:
+          type: object
+          description: Data structure containing information about an associated account
+          properties:
+            account:
+              type: object
+              description: Data structure containing information about an account
+              properties:
+                accountId:
+                  type: string
+                  description: Unique account ID
+                  example: "00491655300123456700"
+                accountIdentification:
+                  type: object
+                  description: Data structure containing information related to account identification
+                  properties:
+                    internationalIdentification:
+                      type: string
+                      description: International Bank Account Number (IBAN)
+                      example: ES9121000418450200051332
+                    nationalIdentification:
+                      type: string
+                      description: National bank account number
+                      example: "902127899967676767"
+    Card:
       type: object
-      description: Data structure containing information about a benefit
+      description: Data structure containing information about a card
       properties:
-        benefitId:
+        cardId:
           type: string
-          description: Unique benefit ID
-          example: "0016"
-        summary:
+          description:
+            Card ID that is used to uniquely identify the card in card-related operations. For internal use, the value
+            does not require tokenization.
+          example: "4547420008209985"
+        cardIdentification:
+          type: object
+          description: Data structure containing identification information for a card
+          properties:
+            displayNumber:
+              type: string
+              description: |-
+                Displayed card number.
+
+                The value must be obfuscated.
+              example: xxxx-xxxx-xxxx-5643
+        type:
           type: string
-          description: Benefit summary
-          example: Digital protection
-        description:
-          type: string
-          description: Benefit description
-          example: Legal protection for your family
-        logo:
-          $ref: "#/components/schemas/Logo"
-        order:
-          type: integer
-          description: Order of the benefit within the benefit program hierarchy
-          example: 1
-        maximumUses:
-          type: integer
-          description: Maximum number of times the benefit can be used
-          example: 5
-    InstalmentPlan:
-      type: object
-      description: Data structure containing information about an instalment plan
-      properties:
-        amount:
-          $ref: "#/components/schemas/Amount"
-        periodicity:
-          $ref: "#/components/schemas/Periodicity"
-    Periodicity:
-      type: object
-      description:
-        Data structure containing information about a periodicity. A periodicity is expressed as a time unit and a
-        frequency of execution.
-      properties:
-        periodTypeCode:
-          type: string
-          description: Code for the time unit in which the periodicity is measured
-          example: "3"
-        periodTypeDescription:
-          type: string
-          description: Description of the time unit in which the periodicity is measured
-          example: Years
-    Term:
-      type: object
-      description: Data structure containing information about a fixed period
-      properties:
-        days:
-          type: number
-          description: Number of days
-          example: 2
-        months:
-          type: number
-          description: Number of months
-          example: 12
+          description: Card type that defines the operations for which it can be used
+          example: Credit card
         typeCode:
           type: string
-          description: Term type code
-          example: Permanent
-        weeks:
-          type: number
-          description: Number of weeks
-          example: 2
-        years:
-          type: number
-          description: Number of years
-          example: 2
-    Product:
-      type: object
-      description: Data structure containing product information. Products can be services or goods.
-      properties:
-        productId:
+          description: Card type code
+          example: "01"
+        typeDescription:
           type: string
-          description: Product ID
-          example: "0049300399"
-        subproduct:
-          $ref: "#/components/schemas/Subproduct"
-    Subproduct:
-      type: object
-      description: Data structure containing subproduct details
-      properties:
-        subproductId:
+          description: Card type description
+          example: Visa Oro 123
+        creditLimitLevel:
+          type: object
+          description:
+            Data structure containing information about the structural level at which the card's credit limit is
+            managed. The credit limit can be managed at customer, card contract, or card level.
+          properties:
+            levelCode:
+              type: string
+              description: |-
+                Code for the credit limit's structural management level.
+
+                The possible values are:
+                - cus = Credit limit is managed at customer level. All cards and contracts use the credit limit that was assigned to the customer.
+                - con = Credit limit is managed at card contract level. Each contract has its own credit limit and all cards within a contract use that contract's limit.
+                - crd = Credit limit is managed at individual card level. Each card has its own credit limit that it uses independently.
+              enum:
+                - cus
+                - con
+                - crd
+              example: cus
+            levelDescription:
+              type: string
+              description: Description of the credit limit's structural management level
+              example: Customer
+        capabilityLevel:
           type: string
-          description: Subproduct ID
-          example: "0000005"
-    Logo:
-      type: object
-      description: Data structure containing information about a logo image
-      properties:
-        name:
-          type: string
-          description: Logo name
-          example: logo.jpg
+          description: |-
+            Level of capability that a back-end or the card processor can provide. The level determines the quick actions that the front-end can present to the customer.
+
+            The possible values are:
+            - PA = PAMPA capability level
+            - PC = PCAS capability level
+            - PL = Plard capability level
+          enum:
+            - PA
+            - PC
+            - PL
+          example: PL
+        product:
+          $ref: "#/components/schemas/Product"
+        contract:
+          type: object
+          description: Data structure containing information about a card contract
+          properties:
+            cardContractId:
+              type: string
+              description: Unique card contract ID
+              example: "123454523"
+            cardContractIdentification:
+              type: object
+              description: Data structure containing information related to card contract identification
+              properties:
+                internalIdentification:
+                  type: string
+                  description: Internal card contract ID, such as the account number in Partenón or in Altair
+                  example: "031700015000501323"
+            nextStatementOpenDate:
+              type: string
+              format: date
+              description: |-
+                Opening date for the next statement period.
+
+                The value uses the complete data format defined in ISO 8601:
+
+                'YYYY-MM-DD'
+                Where:
+                - YYYY: 4-digit year
+                - MM: 2-digit month (for example, 01 = January)
+                - DD: 2-digit day of the month (01 through 31)
+              example: "2026-02-24"
+            statement:
+              $ref: "#/components/schemas/Statement"
+        statusInfo:
+          type: object
+          description: Data structure containing information about an item's status
+          properties:
+            statusCode:
+              type: string
+              description: Status code
+              example: CANC
+            statusDescription:
+              type: string
+              description: Status description
+              example: Inactive
+            statusReasonCode:
+              type: string
+              description: Code for the status reason
+              example: DQUA
+            statusReasonDescription:
+              type: string
+              description: Description of the status reason
+              example: Stolen
+        blocks:
+          type: array
+          description: Array of blocks associated with the card
+          items:
+            type: object
+            description: Data structure containing information about a card block
+            properties:
+              code:
+                type: string
+                description: Card block code
+                example: "10"
+        embossing:
+          type: object
+          description: Data structure containing information about a card's embossing
+          properties:
+            embossingId:
+              type: string
+              description: Unique embossing ID
+              example: AE01066
+            cardArtCode:
+              type: string
+              description: Code for the image stamped on the card
+              maxLength: 3
+              example: "001"
+        cardholder:
+          type: object
+          description:
+            Data structure containing information about a cardholder. A cardholder is a person authorized to perform
+            operations with a specific card.
+          properties:
+            cardholderId:
+              type: string
+              description: Unique cardholder ID
+              example: F123456789
+            typeCode:
+              type: string
+              description:
+                Code for the cardholder type that represents either the attributes or the operability of the cardholder
+                with respect to their card. For example, the card has a limit that can be assigned to the cardholder in
+                either an independent or an aggregated way, where the code determines how the limit is managed.
+              example: "01"
+            typeDescription:
+              type: string
+              description:
+                Description of the cardholder type that represents either the attributes or the operability of the
+                cardholder with respect to their card
+              example: Independent
+        balances:
+          type: array
+          description: Array of balances
+          items:
+            type: object
+            description:
+              Data structure containing a numerical representation of the net increases and decreases in an account at a
+              specific point in time
+            properties:
+              amount:
+                $ref: "#/components/schemas/Amount"
+              typeCode:
+                type: string
+                description: |-
+                  Balance type code.
+
+                  The following value pairs show the mapping of the possible balance types to balance types used in other APIs:
+                  - Authorized = AUT
+                  - Available = AVL
+                  - Charged = AVL (for prepaid cards)
+                  - Drawn = CUR
+                  - Limit = CRL
+                  - Outstanding = OSB
+                  - Spent_Month = POS
+                enum:
+                  - Authorized
+                  - Available
+                  - Charged
+                  - Drawn
+                  - Limit
+                  - Outstanding
+                  - Spent_Month
+                example: Drawn
+              typeDescription:
+                type: string
+                description: Balance type description
+                example: Drawn
+              lastUpdateDate:
+                type: string
+                format: date
+                description: |-
+                  Date when the balance was last updated.
+
+                  The value uses the complete data format defined in ISO 8601:
+
+                  'YYYY-MM-DD'
+
+                  Where:
+                  - YYYY: 4-digit year
+                  - MM: 2-digit month (for example, 01 = January)
+                  - DD: 2-digit day of the month (01 through 31)
+                example: "2026-02-01"
+              lastUpdateDateTime:
+                type: string
+                format: date-time
+                description: |-
+                  Date and time when the balance was last updated.
+
+                  The value uses the complete data format defined in ISO 8601:
+
+                  'YYYY-MM-DDThh:mm:ss.sssTZD'
+
+                  Where:
+                  - YYYY: 4-digit year
+                  - MM: 2-digit month (for example, 01 = January)
+                  - DD: 2-digit day of the month (01 through 31)
+                  - hh: 2-digit hour of the day (00 through 23)
+                  - mm: 2-digit minute of the hour (00 through 59)
+                  - ss.sss: 5-digit seconds and milliseconds, separated by a point
+                  - TZD: Time zone indicator
+                example: "2026-02-01T17:32:28.123Z"
+              countervalueAmount:
+                $ref: "#/components/schemas/Amount"
+        associatedAccount:
+          type: object
+          description: Data structure containing information about an associated account
+          properties:
+            account:
+              type: object
+              description: Data structure containing information about an account
+              properties:
+                accountId:
+                  type: string
+                  description: Unique account ID
+                  example: "00491655300123456700"
+                accountIdentification:
+                  type: object
+                  description: Data structure containing information related to account identification
+                  properties:
+                    internationalIdentification:
+                      type: string
+                      description: International Bank Account Number (IBAN)
+                      example: ES9121000418450200051332
+                    nationalIdentification:
+                      type: string
+                      description: National bank account number
+                      example: "902127899967676767"
     Amount:
       type: object
       description: Data structure containing amount details
@@ -1625,41 +1106,82 @@ components:
           maxLength: 3
           pattern: (^.{3}$)
           example: EUR
-    WrapperRegisterCustomer:
-      x-bizObjRef: BenefitProgramActivationRequest
+    Bank:
       type: object
-      description: Data structure containing information about a request to onboard a customer into a benefit program
+      description: Data structure containing information about a bank
       properties:
-        requestId:
+        bankId:
           type: string
-          description: Unique request ID
-          example: "1234567890"
-        status:
+          description: Unique bank ID
+          example: AAOZ
+        center:
+          $ref: "#/components/schemas/Center"
+    Center:
+      type: object
+      description: Data structure containing information about a bank centre
+      properties:
+        centerId:
+          type: string
+          description: Bank centre ID
+          example: "1001"
+    Product:
+      type: object
+      description: Data structure containing product information. Products can be services or goods.
+      properties:
+        productCode:
+          type: string
+          description: Product code
+          example: "0049300130"
+        productDescription:
+          type: string
+          description: Product description
+          example: Santander Checking Account
+        hasUnlimitedCredit:
+          type: boolean
+          description: Whether the product has unlimited credit
+          example: true
+    Statement:
+      type: object
+      description: Data structure containing information about a statement
+      properties:
+        period:
+          $ref: "#/components/schemas/Period"
+        statusInfo:
           $ref: "#/components/schemas/StatusInfo"
-        contract:
-          $ref: "#/components/schemas/Contract"
-    Contract:
+    Period:
       type: object
-      description: Data structure containing information about a contract
+      description: Data structure containing information about a period
       properties:
-        contractId:
+        endDate:
           type: string
-          description: Unique contract ID
-          example: "031710023000002365"
-        contractIdentification:
-          $ref: "#/components/schemas/ContractIdentification"
-    ContractIdentification:
-      type: object
-      description: Data structure containing identification information for a contract
-      properties:
-        nationalIdentification:
+          format: date
+          description: |-
+            Date when the period ends.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+          example: "2026-02-28"
+        startDate:
           type: string
-          description: National contract ID
-          example: "23902127"
-        internalIdentification:
-          type: string
-          description: Internal contract ID
-          example: "031700015000501323"
+          format: date
+          description: |-
+            Date when the period starts.
+
+            The value uses the complete data format defined in ISO 8601:
+
+            'YYYY-MM-DD'
+
+            Where:
+            - YYYY: 4-digit year
+            - MM: 2-digit month (for example, 01 = January)
+            - DD: 2-digit day of the month (01 through 31)
+          example: "2026-02-01"
     StatusInfo:
       type: object
       description: Data structure containing information about an item's status
@@ -1667,45 +1189,11 @@ components:
         statusCode:
           type: string
           description: Status code
-          example: "01"
+          example: CANC
         statusDescription:
           type: string
           description: Status description
-          example: In progress
-    WrapperStatusInfoEligibility:
-      x-bizObjRef: StatusInfo
-      type: object
-      description: Data structure containing information about an item's status
-      properties:
-        statusCode:
-          type: string
-          description: |-
-            Status code.
-
-            The possible values are:
-            - 01 = Eligible
-            - 02 = Not eligible
-          enum:
-            - "01"
-            - "02"
-          example: "01"
-        statusDescription:
-          type: string
-          description: Status description
-          example: Eligible
-    WrapperStatusInfoSimulation:
-      x-bizObjRef: StatusInfo
-      type: object
-      description: Data structure containing information about an item's status
-      properties:
-        statusCode:
-          type: string
-          description: Status code
-          example: "01"
-        statusDescription:
-          type: string
-          description: Status description
-          example: Contractable
+          example: Cancelled
     Errors:
       type: object
       description: Data structure containing the details for errors
@@ -1739,131 +1227,7 @@ components:
           type: string
           description: Detailed description of the reported issue
           example: Information about the returned error, used to resolve it
-    ErrorItem:
-      type: object
-      required:
-        - code
-        - message
-        - level
-        - description
-      properties:
-        code:
-          type: string
-          example: "TL0005"
-        message:
-          type: string
-          example: "Conflict"
-        level:
-          type: string
-          enum: [ERROR, WARN, INFO]
-        description:
-          type: string
-          example: "Los datos ingresados no son válidos."
-    ErrorResponse:
-      type: object
-      required:
-        - errors
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-    WrapperSimulateContractRequest:
-      type: array
-      description: Array of benefit programs
-      items:
-        $ref: "#/components/schemas/WrapperBenefitProgram"
-    WrapperSimulateContractResponse:
-      type: array
-      description: Array of benefit programs and their statuses
-      items:
-        $ref: "#/components/schemas/WrapperBenefitProgramSimulation"
-    WrapperBenefitProgramSimulation:
-      type: object
-      description:
-        Data structure containing the response information for simulating a customer's contract for a list of benefit
-        programs
-      properties:
-        benefitProgram:
-          $ref: "#/components/schemas/WrapperBenefitProgram"
-        status:
-          $ref: "#/components/schemas/WrapperStatusInfoSimulation"
-    WrapperBenefitProgram:
-      x-bizObjRef: BenefitProgram
-      type: object
-      description:
-        Data structure containing information about a benefit program. A benefit program defines the customer's benefit
-        package.
-      properties:
-        benefitProgramId:
-          type: string
-          description: Unique benefit program ID
-          example: "788013"
-        product:
-          $ref: "#/components/schemas/Product"
-    UpdateTierRequest:
-      type: object
-      description: Data structure containing tier information to be updated
-      properties:
-        key:
-          type: string
-          description: Unique user key
-          example: "43362687"
-        tier_id:
-          type: integer
-          description: User tier identifier
-          example: 2
-        tier_expires_at:
-          type: string
-          description: Tier expiration date
-          example: "2050-01-01"
-    WrapperTier:
-      type: object
-      description: Data structure containing updated tier information
-      properties:
-        tier:
-          $ref: "#/components/schemas/Tier"
-    Tier:
-      type: object
-      description: Data structure containing tier information
-      properties:
-        key:
-          type: string
-          description: Unique user key
-          example: "43362687"
-        tier_id:
-          type: integer
-          description: User tier identifier
-          example: 2
-        tier_expires_at:
-          type: string
-          description: Tier expiration date
-          example: "2050-01-01"
-    BenefitProgramActivationRequest:
-      type: object
-      description: Data structure containing information about a request to onboard a customer into a benefit program
-      properties:
-        benefitProgramCode:
-          type: string
-          description: Code for the benefit program, defining the benefit package to be activated for the customer
-          example: "0001"
-        activationProperties:
-          type: array
-          description: Array of activation properties for the customer's benefit program
-          items:
-            type: object
-            description: Data structure containing information about an activation property
-            properties:
-              key:
-                type: string
-                description: Property key
-                example: dateOfBirth
-              value:
-                type: string
-                description: Property value
-                example: 15-07-1983
   securitySchemes:
     Authorization:
       type: http
       scheme: bearer
-      bearerFormat: JWT
