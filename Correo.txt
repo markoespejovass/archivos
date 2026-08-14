@@ -1,69 +1,422 @@
-description: |-
-  ### Acerca de la funcionalidad expuesta
-  Este servicio permite procesar la información KYC del cliente para determinar su nivel de riesgo asociado.
+@ConfigurationProperties(prefix = "clients.document")
+public record DocumentApiProperties(
+        String baseUrl,
+        String clientId
+) {
+}
 
-  El servicio valida la existencia de alertas HIT, identifica si el cliente es nuevo o existente y obtiene el nivel de riesgo correspondiente mediante las fuentes definidas para cada escenario.
 
-  Para clientes nuevos, el servicio solicita el nivel de riesgo a CRR y registra la información obtenida en People mediante las transacciones correspondientes. Para clientes existentes, consulta el nivel de riesgo almacenado en People mediante la transacción ODP1.
-
-  ### Path Parameters
-  No aplica.
-
-  ### Usos válidos de Query Parameters
-  No aplica.
-
-  ### Variantes válidas del Payload (Cuerpo del mensaje)
-
-  | Campo | Descripción |
-  |--------|-------------|
-  | questionnaireId | Identificador del cuestionario KYC asociado al proceso. Obligatorio. No debe enviarse vacío ni nulo. |
-
-  ### Lista de Valores usadas en esta versión de la API
-  No aplica.
-
-  ### Códigos de error usados en esta versión de la API
-
-  | Código | HTTP Status | Descripción |
-  |--------|-------------|-------------|
-  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-  | TL0002 | 400 | El campo **questionnaireId** es obligatorio y no debe enviarse vacío o nulo. |
-  | TL9999 | 500 | Ocurrió un error al momento de recuperar la información desde DynamoDB. |
-  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+@ConfigurationProperties(prefix = "clients.signature")
+public record SignatureApiProperties(
+        String baseUrl,
+        String clientId
+) {
+}
 
 
 
-description: |-
-  ### Acerca de la funcionalidad expuesta
-  Este servicio permite iniciar el proceso de evaluación Know Your Customer (KYC) para un nuevo cliente.
+clients:
+  document:
+    base-url: https://document-api.example.com
+    client-id: ${DOCUMENT_CLIENT_ID}
 
-  El servicio recibe la información necesaria del cliente, productos asociados, cuestionario KYC, propósito de la relación con el banco, fuentes de ingreso y estado AML, con la finalidad de iniciar el análisis de riesgo correspondiente.
+  signature:
+    base-url: https://signature-api.example.com
+    client-id: ${SIGNATURE_CLIENT_ID}
 
-  Como resultado del proceso se genera la resolución KYC del cliente, incluyendo la información asociada al nivel de riesgo calculado y los documentos requeridos según la evaluación realizada.
 
-  ### Path Parameters
-  No aplica.
+@Configuration
+@EnableConfigurationProperties({
+        DocumentApiProperties.class,
+        SignatureApiProperties.class
+})
+public class WebClientConfig {
 
-  ### Usos válidos de Query Parameters
-  No aplica.
+    @Bean
+    public WebClient documentWebClient(
+            WebClient.Builder builder,
+            DocumentApiProperties properties) {
 
-  ### Variantes válidas del Payload (Cuerpo del mensaje)
+        return builder
+                .baseUrl(properties.baseUrl())
+                .defaultHeader(
+                        "X-Client-Id",
+                        properties.clientId()
+                )
+                .build();
+    }
 
-  | Campo | Descripción |
-  |--------|-------------|
-  | party | Información del cliente que inicia el proceso KYC. Obligatorio. |
-  | products | Lista de productos asociados al cliente. Obligatorio. |
-  | questionnaire | Información correspondiente al cuestionario KYC. Obligatorio. |
-  | relationshipPurpose | Propósito de la relación del cliente con el banco. Obligatorio. |
-  | incomeSources | Lista de fuentes de ingreso del cliente. Obligatorio. |
-  | amlStatus | Estado AML del cliente. Obligatorio. |
+    @Bean
+    public WebClient signatureWebClient(
+            WebClient.Builder builder,
+            SignatureApiProperties properties) {
 
-  ### Lista de Valores usadas en esta versión de la API
-  No aplica.
+        return builder
+                .baseUrl(properties.baseUrl())
+                .defaultHeader(
+                        "X-Client-Id",
+                        properties.clientId()
+                )
+                .build();
+    }
+}
 
-  ### Códigos de error usados en esta versión de la API
 
-  | Código | HTTP Status | Descripción |
-  |--------|-------------|-------------|
-  | TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso. |
-  | TL9999 | 500 | Ocurrió un error al momento de guardar la información en DynamoDB. |
-  | TL9999 | 500 | Ocurrió un error inesperado durante el procesamiento de la solicitud. |
+
+@Component
+@RequiredArgsConstructor
+public class DocumentClient {
+
+    private final WebClient documentWebClient;
+
+    public Mono<DocumentApiResponse> getDocument(
+            String documentId) {
+
+        return documentWebClient
+                .get()
+                .uri("/documents/{documentId}", documentId)
+                .retrieve()
+                .bodyToMono(DocumentApiResponse.class);
+    }
+}
+
+
+
+
+@Component
+@RequiredArgsConstructor
+public class SignatureClient {
+
+    private final WebClient signatureWebClient;
+
+    public Mono<SignatureApiResponse> signDocument(
+            SignatureRequest request) {
+
+        return signatureWebClient
+                .post()
+                .uri("/signatures")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(SignatureApiResponse.class);
+    }
+}
+
+
+
+public class DocumentApiException extends RuntimeException {
+
+    private final String errorCode;
+
+    public DocumentApiException(
+            String errorCode,
+            String message) {
+
+        super(message);
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+}
+
+
+
+public class SignatureApiException extends RuntimeException {
+
+    private final String errorCode;
+
+    public SignatureApiException(
+            String errorCode,
+            String message) {
+
+        super(message);
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+}
+
+
+
+public Mono<DocumentApiResponse> getDocument(String documentId) {
+
+    return documentWebClient
+            .get()
+            .uri("/documents/{documentId}", documentId)
+            .retrieve()
+            .onStatus(
+                    status -> status.is4xxClientError(),
+                    response -> response
+                            .bodyToMono(String.class)
+                            .defaultIfEmpty("")
+                            .flatMap(body ->
+                                    Mono.error(
+                                            new DocumentApiException(
+                                                    "DOCUMENT_API_4XX",
+                                                    body
+                                            )
+                                    )
+                            )
+            )
+            .onStatus(
+                    status -> status.is5xxServerError(),
+                    response -> response
+                            .bodyToMono(String.class)
+                            .defaultIfEmpty("")
+                            .flatMap(body ->
+                                    Mono.error(
+                                            new DocumentApiException(
+                                                    "DOCUMENT_API_5XX",
+                                                    body
+                                            )
+                                    )
+                            )
+            )
+            .bodyToMono(DocumentApiResponse.class);
+}
+
+
+@Service
+@RequiredArgsConstructor
+public class DocumentProcessService {
+
+    private static final int MAX_CONCURRENCY = 5;
+
+    private final DocumentClient documentClient;
+    private final SignatureClient signatureClient;
+    private final DocumentErrorService errorService;
+
+    public Mono<DocumentProcessResponse> process(
+            DocumentProcessRequest request) {
+
+        return Flux.fromIterable(request.documentIds())
+                .flatMap(
+                        documentId ->
+                                processDocument(
+                                        documentId,
+                                        request.client()
+                                ),
+                        MAX_CONCURRENCY
+                )
+                .collectList()
+                .map(this::buildResponse);
+    }
+
+private Mono<DocumentResult> processDocument(
+        String documentId,
+        ClientData client) {
+
+    return documentClient
+            .getDocument(documentId)
+            .flatMap(document ->
+                    signDocument(
+                            documentId,
+                            document,
+                            client
+                    )
+            )
+            .thenReturn(
+                    DocumentResult.success(documentId)
+            )
+            .onErrorResume(error ->
+                    handleDocumentError(
+                            documentId,
+                            error
+                    )
+            );
+}
+
+
+private Mono<SignatureApiResponse> signDocument(
+        String documentId,
+        DocumentApiResponse document,
+        ClientData client) {
+
+    SignatureRequest request =
+            buildSignatureRequest(
+                    documentId,
+                    document,
+                    client
+            );
+
+    return signatureClient.signDocument(request);
+}
+
+private SignatureRequest buildSignatureRequest(
+        String documentId,
+        DocumentApiResponse document,
+        ClientData client) {
+
+    SignerData signer = new SignerData(
+            client.documentType(),
+            client.documentNumber(),
+            client.name(),
+            client.lastName(),
+            client.email()
+    );
+
+    return new SignatureRequest(
+            documentId,
+            document.fileBase64(),
+            signer
+    );
+}
+
+private Mono<DocumentApiResponse> retrieveDocument(
+        String documentId) {
+
+    return documentClient
+            .getDocument(documentId)
+            .onErrorMap(error ->
+                    new DocumentProcessException(
+                            documentId,
+                            ErrorStage.DOCUMENT_RETRIEVAL,
+                            extractErrorCode(error),
+                            error.getMessage(),
+                            error
+                    )
+            );
+}
+
+
+private Mono<SignatureApiResponse> signDocument(
+        String documentId,
+        DocumentApiResponse document,
+        ClientData client) {
+
+    SignatureRequest request =
+            buildSignatureRequest(
+                    documentId,
+                    document,
+                    client
+            );
+
+    return signatureClient
+            .signDocument(request)
+            .onErrorMap(error ->
+                    new DocumentProcessException(
+                            documentId,
+                            ErrorStage.SIGNATURE,
+                            extractErrorCode(error),
+                            error.getMessage(),
+                            error
+                    )
+            );
+}
+
+
+@Getter
+public class DocumentProcessException
+        extends RuntimeException {
+
+    private final String documentId;
+    private final ErrorStage stage;
+    private final String errorCode;
+
+    public DocumentProcessException(
+            String documentId,
+            ErrorStage stage,
+            String errorCode,
+            String message,
+            Throwable cause) {
+
+        super(message, cause);
+
+        this.documentId = documentId;
+        this.stage = stage;
+        this.errorCode = errorCode;
+    }
+}
+
+
+private Mono<DocumentResult> processDocument(
+        String documentId,
+        ClientData client) {
+
+    return retrieveDocument(documentId)
+            .flatMap(document ->
+                    signDocument(
+                            documentId,
+                            document,
+                            client
+                    )
+            )
+            .thenReturn(
+                    DocumentResult.success(documentId)
+            )
+            .onErrorResume(
+                    DocumentProcessException.class,
+                    this::handleDocumentError
+            );
+}
+
+
+private Mono<DocumentResult> handleDocumentError(
+        DocumentProcessException error) {
+
+    return errorService
+            .save(error)
+            .thenReturn(
+                    DocumentResult.failure(
+                            error.getDocumentId(),
+                            error.getStage().name(),
+                            error.getErrorCode(),
+                            error.getMessage()
+                    )
+            );
+}
+
+
+
+
+
+private DocumentProcessResponse buildResponse(
+        List<DocumentResult> results) {
+
+    int total = results.size();
+
+    int successful = (int) results.stream()
+            .filter(result ->
+                    result.status() == DocumentStatus.SUCCESS)
+            .count();
+
+    int failed = total - successful;
+
+    return new DocumentProcessResponse(
+            total,
+            successful,
+            failed,
+            results
+    );
+}
+
+
+
+
+
+
+@Service
+@RequiredArgsConstructor
+public class DocumentErrorService {
+
+    private final DocumentErrorRepository repository;
+
+    public Mono<Void> save(
+            DocumentProcessException error) {
+
+        DocumentErrorEntity entity =
+                new DocumentErrorEntity(
+                        error.getDocumentId(),
+                        error.getStage().name(),
+                        error.getErrorCode(),
+                        error.getMessage()
+                );
+
+        return repository.save(entity)
+                .then();
+    }
+}
+
