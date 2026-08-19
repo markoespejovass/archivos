@@ -1,422 +1,128 @@
-@ConfigurationProperties(prefix = "clients.document")
-public record DocumentApiProperties(
-        String baseUrl,
-        String clientId
-) {
-}
+import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import jwt from "jsonwebtoken";
 
+// Cliente DynamoDB optimizado (reutilizado en invocaciones)
+const ddbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
+const TABLE_NAME = process.env.TOKEN_TABLE; // Ej: "JWTTokens"
+const JWT_SECRET = process.env.JWT_SECRET;
 
-@ConfigurationProperties(prefix = "clients.signature")
-public record SignatureApiProperties(
-        String baseUrl,
-        String clientId
-) {
-}
-
-
-
-clients:
-  document:
-    base-url: https://document-api.example.com
-    client-id: ${DOCUMENT_CLIENT_ID}
-
-  signature:
-    base-url: https://signature-api.example.com
-    client-id: ${SIGNATURE_CLIENT_ID}
-
-
-@Configuration
-@EnableConfigurationProperties({
-        DocumentApiProperties.class,
-        SignatureApiProperties.class
-})
-public class WebClientConfig {
-
-    @Bean
-    public WebClient documentWebClient(
-            WebClient.Builder builder,
-            DocumentApiProperties properties) {
-
-        return builder
-                .baseUrl(properties.baseUrl())
-                .defaultHeader(
-                        "X-Client-Id",
-                        properties.clientId()
-                )
-                .build();
+export const handler = async (event) => {
+  try {
+    // 1. Extraer token del header "Authorization: Bearer <token>"
+    const token = extractToken(event.authorizationToken);
+    if (!token) {
+      return generatePolicy("user", "Deny", event.methodArn);
     }
 
-    @Bean
-    public WebClient signatureWebClient(
-            WebClient.Builder builder,
-            SignatureApiProperties properties) {
-
-        return builder
-                .baseUrl(properties.baseUrl())
-                .defaultHeader(
-                        "X-Client-Id",
-                        properties.clientId()
-                )
-                .build();
-    }
-}
-
-
-
-@Component
-@RequiredArgsConstructor
-public class DocumentClient {
-
-    private final WebClient documentWebClient;
-
-    public Mono<DocumentApiResponse> getDocument(
-            String documentId) {
-
-        return documentWebClient
-                .get()
-                .uri("/documents/{documentId}", documentId)
-                .retrieve()
-                .bodyToMono(DocumentApiResponse.class);
-    }
-}
-
-
-
-
-@Component
-@RequiredArgsConstructor
-public class SignatureClient {
-
-    private final WebClient signatureWebClient;
-
-    public Mono<SignatureApiResponse> signDocument(
-            SignatureRequest request) {
-
-        return signatureWebClient
-                .post()
-                .uri("/signatures")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(SignatureApiResponse.class);
-    }
-}
-
-
-
-public class DocumentApiException extends RuntimeException {
-
-    private final String errorCode;
-
-    public DocumentApiException(
-            String errorCode,
-            String message) {
-
-        super(message);
-        this.errorCode = errorCode;
+    // 2. Verificar firma y decodificar payload (valida exp automáticamente)
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] });
+    } catch (err) {
+      console.error("JWT Verification failed:", err.message);
+      return generatePolicy("user", "Deny", event.methodArn);
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
-}
-
-
-
-public class SignatureApiException extends RuntimeException {
-
-    private final String errorCode;
-
-    public SignatureApiException(
-            String errorCode,
-            String message) {
-
-        super(message);
-        this.errorCode = errorCode;
+    // 3. Validar que el payload CONTENGA el campo 'jti'
+    const { jti, sub } = decoded;
+    if (!jti) {
+      console.warn("Token missing 'jti' claim");
+      return generatePolicy("user", "Deny", event.methodArn);
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
-}
-
-
-
-public Mono<DocumentApiResponse> getDocument(String documentId) {
-
-    return documentWebClient
-            .get()
-            .uri("/documents/{documentId}", documentId)
-            .retrieve()
-            .onStatus(
-                    status -> status.is4xxClientError(),
-                    response -> response
-                            .bodyToMono(String.class)
-                            .defaultIfEmpty("")
-                            .flatMap(body ->
-                                    Mono.error(
-                                            new DocumentApiException(
-                                                    "DOCUMENT_API_4XX",
-                                                    body
-                                            )
-                                    )
-                            )
-            )
-            .onStatus(
-                    status -> status.is5xxServerError(),
-                    response -> response
-                            .bodyToMono(String.class)
-                            .defaultIfEmpty("")
-                            .flatMap(body ->
-                                    Mono.error(
-                                            new DocumentApiException(
-                                                    "DOCUMENT_API_5XX",
-                                                    body
-                                            )
-                                    )
-                            )
-            )
-            .bodyToMono(DocumentApiResponse.class);
-}
-
-
-@Service
-@RequiredArgsConstructor
-public class DocumentProcessService {
-
-    private static final int MAX_CONCURRENCY = 5;
-
-    private final DocumentClient documentClient;
-    private final SignatureClient signatureClient;
-    private final DocumentErrorService errorService;
-
-    public Mono<DocumentProcessResponse> process(
-            DocumentProcessRequest request) {
-
-        return Flux.fromIterable(request.documentIds())
-                .flatMap(
-                        documentId ->
-                                processDocument(
-                                        documentId,
-                                        request.client()
-                                ),
-                        MAX_CONCURRENCY
-                )
-                .collectList()
-                .map(this::buildResponse);
+    // 4. Consultar DynamoDB usando el jti como clave primaria
+    const dbItem = await getTokenFromDB(jti);
+    if (!dbItem) {
+      console.warn(`Token jti ${jti} not found in DynamoDB`);
+      return generatePolicy("user", "Deny", event.methodArn);
     }
 
-private Mono<DocumentResult> processDocument(
-        String documentId,
-        ClientData client) {
-
-    return documentClient
-            .getDocument(documentId)
-            .flatMap(document ->
-                    signDocument(
-                            documentId,
-                            document,
-                            client
-                    )
-            )
-            .thenReturn(
-                    DocumentResult.success(documentId)
-            )
-            .onErrorResume(error ->
-                    handleDocumentError(
-                            documentId,
-                            error
-                    )
-            );
-}
-
-
-private Mono<SignatureApiResponse> signDocument(
-        String documentId,
-        DocumentApiResponse document,
-        ClientData client) {
-
-    SignatureRequest request =
-            buildSignatureRequest(
-                    documentId,
-                    document,
-                    client
-            );
-
-    return signatureClient.signDocument(request);
-}
-
-private SignatureRequest buildSignatureRequest(
-        String documentId,
-        DocumentApiResponse document,
-        ClientData client) {
-
-    SignerData signer = new SignerData(
-            client.documentType(),
-            client.documentNumber(),
-            client.name(),
-            client.lastName(),
-            client.email()
-    );
-
-    return new SignatureRequest(
-            documentId,
-            document.fileBase64(),
-            signer
-    );
-}
-
-private Mono<DocumentApiResponse> retrieveDocument(
-        String documentId) {
-
-    return documentClient
-            .getDocument(documentId)
-            .onErrorMap(error ->
-                    new DocumentProcessException(
-                            documentId,
-                            ErrorStage.DOCUMENT_RETRIEVAL,
-                            extractErrorCode(error),
-                            error.getMessage(),
-                            error
-                    )
-            );
-}
-
-
-private Mono<SignatureApiResponse> signDocument(
-        String documentId,
-        DocumentApiResponse document,
-        ClientData client) {
-
-    SignatureRequest request =
-            buildSignatureRequest(
-                    documentId,
-                    document,
-                    client
-            );
-
-    return signatureClient
-            .signDocument(request)
-            .onErrorMap(error ->
-                    new DocumentProcessException(
-                            documentId,
-                            ErrorStage.SIGNATURE,
-                            extractErrorCode(error),
-                            error.getMessage(),
-                            error
-                    )
-            );
-}
-
-
-@Getter
-public class DocumentProcessException
-        extends RuntimeException {
-
-    private final String documentId;
-    private final ErrorStage stage;
-    private final String errorCode;
-
-    public DocumentProcessException(
-            String documentId,
-            ErrorStage stage,
-            String errorCode,
-            String message,
-            Throwable cause) {
-
-        super(message, cause);
-
-        this.documentId = documentId;
-        this.stage = stage;
-        this.errorCode = errorCode;
+    // 5. Verificar estado en base de datos (ej: "ACTIVE" o "REVOKED")
+    if (dbItem.status !== "ACTIVE") {
+      console.warn(`Token jti ${jti} is ${dbItem.status}`);
+      return generatePolicy("user", "Deny", event.methodArn);
     }
+
+    // 6. (Opcional) Validar expiración adicional en DB o comparar fechas
+    // Si todo ok → PERMITIR acceso
+    console.info(`Access granted for user ${sub} with jti ${jti}`);
+    return generatePolicy(sub, "Allow", event.methodArn, {
+      // Contexto que pasa al backend (útil para logging)
+      userId: sub,
+      tokenId: jti,
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return generatePolicy("user", "Deny", event.methodArn);
+  }
+};
+
+// --- Funciones auxiliares ---
+
+function extractToken(authHeader) {
+  if (!authHeader) return null;
+  const parts = authHeader.split(" ");
+  if (parts.length === 2 && parts[0] === "Bearer") {
+    return parts[1];
+  }
+  return null;
+}
+
+async function getTokenFromDB(jti) {
+  const command = new GetItemCommand({
+    TableName: TABLE_NAME,
+    Key: {
+      jti: { S: jti }, // La tabla debe tener 'jti' como Partition Key (String)
+    },
+    ConsistentRead: false, // Lectura eventual para menor costo/latencia
+  });
+
+  const response = await ddbClient.send(command);
+  if (!response.Item) return null;
+
+  // Desmapear el item de DynamoDB a objeto JS
+  const item = unmarshall(response.Item);
+  return item;
+}
+
+// Genera la política IAM que API Gateway necesita
+function generatePolicy(principalId, effect, resource, context = {}) {
+  // Si es Deny, es recomendable negar todo el ARN (o el específico)
+  // Para Allow, dar acceso al recurso específico de la petición.
+  const policy = {
+    principalId: principalId || "user",
+    policyDocument: {
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: "execute-api:Invoke",
+          Effect: effect,
+          Resource: effect === "Allow" ? resource : "*", // Deny todo o especificar
+        },
+      ],
+    },
+    context: context, // Se pasa al Lambda integrado
+  };
+
+  // Añadir caché (TTL en segundos) para que API Gateway no llame al authorizer en cada request
+  // Se recomienda entre 300 y 3600 segundos según tu caso.
+  policy.context = {
+    ...context,
+    // Opcional: incluir tiempo de expiración del token para cachear hasta ese momento
+  };
+  // Para activar el cache, debes habilitarlo en la consola de API Gateway (Authorizer Cache TTL)
+  // El Lambda devuelve este objeto, API Gateway lo cachea automáticamente si está habilitado.
+
+  return policy;
 }
 
 
-private Mono<DocumentResult> processDocument(
-        String documentId,
-        ClientData client) {
 
-    return retrieveDocument(documentId)
-            .flatMap(document ->
-                    signDocument(
-                            documentId,
-                            document,
-                            client
-                    )
-            )
-            .thenReturn(
-                    DocumentResult.success(documentId)
-            )
-            .onErrorResume(
-                    DocumentProcessException.class,
-                    this::handleDocumentError
-            );
+{
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/util-dynamodb": "^3.600.0",
+    "jsonwebtoken": "^9.0.2"
+  }
 }
-
-
-private Mono<DocumentResult> handleDocumentError(
-        DocumentProcessException error) {
-
-    return errorService
-            .save(error)
-            .thenReturn(
-                    DocumentResult.failure(
-                            error.getDocumentId(),
-                            error.getStage().name(),
-                            error.getErrorCode(),
-                            error.getMessage()
-                    )
-            );
-}
-
-
-
-
-
-private DocumentProcessResponse buildResponse(
-        List<DocumentResult> results) {
-
-    int total = results.size();
-
-    int successful = (int) results.stream()
-            .filter(result ->
-                    result.status() == DocumentStatus.SUCCESS)
-            .count();
-
-    int failed = total - successful;
-
-    return new DocumentProcessResponse(
-            total,
-            successful,
-            failed,
-            results
-    );
-}
-
-
-
-
-
-
-@Service
-@RequiredArgsConstructor
-public class DocumentErrorService {
-
-    private final DocumentErrorRepository repository;
-
-    public Mono<Void> save(
-            DocumentProcessException error) {
-
-        DocumentErrorEntity entity =
-                new DocumentErrorEntity(
-                        error.getDocumentId(),
-                        error.getStage().name(),
-                        error.getErrorCode(),
-                        error.getMessage()
-                );
-
-        return repository.save(entity)
-                .then();
-    }
-}
-
