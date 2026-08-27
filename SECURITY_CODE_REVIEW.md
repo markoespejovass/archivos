@@ -1,0 +1,5116 @@
+# Security Code Review
+
+**Alcance:** `E:\claude\Santander\APIs\codigo`
+**Tipo de revisión:** Secure Code Review + SAST manual + SCA + Threat Modeling + API Security Review
+**Fecha:** 2026-08-20
+**Metodología:** 3 pasadas (reconocimiento → análisis profundo → correlación entre APIs y cadenas de ataque)
+**Naturaleza:** revisión estática. No se ejecutó código, no se invocaron endpoints, no se utilizaron las credenciales encontradas.
+**Insumo adicional:** diagrama de arquitectura PRE/PROD aportado por el equipo (ver §1.2), utilizado para calibrar la explotabilidad real de cada hallazgo.
+**Documento vivo — versión 1.4.** Este informe se mantiene como base de trabajo para la remediación. El estado de cada hallazgo se registra en §20; el historial de cambios, al final del documento.
+
+| Versión | Fecha | Cambio |
+| ------- | ----- | ------ |
+| 1.0 | 2026-08-20 | Versión inicial. 12 proyectos, 46 hallazgos. |
+| 1.1 | 2026-08-20 | Incorporado el diagrama de arquitectura PRE/PROD. Recalibradas las severidades de SEC-009 (Critical→High) y SEC-025 (Medium→Low). Ampliados SEC-001, SEC-002, SEC-004 y SEC-006 con las fronteras de confianza reales. |
+| 1.2 | 2026-08-20 | Excluido `cpe-nxhbsc-beemailsend` del alcance (plantilla sin código de negocio): 11 proyectos, 671 archivos Java, 67 operaciones. Reenfocado SEC-034 hacia la mezcla de líneas de Netty en `bedatacomanagment`. Añadida la guía de entorno de desarrollo sin Cognito en SEC-001. Añadido el seguimiento de remediación (§20). |
+| 1.3 | 2026-08-21 | Congelada la linea base comparable `security-baseline-2026-08-20-v1.2.json` para el diff con futuras auditorias. Ver §21. |
+| 1.4 | 2026-08-24 | Re-escaneo con criterio de **observabilidad externa**, tras conocerse que el Ethical Hacking será de caja negra a través del API Gateway. Seis hallazgos nuevos (SEC-047 a SEC-052). Total: 52. Nuevo anexo `EH_PREVIEW.md` (§22) con los 15 casos de prueba anticipados y su mapeo a OWASP API Top 10 2023. |
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Alcance analizado
+
+Se analizaron **11 microservicios Spring Boot independientes** (Java 17, arquitectura hexagonal, controladores generados con `openapi-generator` y `delegatePattern`), pertenecientes al programa **NexHub / Proyecto NUBE Peru** (`com.santander.cpe.nxhbsc`), con **671 archivos Java** y **67 operaciones REST declaradas** en contratos OpenAPI.
+
+> **Exclusion del alcance.** El directorio contiene un decimosegundo proyecto, `cpe-nxhbsc-beemailsend`, que el equipo ha confirmado como **plantilla sin codigo de negocio** (solo un `sayHello()`). Queda fuera del analisis y no genera hallazgos. Se conserva una unica referencia a el, en SEC-001, por su valor probatorio: al ser la plantilla original intacta, evidencia cual era la configuracion de seguridad de partida antes de que los once proyectos reales la modificaran.
+
+Todos comparten la misma plantilla corporativa Gluon (`santander-spring-boot-starter-parent`), el mismo `Dockerfile`, los mismos workflows de CI/CD y — lo que resulta determinante para este informe — **la misma configuración de seguridad**.
+
+### 1.2 Arquitectura de despliegue y fronteras de confianza
+
+Según el diagrama de arquitectura PRE/PROD facilitado, el flujo de entrada es:
+
+```text
+App Móvil (+ SDK FacePhi)
+   ↓
+Conexa  ──►  Akamai  ──►  Imperva  ──►  AWS WAF  ──►  API Gateway
+                              │                            │
+                              └──► AWS WAF ──► Amazon Cognito
+                                   (AWS LandingZone)        │
+                                                            ▼
+                                                    AWS PrivateLink
+                                                            ▼
+                                                    NLB (VPC, AZ)
+                                                            ▼
+                                        ┌───────── Private Subnet (EKS) ─────────┐
+                                        │ KYC · Oferta Producto · Reclamos       │
+                                        │ Watchlist Screening · Firma Digital    │
+                                        │ Registro SKY · Data Consent Mgmt       │
+                                        │ Gestión Documental · Orquestación      │
+                                        │ Riesgo Crédito · Ident. Biométrica     │
+                                        │ Notificaciones Correo                  │
+                                        └────────────────────────────────────────┘
+                                                            │
+                        ┌───────────────────────────────────┴──────────────────┐
+                        ▼                                                      ▼
+            Transit Gateway → Firewall Norte                     Transit Gateway → Firewall Sur
+                        ▼                                                      ▼
+                    Netskope                                                 GSNET
+                        ▼                                                      ▼
+      Terceros: GDS Modellica, FacePhi, Gesintel,              Sistemas Santander (Navarrete interno):
+      Celmedia, Aerolínea (SKY), Puntos (Qurable)              Sistema Contáctanos
+
+            Datos: AWS WL Account → DynamoDB · S3 · RDS
+            Plataforma: Secrets Manager · KMS · ECR (AWS EKS Account)
+```
+
+**Fronteras de confianza identificadas:**
+
+| # | Frontera | Quién autentica | Quién autoriza | Verificable en código |
+| - | -------- | --------------- | -------------- | --------------------- |
+| T1 | Internet → Conexa/Akamai/Imperva | Imperva (WAF/bot) | — | No |
+| T2 | Imperva → AWS WAF → Cognito | **Amazon Cognito** | Cognito (autenticación) | No |
+| T3 | Cognito → API Gateway | API Gateway (authorizer) | Scopes/rutas del gateway | No |
+| T4 | API Gateway → PrivateLink → NLB → **pod** | **Nadie** | **Nadie** | **Sí — SEC-001** |
+| T5 | **pod → pod** (este-oeste, misma subred) | **Nadie** | **Nadie** | **Sí — SEC-001, SEC-021** |
+| T6 | pod → Netskope → terceros | API key / OAuth2 / Basic | Proveedor | Sí — SEC-003, SEC-004 |
+| T7 | pod → GSNET → Contáctanos | Usuario/contraseña, **HTTP en claro** | Contáctanos | Sí — SEC-009 |
+| T8 | pod → AWS (DynamoDB/S3/RDS) | IRSA + STS AssumeRole | Política IAM del rol | Sí — control correcto |
+
+Este diagrama **mejora sustancialmente la postura frente a Internet** respecto a lo que sugiere el código aislado: los pods viven en subred privada, tras PrivateLink, tras un API Gateway con autorizador Cognito, tras dos capas de WAF y un CDN con protección de bots. Las severidades de este informe están calibradas teniendo en cuenta ese perímetro.
+
+Lo que el perímetro **no** resuelve, y que sigue siendo responsabilidad del código:
+
+* **Autorización a nivel de objeto (T4).** Cognito autentica *quién* llama, pero no puede saber si el `customer_id`, `party_id` o `document_id` que el solicitante pide le corresponde. Esa decisión solo puede tomarse en el microservicio, y **ningún microservicio la toma** porque ninguno lee el token (SEC-002).
+* **Tráfico este-oeste (T5).** Los once servicios comparten subred privada. Un pod comprometido —o cualquier workload con ruta al NLB— invoca a los demás **sin pasar por Imperva, WAF, Cognito ni API Gateway**. En ese plano no hay ningún control (SEC-001, SEC-021).
+* **Defensa en profundidad.** El backend descarta el JWT de Cognito: no valida su firma, no registra el `sub` del llamante y no puede auditar quién accedió a qué. Un fallo de configuración del gateway, una ruta mal declarada o un endpoint no cubierto por el authorizer se traduce en acceso total sin ninguna barrera posterior.
+* **TLS saliente (T6).** Netskope realiza inspección TLS, lo que explica —pero no justifica— la desactivación de la validación de certificados en siete servicios; la solución correcta es confiar en la CA de Netskope, no aceptar cualquier certificado (SEC-004).
+* **Gestión de secretos.** La arquitectura provee **AWS Secrets Manager y KMS**, y el despliegue productivo ya inyecta secretos vía `secretKeyRef`. Aun así hay credenciales de proveedores escritas en el árbol de fuentes (SEC-003), lo que contradice el propio diseño.
+
+### 1.3 Principales riesgos
+
+El hallazgo estructural es que **la capa de autenticacion y autorizacion no existe en ninguna de las 11 APIs**. Los contratos OpenAPI declaran `security: - Authorization: []` (Bearer JWT) en los 11 casos, pero:
+
+* `santander.security.enabled: false` con `white-list: /**` en los 11 `application.yml` (ningun perfil `pro`/`pre`/`cert` lo revierte);
+* `SecurityConfig.filterChain()` termina en `.anyRequest().permitAll()` en las 10 clases existentes (`beemailboxes` no declara `SecurityConfig`);
+* no hay ni un solo `OncePerRequestFilter`, `HandlerInterceptor`, `@PreAuthorize`, `@Secured`, `JwtDecoder` ni `oauth2ResourceServer` en todo el código base.
+
+La consecuencia práctica, dado el diagrama: **el token de Cognito se valida en el borde y se descarta en el backend**. Todo lo que ocurre después de T4 sucede sin identidad. Sobre esa base se apilan operaciones de altísima sensibilidad accesibles con solo cambiar un identificador: posición de tarjetas de cualquier cliente, riesgo crediticio con marcas PEP/PLAFT, consentimientos de datos personales, descarga de documentos contractuales, onboarding biométrico y **generación y validación de OTP**.
+
+A ello se suman:
+
+* **secretos reales de proveedores y de base de datos versionados** en `application-local.yml` y —más grave— en `application-cert.yml` y `application-pre.yml` de `beemailboxes`, además de un refresh token OAuth2 dentro de `Constant.java`, pese a existir Secrets Manager y KMS en la plataforma;
+* **validación de certificado TLS deshabilitada** en 7 servicios (`InsecureTrustManagerFactory`, `TrustStrategy → true`, `NoopHostnameVerifier`);
+* el **callback del flujo de firma digital apuntando a `webhook.site`**, un servicio público de terceros —para el que además el diagrama no contempla ninguna ruta de entrada—, con un token de autenticación que por un error de código es la cadena literal `jwt`;
+* **fuga masiva en logs**: OTP en claro, contraseñas de integración, access tokens OAuth2, JWT de callback, la clave AES de cifrado, documentos PDF completos en base64 y tokens biométricos;
+* datos personales reales de clientes (DNI + clasificación PLAFT/PEP/castigo) en `data.sql`.
+
+### 1.4 Conclusión
+
+El perímetro descrito en el diagrama es sólido y reduce de forma significativa la exposición a Internet. El problema es que **toda la seguridad reside en él**: los microservicios operan con confianza implícita total en lo que atraviesa el API Gateway y en lo que llega por la red interna. Esto configura un modelo de "cáscara dura, interior blando" en el que un único fallo perimetral —o cualquier movimiento lateral dentro del VPC— expone íntegramente datos financieros, crediticios, biométricos y de identidad, sin capa de contención ni pista de auditoría atribuible.
+
+Con independencia del perímetro, hay dos clases de riesgo que **ningún control de borde puede mitigar** y que requieren cambios en el código:
+
+1. **BOLA (SEC-002).** Un usuario legítimo de la app móvil, con un token de Cognito perfectamente válido, puede solicitar los datos de cualquier otro cliente cambiando un identificador. Imperva, el WAF, Cognito y el API Gateway lo dejarán pasar porque la petición está correctamente autenticada. Este es el riesgo número uno del conjunto.
+2. **Bypass del segundo factor (SEC-005).** La validación de OTP no vincula el código con el usuario, no limita intentos y acepta cualquier respuesta no nula del proveedor.
+
+Se identificaron **46 hallazgos**: 9 Critical, 14 High, 17 Medium, 6 Low/Info.
+
+Prioridades inmediatas:
+1. **SEC-002** — implementar autorización a nivel de objeto contra el `sub`/claims del token de Cognito.
+2. **SEC-005** — rediseñar el flujo OTP.
+3. **SEC-003** — rotar los secretos expuestos y migrarlos a Secrets Manager (ya disponible en la plataforma).
+4. **SEC-001** — validar el JWT de Cognito en el backend, como defensa en profundidad y como base técnica de SEC-002.
+5. **SEC-004 / SEC-006** — restaurar la validación TLS confiando en la CA de Netskope, y eliminar el callback a `webhook.site`.
+
+---
+
+## 2. APIs / proyectos analizados
+
+| Proyecto | Ruta base (contrato) | Parent Gluon | Java | Endpoints decl. | Persistencia / Integración | Riesgo |
+| -------- | -------------------- | ------------ | ---: | --------------: | -------------------------- | ------ |
+| cpe-nxhbsc-beclaims | `/v1/claims_book` | 1.5.2 | 17 | 4 | Contáctanos (GSNET, HTTP claro) | **CRÍTICO** |
+| cpe-nxhbsc-becreditrisk | `/v1/credit_risk_decisions` | 1.6.0 | 17 | 1 | RDS Postgres + DynamoDB + Modellica | **CRÍTICO** |
+| cpe-nxhbsc-becustombeprogrm | `/v1/customer_benefit_programs` | 1.5.2 | 17 | 5 | DynamoDB + SKY + Qurable | **ALTO** |
+| cpe-nxhbsc-bedatacomanagment | `/v7/data_consents_management` | 1.5.2 | 17 | 8 | DynamoDB | **ALTO** |
+| cpe-nxhbsc-bedigitsignature | `/v1` | 1.6.0 | 17 | 1 | DynamoDB + bedocmanagement + FacePhi/Zytrust | **CRÍTICO** |
+| cpe-nxhbsc-bedocmanagement | `/v2/document_management` | 1.5.2 | 17 | 10 | S3 + DynamoDB | **CRÍTICO** |
+| cpe-nxhbsc-beemailboxes | `/v1/emailboxes` | 1.6.0 | 17 | 3 | DynamoDB + S3 + Celmedia (OTP/mail) | **CRÍTICO** |
+| cpe-nxhbsc-beidentbiometric | `/v1/identity_biometric` | 1.6.0 | 17 | 13 | DynamoDB + FacePhi | **CRÍTICO** |
+| cpe-nxhbsc-beknowyocustomer | `/v6/know_your_customer` | 1.5.2 | 17 | 20 | DynamoDB | **ALTO** |
+| cpe-nxhbsc-beproducoffering | `/v1/customer_card_position` | 1.5.1 | 17 | 1 | RDS Postgres | **CRÍTICO** |
+| cpe-nxhbsc-bewatchscreening | `/v1/watchlist_screening` | 1.6.0 | 17 | 1 | Gesintel / AMLUpdate | **ALTO** |
+
+> `beknowyocustomer` declara 20 operaciones e implementa 2. La superficie documentada excede a la implementada (SEC-046).
+>
+> Los servicios "Orquestacion Riesgo Credito" y "Notificaciones Correo" del diagrama se corresponden con `becreditrisk` y `beemailboxes`.
+>
+> `cpe-nxhbsc-beemailsend` queda **fuera del alcance** por ser una plantilla sin codigo de negocio.
+
+---
+
+## 3. Risk Summary
+
+| Severidad | Cantidad |
+| --------- | -------: |
+| Critical  |        9 |
+| High      |       17 |
+| Medium    |       18 |
+| Low       |        6 |
+| Info      |        2 |
+| **Total** |   **52** |
+
+> **Nota de calibración.** Las severidades incorporan el perímetro del diagrama (Imperva + WAF + Cognito + API Gateway + subred privada). Dos hallazgos se rebajaron respecto a la evaluación basada solo en código: **SEC-009** (Contáctanos viaja por GSNET interno, no por Internet) pasa de Critical a High, y **SEC-025** (Swagger) de Medium a Low al no estar publicado en el gateway. **SEC-002 y SEC-005 no admiten atenuación**: son explotables por un usuario con token válido de Cognito, atravesando todo el perímetro de forma legítima.
+
+---
+
+## 4. Resumen de hallazgos
+
+| ID | Severidad | Confianza | Hallazgo | Proyecto | Componente | CWE | Prioridad |
+| -- | --------- | --------- | -------- | -------- | ---------- | --- | --------- |
+| SEC-001 | Critical | CONFIRMADO | Autenticación y autorización desactivadas en todas las APIs | Todos (11) | `SecurityConfig` + `application.yml` | CWE-306 | P0 |
+| SEC-002 | Critical | CONFIRMADO | BOLA/IDOR sistémico sobre identificadores de negocio | 8 proyectos | Delegates / UseCases | CWE-639 | P0 |
+| SEC-003 | Critical | CONFIRMADO | Secretos de proveedores y BD versionados en el repositorio | 6 proyectos | `application-*.yml`, `Constant.java` | CWE-798 | P0 |
+| SEC-004 | Critical | CONFIRMADO | Validación de certificado TLS deshabilitada (trust-all) | 7 proyectos | `WebClientConfig` / `RestTemplateConfig` | CWE-295 | P0 |
+| SEC-005 | Critical | CONFIRMADO | Bypass de OTP: sin vínculo a usuario, sin límite, OTP en path y en logs | beemailboxes | `OTPServiceAdapter` | CWE-304, CWE-307 | P0 |
+| SEC-006 | Critical | CONFIRMADO | Callback de firma digital a `webhook.site` y token de callback literal `jwt` | bedigitsignature | `Constant`, `DocumentProcessService` | CWE-200, CWE-306 | P0 |
+| SEC-007 | Critical | CONFIRMADO | Credenciales, tokens y clave AES escritos en logs | 4 proyectos | `TokenService`, `AesEncryptionService` | CWE-532 | P0 |
+| SEC-008 | Critical | CONFIRMADO | Datos personales reales (DNI + PLAFT/PEP) en `data.sql` versionado | becreditrisk | `src/main/resources/data.sql` | CWE-359 | P0 |
+| SEC-009 | High | CONFIRMADO | Credenciales enviadas por HTTP en claro a Contáctanos (red interna GSNET) | beclaims | `application-local.yml` + `TokenService` | CWE-319 | P1 |
+| SEC-010 | Critical | CONFIRMADO | Fail-open: se devuelven datos ficticios cuando falla el proveedor | beclaims | `ClaimsAdapter` | CWE-754 | P0 |
+| SEC-011 | High | CONFIRMADO | Documento PDF completo en base64 escrito al log | bedigitsignature | `DocumentClient:80` | CWE-532 | P1 |
+| SEC-012 | High | CONFIRMADO | Tokens biométricos y datos de DNI escritos al log | beidentbiometric | `FacephiAdapter:84,124` | CWE-532 | P1 |
+| SEC-013 | High | CONFIRMADO | `wiretap(true)`: tráfico HTTP completo (incl. `Authorization`) al log | 6 proyectos | `WebClientConfig` | CWE-532 | P1 |
+| SEC-014 | High | CONFIRMADO | `GET /documents/{id}/versions` ignora el id y devuelve un scan completo | bedocmanagement | `DocumentManagementAdapter:188` | CWE-200 | P1 |
+| SEC-015 | High | ALTA CONFIANZA | Clave S3 y `Content-Type` construidos con datos del cliente sin sanear | bedocmanagement | `DocumentManagementAdapter:120-129` | CWE-99, CWE-434 | P1 |
+| SEC-016 | High | CONFIRMADO | Integraciones salientes sin timeout | 3 proyectos | `WebClientConfig`, `RestTemplateConfig` | CWE-1088 | P1 |
+| SEC-017 | High | CONFIRMADO | Reintentos sobre operaciones no idempotentes sin clave de idempotencia | becustombeprogrm | `SKYServiceAdapter:94` | CWE-837 | P1 |
+| SEC-018 | High | CONFIRMADO | Cuerpo de error del proveedor propagado al consumidor | becustombeprogrm, bedigitsignature | `SKYServiceAdapter`, `Util.handleError` | CWE-209 | P1 |
+| SEC-019 | High | ALTA CONFIANZA | Sin rate limiting: amplificación de recursos y abuso de envío de correo | Todos | — | CWE-770 | P1 |
+| SEC-020 | High | CONFIRMADO | Payloads base64 sin límite de tamaño ni validación | 4 proyectos | Contratos OpenAPI + adapters | CWE-400 | P1 |
+| SEC-021 | High | CONFIRMADO | Endpoint `download_document_intern` público y confianza transitiva | bedocmanagement ← bedigitsignature | `openapi.yaml`, `WebClientConfig` | CWE-668 | P1 |
+| SEC-022 | High | CONFIRMADO | Actuator expuesto sin autenticación con `show-details: ALWAYS` | Todos | `application.yml` + `SecurityConfig` | CWE-200 | P1 |
+| SEC-023 | High | CONFIRMADO | JWT M2M sin `iss`/`aud`/`jti`, clave AES reutilizada como clave JWT, expiración de 20 s | becustombeprogrm, bedigitsignature | `JwtUtil`, `SkyTokenService` | CWE-1270, CWE-613 | P1 |
+| SEC-024 | Medium | CONFIRMADO | AES sin cifrado autenticado y transformación tomada de configuración | becustombeprogrm | `AesEncryptionService:30-46` | CWE-353 | P2 |
+| SEC-025 | Low | CONFIRMADO | Swagger UI y `/v3/api-docs` habilitados en todos los perfiles (no publicados en el gateway) | Todos | `application.yml`, `SecurityConfig` | CWE-200 | P3 |
+| SEC-026 | Medium | CONFIRMADO | Headers `society`/`channel` del consumidor alimentan el motor de riesgo | becreditrisk | `CreditRiskDelegateImpl:36-37` | CWE-807 | P2 |
+| SEC-027 | Medium | REQUIERE VALIDACIÓN | `forward-headers-strategy: framework` sin proxy de confianza verificado | Todos | `application.yml` | CWE-348 | P2 |
+| SEC-028 | Medium | CONFIRMADO | Excepciones no mapeadas producen 500 con posible detalle interno | 5 proyectos | Varios | CWE-248 | P2 |
+| SEC-029 | Medium | CONFIRMADO | `ddl-auto: update` y `sql.init.mode: always` en producción | beproducoffering | `application-pro.yml` | CWE-16 | P2 |
+| SEC-030 | Medium | CONFIRMADO | `patchConsent` usa `putIfAbsent`: la actualización nunca se aplica | bedatacomanagment | `DataConsentManagementAdapter:83` | CWE-670 | P2 |
+| SEC-031 | Medium | CONFIRMADO | JWT almacenado como partition key en DynamoDB | bedigitsignature | `Entity.java:57-67` | CWE-522 | P2 |
+| SEC-032 | Medium | CONFIRMADO | Backdoor de pruebas `CONTRATO_CLIENTE` devuelve un PDF del classpath | bedigitsignature | `DocumentClient:37-46` | CWE-489 | P2 |
+| SEC-033 | Medium | CONFIRMADO | Token cacheado sin expiración ni renovación | beclaims | `TokenService:38-43` | CWE-613 | P2 |
+| SEC-034 | Medium | CONFIRMADO | Deriva de versiones; `bedatacomanagment` mezcla Netty 4.1.x y 4.2.x | Todos | `pom.xml` | CWE-1104 | P2 |
+| SEC-035 | Medium | CONFIRMADO | `assert` usado para control de flujo (inactivo en runtime) | beemailboxes | `JsonTokenProvider:56`, `XmlTokenProvider:116` | CWE-617 | P2 |
+| SEC-036 | Medium | REQUIERE VALIDACIÓN | `XmlMapper` sin endurecimiento explícito frente a DTD/entidades externas | beemailboxes | `XmlApiClient:31` | CWE-611 | P2 |
+| SEC-037 | Medium | CONFIRMADO | Sin idempotencia ni anti-replay en operaciones sensibles | bedigitsignature, becustombeprogrm, beemailboxes | — | CWE-799 | P2 |
+| SEC-038 | Medium | REQUIERE VALIDACIÓN | Datos externos escritos al log sin neutralizar (log injection) | 6 proyectos | Varios | CWE-117 | P2 |
+| SEC-039 | Medium | CONFIRMADO | `search_documents` ejecuta Scan completo de DynamoDB sin paginación | bedocmanagement | `BaseDynamoRepository:76-92` | CWE-405 | P2 |
+| SEC-040 | Medium | ALTA CONFIANZA | `validate_status` devuelve siempre `"Match Found"` | bewatchscreening | `GesintelAdapter:100-115` | CWE-393 | P2 |
+| SEC-041 | Low | CONFIRMADO | Generador de códigos con PRNG no criptográfico y espacio reducido (código muerto) | beemailboxes | `UtilsOtp:22-36` | CWE-338 | P3 |
+| SEC-042 | Low | CONFIRMADO | Endpoints internos y hostnames de BD revelados en el repositorio | 3 proyectos | `application-local.yml`, test properties | CWE-200 | P3 |
+| SEC-043 | Low | CONFIRMADO | `automountServiceAccountToken: true` en despliegue productivo | Todos | `.gluon/cd/pro/values-pro.yaml` | CWE-250 | P3 |
+| SEC-044 | Low | CONFIRMADO | CSP definida para API JSON; falta política de cabeceras adecuada al tipo de servicio | Todos | `SecurityConfig` | CWE-1021 | P3 |
+| SEC-045 | Info | CONFIRMADO | `jwks.json` con claves públicas presente pero no utilizado | beclaims | `src/main/resources/jwks.json` | — | P3 |
+| SEC-046 | Info | CONFIRMADO | 67 operaciones declaradas frente a ~26 implementadas | Todos | Contratos OpenAPI | — | P3 |
+| SEC-047 | High | CONFIRMADO | Enumeración diferencial: tres respuestas distintas ante recurso inexistente | bedocmanagement | `DocumentManagementAdapter:61-71,178-185,200-215` | CWE-204 | P1 |
+| SEC-048 | High | CONFIRMADO | El DNI del titular se devuelve en el campo `name` de los metadatos | bedocmanagement | `DocumentMapper:111-118` | CWE-359 | P1 |
+| SEC-049 | High | CONFIRMADO | `deleteDocument` sin verificación de titularidad ni de existencia | bedocmanagement | `DocumentManagementAdapter:200-215` | CWE-639 | P1 |
+| SEC-050 | Medium | CONFIRMADO | El path variable determina el verbo HTTP hacia el proveedor | becustombeprogrm | `QurableServiceAdapter:80-92,169-178` | CWE-470 | P2 |
+| SEC-051 | Medium | CONFIRMADO | Campos cruzados en `FileEntity`: `customerId` guarda el id del documento | bedocmanagement | `FileEntity:18-36`, `DocumentMapper:71-90` | CWE-1109 | P2 |
+| SEC-052 | Low | CONFIRMADO | Endpoints declarados que responden 501 Not Implemented | beknowyocustomer, bedatacomanagment | Contratos + delegates | CWE-1059 | P3 |
+
+---
+
+## 5. Detalle de hallazgos
+
+### SEC-001 — Autenticación y autorización completamente desactivadas en las 11 APIs
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-306 (Missing Authentication for Critical Function), CWE-1188 (Insecure Default Initialization)
+**OWASP API Security Top 10:** API2:2023 Broken Authentication · API8:2023 Security Misconfiguration
+**Proyecto/API:** los 11
+
+#### Ubicación
+
+```text
+Archivo: <cada-proyecto>/src/main/resources/config/application.yml
+Bloque:  santander.security
+Lineas:  22-25 (beclaims), equivalente en los 11 proyectos
+
+Archivo: <cada-proyecto>/src/main/java/.../infrastructure/config/SecurityConfig.java
+Clase:   SecurityConfig
+Metodo:  filterChain(HttpSecurity)
+Lineas:  31-42 (beclaims); 25-33 (becustombeprogrm); equivalentes en las 10 clases existentes
+```
+
+#### Descripción
+
+Existen dos capas de seguridad y **ambas están anuladas**:
+
+1. **Framework corporativo.** El starter `santander-spring-boot-starter-authentication` está declarado como dependencia en los `pom.xml`, pero la configuración lo desactiva:
+
+```yaml
+santander:
+  security:
+    enabled: false
+    white-list:
+      - /**
+```
+
+Ningun `application-pro.yml`, `application-pre.yml` ni `application-cert.yml` sobrescribe estos valores: se verificaron los 11 proyectos, en los tres perfiles.
+
+2. **Spring Security propio.** La cadena de filtros deja pasar todo:
+
+```java
+// SecurityConfig.java  (beclaims 31-42, idéntico en 9 proyectos más)
+http.securityMatcher("/**")
+    .authorizeHttpRequests(
+        auth -> auth.requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+                    .anyRequest()
+                    .permitAll())          // <-- todo el resto también
+    .csrf(AbstractHttpConfigurer::disable)
+    ...
+```
+
+`cpe-nxhbsc-beemailboxes` ni siquiera tiene `SecurityConfig`.
+
+Todo esto **contradice el contrato publicado**. Los 12 `openapi.yaml` declaran:
+
+```yaml
+security:
+  - Authorization: []
+components:
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+
+y documentan explícitamente el código de error `TL0001 | 401 | No se cuenta con credenciales válidas para acceder al recurso.` — un 401 que el código nunca puede producir.
+
+Confirmacion adicional: la **plantilla corporativa de partida trae la autenticacion activada**. El proyecto `cpe-nxhbsc-beemailsend` (fuera del alcance de esta revision por ser una plantilla sin codigo de negocio) conserva el `application.yml` original, y en el si esta declarado el conector de autenticacion:
+
+```yaml
+santander:
+  security:
+    connectors:
+      pkm-connector:
+        pkm-endpoint:
+          - ${env.pkm-endpoint}
+```
+
+Es decir, el estado por defecto de la plantilla corporativa incluye autenticación; los otros once proyectos la retiraron de forma deliberada.
+
+Búsquedas exhaustivas sobre `*/src/main` que no devuelven **ningún** resultado: `OncePerRequestFilter`, `GenericFilterBean`, `HandlerInterceptor`, `FilterRegistrationBean`, `@PreAuthorize`, `@Secured`, `@RolesAllowed`, `@EnableMethodSecurity`, `JwtDecoder`, `oauth2ResourceServer`.
+
+#### Flujo
+
+```text
+Cualquier cliente HTTP
+   ↓  (sin Authorization)
+SecurityFilterChain → anyRequest().permitAll()
+   ↓
+ApiDelegateImpl (sin comprobación de principal)
+   ↓
+UseCase → Adapter
+   ↓
+DynamoDB / S3 / RDS / proveedor externo
+```
+
+#### Source
+
+Petición HTTP arbitraria a cualquier ruta del servicio. No se requiere credencial alguna.
+
+#### Sink
+
+Todas las operaciones de negocio: consulta de posición de tarjetas, decisión de riesgo crediticio, consentimientos de datos personales, descarga y borrado de documentos, onboarding biométrico, generación y validación de OTP, envío de correo, firma de documentos.
+
+#### Escenario de explotación
+
+El diagrama de arquitectura sitúa los pods en una subred privada, tras `AWS PrivateLink` → `API Gateway` → `AWS WAF` → `Imperva` → `Akamai`, con `Amazon Cognito` como autorizador. **Esto elimina el escenario de acceso directo desde Internet**, y por eso este hallazgo no se evalúa como "API pública sin autenticación". El riesgo real es otro, y persiste:
+
+1. **Tráfico este-oeste (frontera T5).** Los once servicios comparten la misma subred privada del VPC. Cualquier pod comprometido —o cualquier workload con ruta al NLB o a los `Service` de Kubernetes— invoca a los demás **sin atravesar Akamai, Imperva, el WAF, Cognito ni el API Gateway**. En ese plano no existe ningún control: ni autenticación, ni autorización, ni registro atribuible. La superficie lateral incluye biometría, documentos, riesgo crediticio y OTP.
+2. **Ausencia de defensa en profundidad (frontera T4).** El backend descarta el JWT de Cognito. Cualquier desviación del perímetro —una ruta añadida al API Gateway sin authorizer, un endpoint no cubierto por el mapeo, un cambio de configuración, un fallo del autorizador que devuelva *allow* por defecto— se traduce en acceso completo sin ninguna barrera posterior. Un unico punto de fallo protege once servicios.
+3. **Imposibilidad de autorizar y de auditar.** Al no leer el token, el servicio no conoce el `sub`, el `client_id` ni los `scope` del llamante. Esto hace **técnicamente imposible** implementar autorización a nivel de objeto (SEC-002) y deja los registros sin atribución: ante un incidente no puede reconstruirse quién accedió a qué.
+4. **`beemailboxes` ni siquiera declara `SecurityConfig`**, por lo que depende exclusivamente de la configuracion del framework, tambien desactivada.
+
+#### Impacto
+
+* **Confidencialidad:** en el plano este-oeste, acceso sin restricción a datos financieros, crediticios, biométricos y de identidad de cualquier cliente.
+* **Integridad:** creación y modificación de consentimientos, borrado de documentos, alta de usuarios y disparo de firmas sin identidad asociada.
+* **Trazabilidad:** ausencia total de atribucion en los registros de las once APIs — relevante para investigación forense y para los requisitos de auditoría de la SBS.
+* **Arquitectura:** modelo de confianza "cáscara dura, interior blando", contrario al principio de confianza cero y a los requisitos de autenticación de APIs del propio grupo.
+
+Este hallazgo es el **habilitador técnico** de SEC-002 (sin token leído no hay autorización posible) y agrava SEC-005, SEC-014, SEC-021 y SEC-022. Su corrección es requisito previo para SEC-002.
+
+#### Remediación
+
+1. Reactivar el control del framework en **todos** los perfiles y reducir la whitelist a lo estrictamente necesario:
+
+```yaml
+santander:
+  security:
+    enabled: true
+    white-list:
+      - /actuator/health/**
+```
+
+2. Sustituir el `permitAll` global por una cadena que exija autenticación por defecto, **validando el mismo JWT que ya emite Amazon Cognito** en el borde. El backend no necesita un nuevo mecanismo: le basta con dejar de descartar el token que ya viaja en la petición:
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.securityMatcher("/**")
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.GET, "/actuator/health/**").permitAll()
+            .requestMatchers("/actuator/**").hasAuthority("SCOPE_ops.monitor")
+            .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").denyAll() // ver SEC-025
+            .anyRequest().authenticated())                                   // <-- por defecto denegar
+        .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt
+            .jwtAuthenticationConverter(scopeConverter())))
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .csrf(AbstractHttpConfigurer::disable)   // correcto para API stateless sin cookies
+        .headers(h -> h
+            .contentTypeOptions(Customizer.withDefaults())
+            .httpStrictTransportSecurity(Customizer.withDefaults())
+            .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny));
+    return http.build();
+  }
+}
+```
+
+3. Configurar el `JwtDecoder` contra el **JWKS del User Pool de Cognito**, validando issuer, audience y expiración (ver SEC-023):
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # https://cognito-idp.{region}.amazonaws.com/{userPoolId}
+          issuer-uri: ${COGNITO_ISSUER_URI}
+          audiences: ${COGNITO_APP_CLIENT_ID}
+```
+
+Nota: `beclaims` ya incluye un `src/main/resources/jwks.json` con dos claves RSA públicas y `kid` en formato Cognito (SEC-045), pero **no se referencia desde ningún punto del código**. Debe sustituirse por la resolución dinámica del JWKS vía `issuer-uri`, que gestiona la rotación de claves automáticamente; fijar el JWKS en un fichero provocaría una caída del servicio en la siguiente rotación.
+
+4. **Aplicar autenticación también en el plano este-oeste.** El JWT de Cognito cubre las llamadas que entran por el API Gateway, pero no las llamadas pod-a-pod (`bedigitsignature` → `bedocmanagement`, SEC-021). Para ese tramo, elegir una de estas opciones y aplicarla de forma consistente:
+   * **mTLS de malla** (service mesh) con identidad de workload — preferible, transparente al código;
+   * o **token de cliente propio** obtenido por client-credentials contra Cognito, con un `scope` distinto al de los consumidores externos (por ejemplo `document.read.internal`), validado en `bedocmanagement`.
+   Adicionalmente, aplicar `NetworkPolicy` de Kubernetes para que solo los pods autorizados puedan alcanzar cada servicio.
+
+5. Añadir un test de integración que falle si algún endpoint de negocio responde distinto de 401 sin `Authorization`. Los `SecurityConfigTest` actuales solo verifican con mocks que `permitAll()` fue invocado — es decir, **blindan el comportamiento inseguro** y darían por bueno cualquier regresión.
+
+#### Nota sobre el entorno de desarrollo: por qué la configuración actual no logra lo que pretende
+
+El equipo ha indicado que **en desarrollo no se utiliza Cognito**, y que esa es la razón por la que se desactivó la seguridad. Es una motivación legítima y muy común. El problema es que **la desactivación no quedó acotada a desarrollo**: por la forma en que está implementada, se aplica en los cuatro entornos.
+
+Hay dos mecanismos distintos y ambos son globales:
+
+**1. `application.yml` es el fichero base, no el de desarrollo.**
+
+```text
+src/main/resources/config/
+├── application.yml          ← santander.security.enabled: false  · SE APLICA A TODOS LOS PERFILES
+├── application-local.yml
+├── application-cert.yml
+├── application-pre.yml
+└── application-pro.yml
+```
+
+En Spring Boot, `application.yml` sin sufijo define la configuración común y los ficheros `application-<perfil>.yml` la **sobrescriben** cuando ese perfil está activo. Como ninguno de los perfiles `cert`, `pre` ni `pro` redefine `santander.security`, el valor `false` del fichero base es el que rige también en producción. Se verificó fichero por fichero en los 11 proyectos.
+
+**2. `SecurityConfig.java` no es configurable por perfil en absoluto.**
+
+```java
+// SecurityConfig.java — se compila y se aplica en TODOS los entornos, sin excepción
+.anyRequest().permitAll()
+```
+
+Aunque se corrigiera el punto 1, esta línea seguiría abriendo todos los endpoints en producción. Es código Java, no configuración: no hay perfil, variable de entorno ni parámetro de despliegue que lo desactive.
+
+Dicho de otro modo: la intención era *"que en local no haga falta un token"*, y el resultado es *"que en ningún entorno haga falta un token"*.
+
+#### Remediación recomendada: invertir el valor por defecto
+
+El principio es que **la configuración segura sea la que se hereda, y la relajación sea una excepción explícita, nombrada y acotada a un perfil que nunca se despliega**.
+
+**Paso 1 — Mover la desactivación al perfil `local` únicamente.**
+
+```yaml
+# application.yml (base) — RECOMENDADO: seguro por defecto
+santander:
+  security:
+    enabled: true
+    white-list:
+      - /actuator/health/**
+```
+
+```yaml
+# application-local.yml — la relajación vive aquí y solo aquí
+santander:
+  security:
+    enabled: false
+    white-list:
+      - /**
+```
+
+Con esto, un despliegue con el perfil equivocado o sin perfil arranca **seguro**, no abierto. Es el comportamiento deseable: el fallo de configuración debe cerrar, no abrir.
+
+**Paso 2 — Condicionar `SecurityConfig` por perfil.**
+
+```java
+// Código recomendado — dos beans mutuamente excluyentes, explícitos en su intención
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    /** Cadena real: aplica en cert, pre y pro. */
+    @Bean
+    @Profile("!local")
+    public SecurityFilterChain secureFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/**")
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.GET, "/actuator/health/liveness",
+                                                 "/actuator/health/readiness").permitAll()
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .csrf(AbstractHttpConfigurer::disable)
+            .headers(h -> h
+                .contentTypeOptions(Customizer.withDefaults())
+                .httpStrictTransportSecurity(Customizer.withDefaults())
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny));
+        return http.build();
+    }
+
+    /** Cadena de desarrollo local. Nunca se activa en un entorno desplegado. */
+    @Bean
+    @Profile("local")
+    public SecurityFilterChain localFilterChain(HttpSecurity http) throws Exception {
+        log.warn("=== PERFIL LOCAL: autenticacion DESACTIVADA. No usar fuera de desarrollo. ===");
+        http.securityMatcher("/**")
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .csrf(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+}
+```
+
+El log de advertencia en el arranque es deliberado: si alguna vez aparece en el arranque de un pod de `cert`, `pre` o `pro`, el error se detecta de inmediato en lugar de pasar inadvertido durante meses.
+
+**Paso 3 — Elegir cómo desarrollar sin Cognito.** Tres opciones, de mejor a peor:
+
+| Opción | Cómo funciona | Ventaja | Inconveniente |
+| ------ | ------------- | ------- | ------------- |
+| **A. Emisor local (recomendada)** | Keycloak o Spring Authorization Server en `docker-compose`; en `application-local.yml` se apunta `issuer-uri` a `http://localhost:8080/realms/dev` | **Mismo camino de código en todos los entornos.** Hay principal, hay claims, la autorización de objeto (SEC-002) se ejercita en local | Requiere un contenedor más en el entorno de desarrollo |
+| **B. `JwtDecoder` de desarrollo** | Bean `@Profile("local")` que valida con una clave simétrica local; el desarrollador genera tokens con un script | Sin infraestructura adicional | Hay que mantener el generador de tokens |
+| **C. `permitAll` en local** | La cadena permisiva del paso 2 | Cero fricción | **No hay principal.** El código de autorización de SEC-002 no se ejercita y puede fallar con `NullPointerException` en cuanto se despliega |
+
+La **opción A es claramente preferible**, y la razón es concreta: en cuanto se implemente la autorización de objeto (SEC-002), el código hará `SecurityContextHolder.getContext().getAuthentication().getPrincipal()`. Con la opción C ese principal es `anonymousUser` o `null` en local, de modo que **la ruta de código más importante para la seguridad sería la única que nunca se prueba antes de producción**. Con la opción A se prueba en cada ejecución local.
+
+```yaml
+# application-local.yml — opción A
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/nexhub-dev
+
+santander:
+  security:
+    enabled: false      # el conector PKM corporativo sigue sin usarse en local...
+```
+
+```yaml
+# application-pro.yml — mismo código, distinto emisor
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${COGNITO_ISSUER_URI}
+          audiences: ${COGNITO_APP_CLIENT_ID}
+```
+
+La diferencia entre local y producción queda reducida a **una URL en un fichero de configuración**. Ese es el objetivo: que el entorno cambie, no el código.
+
+**Paso 4 — Guardarraíles que impidan la regresión.** Sin ellos, la configuración volverá a derivar:
+
+```yaml
+# .github/workflows/security.yml — job adicional recomendado
+- name: Verificar que la seguridad no esta desactivada fuera de local
+  run: |
+    if grep -rn "enabled: false" src/main/resources/config/          --include="application.yml"          --include="application-cert.yml"          --include="application-pre.yml"          --include="application-pro.yml" | grep -q "security"; then
+      echo "ERROR: santander.security.enabled=false fuera de application-local.yml"
+      exit 1
+    fi
+    if grep -rn "anyRequest()" src/main/java --include="*.java" | grep -q "permitAll"; then
+      if ! grep -rn -B5 "anyRequest().permitAll()" src/main/java --include="*.java" | grep -q '@Profile("local")'; then
+        echo "ERROR: anyRequest().permitAll() sin @Profile(\"local\")"
+        exit 1
+      fi
+    fi
+```
+
+Y un test de integración que se ejecute con el perfil `test` (no `local`), de forma que verifique la cadena real:
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+class SecurityIntegrationTest {
+
+    @Autowired private TestRestTemplate rest;
+
+    @Test
+    void debeRechazarPeticionSinToken() {
+        ResponseEntity<String> res = rest.getForEntity("/v1/customer_card_position/list?customer_id=1234567890",
+                                                       String.class);
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);   // no 200
+    }
+
+    @Test
+    void debeRechazarTokenDeOtroCliente() {                                   // cubre SEC-002
+        HttpHeaders h = new HttpHeaders();
+        h.setBearerAuth(tokenParaCliente("1111111111"));
+        ResponseEntity<String> res = rest.exchange("/v1/customer_card_position/list?customer_id=2222222222",
+                                                   HttpMethod.GET, new HttpEntity<>(h), String.class);
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+}
+```
+
+Este segundo test es el que hoy no existe y el que habría detectado tanto SEC-001 como SEC-002. Los `SecurityConfigTest` actuales, en cambio, verifican con mocks que `permitAll()` **fue invocado**: no comprueban seguridad, comprueban que la inseguridad sigue en su sitio.
+
+**Punto que conviene no perder de vista.** Activar Cognito en el backend cierra SEC-001, pero **no cierra SEC-002**. Un token válido de un cliente seguirá sirviendo para consultar los datos de otro mientras no se compare el identificador solicitado con el sujeto del token. Los dos cambios son necesarios, y el orden natural es SEC-001 primero (habilita técnicamente al segundo) y SEC-002 inmediatamente después.
+
+
+---
+
+### SEC-002 — BOLA / IDOR sistémico: identificadores de negocio sin control de autorización
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-639 (Authorization Bypass Through User-Controlled Key), CWE-284
+**OWASP API Security Top 10:** API1:2023 Broken Object Level Authorization
+**Proyecto/API:** beproducoffering, becreditrisk, bedatacomanagment, bedocmanagement, beknowyocustomer, becustombeprogrm, beemailboxes, bedigitsignature
+
+#### Ubicación
+
+```text
+beproducoffering  · HelloApiDelegateImpl.java:64-72        · getCardPosition(..., customerId, ...)
+becreditrisk      · CreditRiskManagementInputPort.java:46-77 · validateCreditRisk(criteria)
+bedatacomanagment · DataConsentManagementAdapter.java:37-93 · getConsent / postConsent / patchConsent
+bedocmanagement   · DocumentManagementAdapter.java:61-71,178-185,200-215 · downloadDocument / getDocument / deleteDocument
+beknowyocustomer  · KnowYourCustomerUseCaseImpl.java:36-57 · getRiskScore(criteria)
+becustombeprogrm  · QurableServiceAdapter.java:133-167,190-224 · getUser / getUsersQurable
+bedigitsignature  · DocumentProcessService.java:75-80      · retrieveDocument(documentId)
+```
+
+#### Descripción
+
+Cada una de estas operaciones recibe del consumidor un identificador que designa el objeto de negocio y lo utiliza directamente contra la persistencia o el proveedor, **sin ninguna comprobación de que el solicitante tenga derecho sobre ese objeto**. Al no existir principal autenticado (SEC-001), no hay nada contra lo que comparar.
+
+El caso más directo es `beproducoffering`:
+
+```java
+// HelloApiDelegateImpl.java:64-72
+@Override
+public ResponseEntity<WrapperCustomerPositionResponse> getCardPosition(List<String> typeCode,
+                                                                       Boolean groupByTypeCode,
+                                                                       String filteringStatusCode,
+                                                                       String customerId,
+                                                                       String fields) {
+    log.info("Log from Servlet controller");
+    return ResponseEntity.ok(channelServiceInputPort.getServices(customerId));
+}
+```
+
+El único control existente es de **formato**, no de propiedad:
+
+```java
+// CustomerIdValidator.java:14-23
+private static final Pattern CUSTOMER_ID_PATTERN = Pattern.compile("^\\d{10}$");
+```
+
+Un patrón de 10 dígitos no restringe el acceso: define un espacio enumerable.
+
+En `becreditrisk` el objeto es aún más sensible — el `documentNumber` del request se usa para recuperar el expediente crediticio completo y enviarlo al motor de decisión:
+
+```java
+// CreditRiskManagementInputPort.java:48-64
+DocumentIdRecord documentId = creditRiskValidateCriteria.getCustomerAccountHolder().getId();
+Person personRecord = creditRiskManagementOutputPort.findPersonRecordByDocumentId(documentId);
+CustomerCloudRecord customerCloudRecord = ...findCustomerCloudRecordByDocumentId(documentId);
+CustomerScp customerScpRecord = ...findCustomerScpRecordByDocumentId(documentId);
+List<Cma> cmaRecord = ...findCmaRecordByDocumentId(documentId);
+```
+
+El contenido de `CMA` incluye clasificaciones como `UPLA - PEP`, `UPLA - PLAFT` y `Castigo, Deficiente o Peor en los últimos 48 meses` (ver `data.sql`, SEC-008).
+
+En `bedatacomanagment` el `partyId` gobierna lectura **y escritura** de consentimientos de tratamiento de datos personales — el registro que legitima el uso de los datos del cliente:
+
+```java
+// DataConsentManagementAdapter.java:37-93
+public WrapperGetConsentsOutput getConsent(String partyId) { ... consentRepository.getByKey(partyId) ... }
+public List<WrapperConsentId> postConsent(List<...> criteria, String partyId) { ... }
+public Void patchConsent(WrapperPatchConsentRequestBody criteria, String partyId, String consentId) { ... }
+```
+
+#### Flujo
+
+```text
+POST /v1/credit_risk_decisions/decide_risk   {"customerAccountHolder":{"id":{"documentNumber":"<DNI ajeno>"}}}
+   ↓
+CreditRiskDelegateImpl.validateCreditRisk()      ← sin principal
+   ↓
+CreditRiskManagementInputPort.validateCreditRisk()  ← sin comprobación de propiedad
+   ↓
+RDS Postgres (CREDIT_RISK, person, customer_cloud, customer_scp) + Modelica
+   ↓
+Respuesta 200 con el perfil de riesgo del titular ajeno
+```
+
+#### Source
+
+`customer_id` (query param), `documentNumber` / `dni` (body), `party_id`, `document_id`, `consent_id`, `questionnaire_id`, `key`, `emailbox_id` (path/body).
+
+#### Sink
+
+Consultas a DynamoDB / RDS / S3 y llamadas a proveedores que devuelven el objeto completo al solicitante.
+
+#### Escenario de explotación
+
+**Este es el hallazgo que el perímetro no puede mitigar, y por ello el de mayor riesgo real del conjunto.**
+
+Un usuario legítimo de la app móvil se autentica normalmente contra Amazon Cognito y obtiene un token válido. Con ese token —que Akamai, Imperva, el AWS WAF, Cognito y el API Gateway aceptarán sin objeción, porque es correcto— envía la petición cambiando únicamente el identificador del objeto:
+
+```text
+GET /v1/customer_card_position/list?customer_id=<otro cliente>
+Authorization: Bearer <token de Cognito válido, del atacante>
+```
+
+Ningún control del borde puede detectarlo: la autenticación es correcta, la ruta es correcta, el esquema del parámetro es correcto. La única capa capaz de decidir que ese `customer_id` no le corresponde al portador del token es el microservicio, **y el microservicio no lee el token** (SEC-001).
+
+A partir de ahí, iterar el identificador. Con `customer_id` de 10 dígitos o con el DNI peruano (8 dígitos), el espacio es enumerable, y las cuotas del API Gateway/Imperva limitan el ritmo pero no impiden la extracción sostenida. El resultado es la obtención del padrón de clientes con su posición de productos y su clasificación de riesgo, sin que quede en los registros del backend ninguna traza de qué identidad realizó cada consulta.
+
+#### Impacto
+
+* **Confidencialidad:** extracción masiva de datos personales y financieros.
+* **Integridad:** en `bedatacomanagment` y `bedocmanagement`, alteración y borrado de registros de terceros.
+* **Negocio:** el consentimiento de tratamiento de datos es prueba legal; su manipulación por terceros compromete la defensa del banco ante la autoridad de protección de datos.
+
+#### Remediación
+
+La autorización debe derivar del **principal autenticado**, nunca del parámetro.
+
+```java
+// Código vulnerable
+public ResponseEntity<WrapperCustomerPositionResponse> getCardPosition(..., String customerId, ...) {
+    return ResponseEntity.ok(channelServiceInputPort.getServices(customerId));
+}
+
+// Código recomendado
+public ResponseEntity<WrapperCustomerPositionResponse> getCardPosition(..., String customerId, ...) {
+    Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    authorizationService.assertCanAccessCustomer(jwt, customerId);   // 403 si no procede
+    return ResponseEntity.ok(channelServiceInputPort.getServices(customerId));
+}
+```
+
+Con el patrón recomendado para integraciones M2M:
+
+* **Consumidor delegado (actúa por un cliente concreto):** el `customer_id` no viaja como parámetro, se deriva del claim `sub` del token del usuario final propagado, o se valida contra él.
+* **Consumidor de sistema (batch, back-office):** exigir un `scope` específico (`credit_risk.read.all`) y registrar auditoría con `client_id` + objeto accedido en cada acceso.
+
+```java
+@Component
+@RequiredArgsConstructor
+public class CustomerAuthorizationService {
+
+  public void assertCanAccessCustomer(Jwt jwt, String customerId) {
+    List<String> scopes = jwt.getClaimAsStringList("scope");
+    if (scopes != null && scopes.contains("customer_position.read.all")) {
+      auditService.recordBulkAccess(jwt.getClaimAsString("client_id"), customerId);
+      return;
+    }
+    String subject = jwt.getClaimAsString("customer_id");
+    if (!Objects.equals(subject, customerId)) {
+      throw new BusinessException(HttpStatus.FORBIDDEN, List.of(Exceptions.TL0004));
+    }
+  }
+}
+```
+
+Añadir además tests que verifiquen que un token del cliente A recibe 403 al solicitar el objeto del cliente B.
+
+---
+
+### SEC-003 — Secretos de proveedores y de base de datos versionados en el repositorio
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-798 (Use of Hard-coded Credentials), CWE-540 (Inclusion of Sensitive Information in Source Code)
+**OWASP:** API8:2023 Security Misconfiguration
+**Proyecto/API:** beclaims, becreditrisk, becustombeprogrm, beemailboxes, beidentbiometric, bewatchscreening
+
+#### Ubicación
+
+```text
+cpe-nxhbsc-beclaims/src/main/resources/config/application-local.yml:19-21
+cpe-nxhbsc-becreditrisk/src/main/resources/config/application-local.yml:15-17, 23-26
+cpe-nxhbsc-becustombeprogrm/src/main/resources/config/application-local.yml:13-17, 24-29
+cpe-nxhbsc-beemailboxes/src/main/resources/config/application-local.yml:9-19
+cpe-nxhbsc-beemailboxes/src/main/resources/config/application-cert.yml:11-12, 18
+cpe-nxhbsc-beemailboxes/src/main/resources/config/application-pre.yml:11-12, 18
+cpe-nxhbsc-beemailboxes/src/main/java/.../infrastructure/constants/Constant.java:28
+cpe-nxhbsc-beidentbiometric/src/main/resources/config/application-local.yml:27-28
+cpe-nxhbsc-bewatchscreening/src/main/resources/config/application-local.yml:4-6
+cpe-nxhbsc-bedigitsignature/src/main/resources/config/application.yml (x-santander-client-id)
+```
+
+#### Descripción
+
+Se localizaron credenciales con apariencia de ser reales, versionadas como valores por defecto de `${VAR:default}`. **No se han utilizado ni validado.** Se listan enmascaradas:
+
+| Proyecto | Secreto | Ubicación | Valor (enmascarado) |
+| -------- | ------- | --------- | ------------------- |
+| beclaims | Password API Contáctanos | `application-local.yml:21` | `ApiB…####` (36 car.) |
+| beclaims | Usuario API Contáctanos | `application-local.yml:20` | `apib…aim` |
+| becreditrisk | Password RDS Postgres | `application-local.yml:17` | `Sx8F…KPxq` |
+| becreditrisk | Usuario RDS Postgres | `application-local.yml:16` | `admi…oper` |
+| becreditrisk | `client_secret` Modelica | `application-local.yml:25` | `kC?b…xrUP` (40 car.) |
+| becreditrisk | `client_id` Modelica | `application-local.yml:24` | `bwuY…nM5` |
+| becustombeprogrm | Clave AES (`aes.secret`) | `application-local.yml:14` | `9b7c…9d01` (64 hex) |
+| becustombeprogrm | Secreto JWT (`jwt.secret`) | `application-local.yml:17` | **idéntico al anterior** |
+| becustombeprogrm | Subscription key SKY | `application-local.yml:25` | `5cfc…1d2c` |
+| beemailboxes | `client_secret` correo Celmedia | `local/cert/pre.yml` | `86ec…8e6c` |
+| beemailboxes | **refresh_token OAuth2 Celmedia** | `local/cert/pre.yml` **y `Constant.java:28`** | `rMu4…OXsS1` |
+| beemailboxes | `client_id` OTP Celmedia | `local/cert/pre.yml` | `cli_…7c7d` |
+| beemailboxes | `client_secret` OTP Celmedia | `local/cert/pre.yml` | `sec_…d8c7` (64 hex) |
+| beidentbiometric | API key FacePhi | `application-local.yml:27` | `hAGV…M7hf` (40 car.) |
+| beidentbiometric | API key FacePhi (auth) | `application-local.yml:28` | `Xlap…ClPX` (40 car.) |
+| bewatchscreening | Secret key Gesintel | `application-local.yml:4` | `2074…97e1d` (UUID) |
+| bewatchscreening | Usuario Gesintel | `application-local.yml:5` | `serv…nder` |
+| bewatchscreening | Password Gesintel | `application-local.yml:6` | `3Kgp…rv1` |
+
+Tres agravantes:
+
+**(a) `beemailboxes` no usa variables de entorno en CERT ni PRE.** En los demás proyectos los secretos aparecen solo como *default* de una variable (`${VAR:valor}`), lo que al menos permite sobrescribirlos. Aquí están escritos como literales:
+
+```yaml
+# cpe-nxhbsc-beemailboxes/src/main/resources/config/application-cert.yml:9-21
+email:
+  client-id: da3996aa-…
+  client-secret: 86ecd30c-…          # literal, sin ${...}
+  refresh-token: rMu4uG24_…          # literal, sin ${...}
+otp:
+  client-id: cli_2663…
+  client-secret: sec_c66e…           # literal, sin ${...}
+```
+
+Los perfiles `cert` y `pre` **no pueden funcionar sin estos valores**, lo que indica que son los secretos operativos de esos entornos.
+
+**(b) El refresh token también está en código Java**, fuera de cualquier gestión de configuración:
+
+```java
+// cpe-nxhbsc-beemailboxes/.../infrastructure/constants/Constant.java:28
+public static final String REFRESH_VALUE = "rMu4uG24_…";
+```
+
+Un refresh token OAuth2 permite obtener access tokens indefinidamente hasta su revocación explícita.
+
+**(c) La clave AES y la clave de firma JWT son el mismo valor** en `becustombeprogrm` (ver SEC-023). Comprometer una compromete la otra.
+
+#### Source / Sink
+
+No aplica flujo de datos: la exposición se produce por el propio versionado. El sink es el historial de Git, cada clon local, cada runner de CI, cada imagen de contenedor y cada artefacto en el repositorio Maven.
+
+#### Escenario de explotación
+
+Cualquier persona con acceso de lectura al repositorio — o a un fork, a un backup, al historial tras una rotación de permisos, o a la imagen del contenedor — obtiene credenciales válidas de los proveedores de biometría, AML, riesgo crediticio, OTP y correo, y de la base de datos de riesgo crediticio. Con la API key de FacePhi se puede operar contra la plataforma de identidad al margen del banco; con el refresh token de Celmedia, generar OTP y enviar correo desde la infraestructura del proveedor.
+
+#### Impacto
+
+* **Confidencialidad:** compromiso de todas las integraciones enumeradas, incluida una base de datos con datos crediticios.
+* **Integridad:** capacidad de operar como el banco frente a proveedores de identidad y AML.
+* **Negocio:** notificación obligatoria a los proveedores, rotación coordinada y posible incidente reportable.
+
+#### Remediación
+
+Es un incidente, no solo un defecto de código. Secuencia:
+
+1. **Rotar de inmediato los 18 secretos listados**, coordinando con cada proveedor. Asumirlos comprometidos: han estado en un repositorio.
+2. **Purgar el historial de Git** (`git filter-repo`) o, si no es viable, rotar y documentar formalmente la exposición. Rotar es suficiente si se hace primero.
+3. **Eliminar los literales** y dejar únicamente la referencia sin valor por defecto, de forma que el arranque falle si falta el secreto:
+
+```yaml
+# Vulnerable
+password: ${SEC_CONTACTANOS_PASSWORD:ApiBook!…}
+
+# Recomendado
+password: ${SEC_CONTACTANOS_PASSWORD}
+```
+
+4. **Eliminar `Constant.REFRESH_VALUE`** y obtener el refresh token del gestor de secretos:
+
+```java
+// Código vulnerable
+public static final String REFRESH_VALUE = "rMu4uG24_…";
+
+// Código recomendado
+@ConfigurationProperties(prefix = "email")
+public record EmailProperties(String clientId, String clientSecret,
+                              String refreshToken, String urlSendMail, String uriApiToken) {}
+```
+
+5. Para desarrollo local, usar un `application-local.yml` **no versionado** (añadirlo a `.gitignore`) o un `.env` local, nunca valores por defecto en el árbol de fuentes.
+6. Habilitar detección de secretos en el pipeline (`gitleaks` / `trufflehog`) como *gate* bloqueante en el workflow `security.yml`, que hoy solo ejecuta el análisis reutilizable de imagen.
+
+---
+
+### SEC-004 — Validación de certificado TLS deshabilitada en todas las salidas
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-295 (Improper Certificate Validation), CWE-297 (Improper Validation of Certificate with Host Mismatch)
+**OWASP:** A02:2021 Cryptographic Failures
+**Proyecto/API:** beclaims, becreditrisk, becustombeprogrm, bedigitsignature, beidentbiometric, bewatchscreening, beemailboxes
+
+#### Ubicación
+
+```text
+beclaims          · WebClientConfig.java:52-54, 93-95
+becreditrisk      · WebClientConfig.java:73-74, 98-99
+becustombeprogrm  · WebClientConfig.java:23-25
+bedigitsignature  · WebClientConfig.java:78-79
+beidentbiometric  · WebClientConfig.java:53-54
+bewatchscreening  · WebClientConfig.java:50-51, 92-93
+beemailboxes      · RestTemplateConfig.java:31-42
+```
+
+#### Descripción
+
+Seis servicios construyen su `SslContext` con el trust manager de pruebas de Netty, que **acepta cualquier certificado**:
+
+```java
+// beidentbiometric/WebClientConfig.java:53-54
+var sslContext =
+    SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+```
+
+`beemailboxes` implementa lo mismo sobre Apache HttpClient 5 y **además desactiva la verificación de hostname**, con un comentario que confirma la intención:
+
+```java
+// beemailboxes/RestTemplateConfig.java:31-42
+// Equivalente a InsecureTrustManagerFactory.INSTANCE
+TrustStrategy trustStrategy = (chain, authType) -> true;
+
+SSLContext sslContext = SSLContexts.custom()
+        .loadTrustMaterial(null, trustStrategy)
+        .build();
+
+SSLConnectionSocketFactory sslSocketFactory =
+        new SSLConnectionSocketFactory(
+                sslContext,
+                NoopHostnameVerifier.INSTANCE
+        );
+```
+
+`(chain, authType) -> true` acepta cualquier cadena de certificación, incluidos certificados autofirmados o emitidos por una CA arbitraria. `NoopHostnameVerifier` elimina la comprobación de que el certificado corresponda al host solicitado.
+
+Sobre estos canales viajan: API keys de FacePhi, la API key de Zytrust, `client_secret` de Modellica, credenciales de Gesintel, credenciales de Contáctanos, tokens OAuth2 de Celmedia, imágenes faciales, documentos de identidad y PDFs contractuales.
+
+**Causa raíz probable y por qué la solución adoptada es incorrecta.** El diagrama muestra que la salida a terceros atraviesa `Transit Gateway → Firewall Norte → Netskope → Terceros`. Netskope es un Secure Web Gateway que realiza **inspección TLS**: termina la conexión, la reinspecciona y la vuelve a emitir con un certificado firmado por su propia CA. Un cliente que confíe únicamente en las CA públicas rechazará ese certificado con `PKIX path building failed`.
+
+Es casi seguro que ese error fue el motivo por el que se introdujo `InsecureTrustManagerFactory`. La solución correcta ante ese síntoma es **añadir la CA de Netskope al truststore**, no aceptar cualquier certificado: al hacer trust-all, el servicio pierde la capacidad de distinguir el MITM legítimo y autorizado de Netskope de cualquier otro MITM no autorizado en la ruta. El control corporativo de inspección queda intacto; lo que se pierde es toda garantía adicional.
+
+Agravante: los clientes salen además a través de un proxy HTTP (`proxy.sig.umbrella.com:443`), lo que suma otro punto de terminación en la cadena.
+
+#### Flujo
+
+```text
+Microservicio
+   ↓ HttpClient con trust-all + (beemailboxes) sin verificación de hostname
+Proxy corporativo
+   ↓
+Internet
+   ↓
+Proveedor externo (FacePhi / Zytrust / Modelica / Gesintel / Celmedia)
+```
+
+Cualquier nodo en esa ruta que pueda interceptar la conexión presenta su propio certificado y es aceptado.
+
+#### Source
+
+No aplica: es un defecto de configuración criptográfica, no un flujo de datos controlado por el atacante.
+
+#### Sink
+
+Toda comunicación TLS saliente de los siete servicios.
+
+#### Escenario de explotación
+
+Un atacante con posición de red (proxy comprometido, DNS envenenado, workload malicioso en el clúster, o un intermediario en el tránsito hacia el proveedor) presenta un certificado propio. El cliente lo acepta sin objeción, y el atacante obtiene en claro las credenciales del proveedor y los datos biométricos y documentales en tránsito, además de poder alterar las respuestas — por ejemplo, convertir un `liveness` fallido en satisfactorio.
+
+#### Impacto
+
+* **Confidencialidad:** exposición en tránsito de credenciales y de datos biométricos y documentales.
+* **Integridad:** manipulación de las respuestas de los proveedores de identidad y AML, con impacto directo en decisiones de onboarding y de riesgo.
+* **Cumplimiento:** anula el propósito del cifrado en tránsito exigido por la normativa interna.
+
+#### Remediación
+
+Eliminar el trust-all y usar el almacén de confianza del sistema (que ya contiene la CA corporativa en la imagen base) o un truststore explícito:
+
+```java
+// Código vulnerable
+var sslContext =
+    SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+
+HttpClient httpClient = HttpClient.create()
+        .secure(t -> t.sslContext(sslContext)
+                      .handlerConfigurator((SslHandler sslHandler) -> {}));  // desactiva el hostname check
+```
+
+```java
+// Código recomendado
+@Bean
+public HttpClient httpClient(SslProperties props) throws Exception {
+  KeyStore trustStore = KeyStore.getInstance("PKCS12");
+  try (InputStream in = Files.newInputStream(Path.of(props.trustStorePath()))) {
+      trustStore.load(in, props.trustStorePassword().toCharArray());
+  }
+  TrustManagerFactory tmf =
+      TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+  tmf.init(trustStore);
+
+  SslContext sslContext = SslContextBuilder.forClient()
+          .trustManager(tmf)
+          .protocols("TLSv1.3", "TLSv1.2")
+          .build();
+
+  return HttpClient.create()
+          .secure(spec -> spec.sslContext(sslContext));   // sin handlerConfigurator vacío:
+                                                          // conserva la verificación de hostname
+}
+```
+
+Para `beemailboxes`:
+
+```java
+// Código recomendado
+SSLContext sslContext = SSLContexts.createSystemDefault();
+SSLConnectionSocketFactory sslSocketFactory =
+        new SSLConnectionSocketFactory(sslContext, HttpsSupport.getDefaultHostnameVerifier());
+```
+
+Nota sobre `handlerConfigurator((SslHandler sslHandler) -> {})`: en Reactor Netty ese lambda vacío **reemplaza** la configuración por defecto que activa `HTTPS` endpoint identification. Debe eliminarse aunque se corrija el trust manager.
+
+**Truststore recomendado para este entorno:** construir en la imagen del contenedor un truststore que contenga (a) las CA públicas del sistema y (b) **la CA de inspección de Netskope** y la del proxy corporativo. Con eso, la validación queda activa y las conexiones inspeccionadas se aceptan legítimamente:
+
+```dockerfile
+# Dockerfile — recomendado (capa adicional sobre la imagen base corporativa)
+COPY --chown=java:java certs/netskope-ca.pem /tmp/netskope-ca.pem
+RUN keytool -importcert -noprompt -trustcacerts \
+      -alias netskope-ca -file /tmp/netskope-ca.pem \
+      -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit \
+ && rm /tmp/netskope-ca.pem
+```
+
+Si algún proveedor usa además un certificado emitido por una CA privada propia, importarla igualmente. Si el requisito es mTLS, configurar `keyManager` con el certificado de cliente — nunca desactivar la validación del servidor.
+
+Añadir una regla de calidad que falle el build ante `InsecureTrustManagerFactory`, `NoopHostnameVerifier` o `TrustStrategy` permisiva.
+
+---
+
+### SEC-005 — Bypass del segundo factor: validación de OTP sin vínculo al usuario, sin límite de intentos y con el código en el path y en los logs
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-304 (Missing Critical Step in Authentication), CWE-307 (Improper Restriction of Excessive Authentication Attempts), CWE-532 (Insertion of Sensitive Information into Log File), CWE-598 (Use of GET Request Method With Sensitive Query Strings)
+**OWASP:** API2:2023 Broken Authentication
+**Proyecto/API:** cpe-nxhbsc-beemailboxes
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-beemailboxes/src/main/java/.../infrastructure/adapters/output/OTPServiceAdapter.java
+Clase:   OTPServiceAdapter
+Metodos: validCode(String, WrapperRequestClassifyEmails)  · lineas 60-70
+         generateValidateOtp(String)                      · lineas 72-80
+         sendMailing(WrapperRequestSendEmail, String)      · lineas 89-118
+Archivo: cpe-nxhbsc-beemailboxes/src/main/java/.../infrastructure/adapters/input/rest/EmailboxIdApiDelegateImpl.java:50-56
+Archivo: cpe-nxhbsc-beemailboxes/src/main/java/.../infrastructure/client/XmlApiClient.java:44,47
+Contrato: cpe-nxhbsc-beemailboxes/src/main/resources/openapi.yaml — POST /{emailbox_id}/emails/{email_id}/classify_email
+```
+
+#### Descripción
+
+Cuatro defectos concurrentes rompen el segundo factor.
+
+**(1) La validación no vincula el OTP con ningún usuario ni sesión.**
+
+```java
+// OTPServiceAdapter.java:60-80
+@Override
+public WrapperClassifyEmail validCode(String otp, WrapperRequestClassifyEmails criteria) {
+
+    String status = jsonApiClient.validOTP(generateValidateOtp(otp));
+
+    if (status != null) {
+        return generateResponsseValidCode(StatusInfo.StatusCodeEnum.PROCESSED);
+    } else {
+        return generateResponsseValidCode(StatusInfo.StatusCodeEnum.ERROR);
+    }
+}
+
+private ValidateOtpRequest generateValidateOtp(String otp){
+    String uuid = "";
+    var optionalEntity = repository.getByKey(otp,null);
+    if(optionalEntity.isEmpty()){
+        return new ValidateOtpRequest();       // <-- sigue llamando al proveedor con request vacío
+    }
+    uuid = optionalEntity.get(0).getId();
+    return new ValidateOtpRequest(uuid, otp);
+}
+```
+
+El OTP es la *partition key* de la tabla DynamoDB. Se busca el código, se recupera **el `uuid` que le corresponda a quien sea**, y se valida esa pareja. El `criteria` recibido no se usa. No hay identidad, contrato, sesión ni destinatario contra el que contrastar: **un OTP válido de cualquier usuario sirve para superar la validación de cualquier operación**.
+
+**(2) La condición de éxito es `status != null`.**
+
+`validOTP` devuelve `response.getBody().getMessage()` — un texto del proveedor:
+
+```java
+// JsonApiClient.java:59-76
+public String validOTP(ValidateOtpRequest request){
+    ...
+    ResponseEntity<ValidateOtpResponse> response = restTemplate.postForEntity(
+            otpProperties.getValidateUrl(),entity, ValidateOtpResponse.class);
+    return Objects.requireNonNull(response.getBody()).getMessage();
+}
+```
+
+Cualquier `message` no nulo — incluido `"OTP inválido"` o `"expirado"` — produce `PROCESSED`. La validación no comprueba un código de resultado, comprueba que el proveedor haya respondido algo.
+
+**(3) El OTP viaja en la ruta de la URL.**
+
+```java
+// EmailboxIdApiDelegateImpl.java:50-56
+@Override
+public ResponseEntity<WrapperClassifyEmail> createEmailboxEmailClassify(String emailboxId,
+                                                                 String emailId,
+                                                                 WrapperRequestClassifyEmails criteria) {
+    return ResponseEntity.ok(emailboxIdInputPort
+            .validCode(emailId, criteria));      // emailId (path variable) ES el OTP
+}
+```
+
+La ruta es `POST /v1/emailboxes/{emailbox_id}/emails/{email_id}/classify_email`. El parámetro documentado como identificador de correo es en realidad el código de un solo uso. Las URLs se registran en los access logs del ingress, del API Gateway, del proxy y en las trazas de APM.
+
+**(4) El OTP se escribe en claro en los logs, dos veces.**
+
+```java
+// OTPServiceAdapter.java:98-114
+log.info("Antes de generar OTP: {}", uuid);
+String otp = jsonApiClient.generarOTP(uuid);
+log.info("OTP generado: {}",otp);                    // <-- OTP en claro
+repository.putIfAbsent(new OtpEntity(uuid,otp));
+requestOTP = setearOtp(requestOTP, otp);
+...
+log.info("Antes de enviar correo: {}", requestOTP);   // <-- OTP + destinatario
+```
+
+```java
+// XmlApiClient.java:44,47
+log.info("antes de llamar al api: {}", entity.getBody());   // XML completo con el OTP
+log.info("despues de llamar al api: {}", response.getBody());
+```
+
+`RequestOTP` es un `@Data` de Lombok, por lo que `{}` imprime todos sus campos, incluida la personalización que contiene el código concatenado (`setearOtp`, líneas 155-162) y el correo del destinatario.
+
+**(5) No hay límite de intentos ni de generación.** No existe contador de intentos fallidos, bloqueo, ni rate limiting (SEC-019). Y el endpoint que **genera** el OTP y envía el correo tampoco está autenticado (SEC-001).
+
+#### Flujo
+
+```text
+POST /v1/emailboxes/{emailbox_id}/send_email   (sin autenticación)
+   ↓
+OTPServiceAdapter.sendMailing(..., flow="otp")
+   ↓  genera OTP en Celmedia, lo persiste en DynamoDB con el OTP como PK,
+      lo escribe en el log y lo envía por correo
+   ↓
+POST /v1/emailboxes/{id}/emails/{OTP}/classify_email   (sin autenticación)
+   ↓
+OTPServiceAdapter.validCode(otp, criteria)
+   ↓  repository.getByKey(otp)  ← sin comprobar de quién es el OTP
+   ↓  jsonApiClient.validOTP(...)  →  message != null
+   ↓
+StatusCodeEnum.PROCESSED
+```
+
+#### Source
+
+* `email_id` (path variable) — el código OTP, totalmente controlado por el solicitante.
+* Cuerpo de `send_email` — destinatario del correo, controlado por el solicitante.
+
+#### Sink
+
+Respuesta `PROCESSED` que el consumidor interpreta como segundo factor superado; y persistencia/envío del OTP.
+
+#### Escenario de explotación
+
+Tres vías, todas viables:
+
+* **Reutilización cruzada.** El atacante solicita un OTP para su propia dirección de correo mediante `send_email` (endpoint no autenticado), lo recibe, y lo presenta en `classify_email` para autorizar una operación asociada a otra persona. El código no comprueba a quién pertenece el OTP.
+* **Fuerza bruta.** Los códigos residen en una tabla indexada por el propio código. Sin límite de intentos ni rate limiting, un barrido concurrente encuentra códigos activos de otros usuarios.
+* **Lectura de logs.** Quien tenga acceso al agregador de logs (equipos de soporte, observabilidad, o cualquier compromiso de esa plataforma) lee los OTP en claro conforme se generan, en tiempo real.
+
+#### Impacto
+
+* **Integridad / negocio:** anulación del segundo factor. Cualquier operación que dependa de esta validación queda autorizable por un tercero.
+* **Confidencialidad:** OTP, direcciones de correo y contenido de los mensajes expuestos en logs.
+* **Disponibilidad y coste:** generación ilimitada de OTP y correos contra la cuota del proveedor, y uso de la infraestructura del banco para enviar correo a destinatarios arbitrarios.
+
+#### Remediación
+
+Rediseño del flujo. Los cuatro cambios son necesarios; ninguno basta por sí solo.
+
+**1. Vincular el OTP a una operación y a un sujeto.** La clave debe ser el identificador de la operación, no el código:
+
+```java
+// Código vulnerable
+var optionalEntity = repository.getByKey(otp, null);   // busca POR el OTP
+uuid = optionalEntity.get(0).getId();
+
+// Código recomendado
+@Override
+public WrapperClassifyEmail validCode(String transactionId, String otp, String subjectId) {
+    OtpEntity entity = repository.getByKey(transactionId, null)          // PK = transactionId
+            .orElseThrow(() -> new BusinessException(HttpStatus.UNAUTHORIZED, List.of(Exceptions.TL0003)));
+
+    if (!Objects.equals(entity.getSubjectId(), subjectId)) {             // el OTP es de otro
+        throw new BusinessException(HttpStatus.FORBIDDEN, List.of(Exceptions.TL0004));
+    }
+    if (entity.getAttempts() >= MAX_ATTEMPTS || Instant.now().isAfter(entity.getExpiresAt())) {
+        repository.invalidate(transactionId);
+        throw new BusinessException(HttpStatus.UNAUTHORIZED, List.of(Exceptions.TL0003));
+    }
+    repository.incrementAttempts(transactionId);
+
+    ValidateOtpResponse result = jsonApiClient.validOTP(new ValidateOtpRequest(entity.getId(), otp));
+    if (!result.isValid()) {                                             // código de resultado, no != null
+        return generateResponsseValidCode(StatusInfo.StatusCodeEnum.ERROR);
+    }
+    repository.consume(transactionId);                                   // un solo uso
+    return generateResponsseValidCode(StatusInfo.StatusCodeEnum.PROCESSED);
+}
+```
+
+**2. Sacar el OTP del path.** Debe viajar en el cuerpo de un `POST`, y el contrato debe corregirse:
+
+```yaml
+# openapi.yaml — recomendado
+/otp/{transaction_id}/verify:
+  post:
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [code]
+            properties:
+              code:
+                type: string
+                pattern: '^[0-9]{6,8}$'
+                maxLength: 8
+```
+
+**3. Eliminar el OTP de los logs.**
+
+```java
+// Código vulnerable
+log.info("OTP generado: {}",otp);
+log.info("Antes de enviar correo: {}", requestOTP);
+
+// Código recomendado
+log.info("OTP generado para transactionId={} (destinatario enmascarado: {})",
+         transactionId, mask(recipient));
+```
+
+Y en `XmlApiClient`, sustituir el volcado del cuerpo por metadatos:
+
+```java
+// Código recomendado
+log.debug("Envío a proveedor: transactionId={}, bytes={}", transactionId, xmlBody.length());
+```
+
+**4. Aplicar límites**: intentos por transacción (3-5), generación por sujeto y por ventana temporal, y expiración corta (TTL de DynamoDB). Ver SEC-019.
+
+---
+
+### SEC-006 — Callback del flujo de firma digital dirigido a `webhook.site` y token de callback literal `jwt`
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-200 (Exposure of Sensitive Information to an Unauthorized Actor), CWE-306, CWE-798, CWE-1188
+**OWASP:** API8:2023 Security Misconfiguration · API2:2023 Broken Authentication
+**Proyecto/API:** cpe-nxhbsc-bedigitsignature
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-bedigitsignature/src/main/java/.../infrastructure/utils/Constant.java
+Lineas:  64-65
+Archivo: cpe-nxhbsc-bedigitsignature/src/main/java/.../infrastructure/adapters/output/DocumentProcessService.java
+Metodo:  buildSignatureRequest(String, String, ApplicationSignatureRequest, String)
+Lineas:  64-73, 87-109
+Archivo: cpe-nxhbsc-bedigitsignature/src/main/java/.../infrastructure/utils/JwtUtil.java:30-47
+```
+
+#### Descripción
+
+Dos defectos en el mismo punto del flujo de firma.
+
+**(a) La URL de callback apunta a un servicio público de terceros.**
+
+```java
+// Constant.java:64-65
+public static final String CALLBACK = "https://webhook.site/#!/view/b9857938-cd5d-4a17-8387-7f2d1fbe8e29";
+public static final String HEADERS = "Authorization=Bearer jwt;Content-Type=application/json";
+```
+
+`webhook.site` es un servicio gratuito de captura de webhooks para pruebas. Esta URL se envía al proveedor de firma en cada solicitud.
+
+**El diagrama de arquitectura confirma la gravedad de dos formas.** Primera: la salida hacia terceros pasa por `Firewall Norte → Netskope`, de modo que las peticiones que registran este callback ante el proveedor atraviesan y quedan registradas en el control de navegación corporativo con destino a un dominio de captura pública. Segunda, y más relevante: **el diagrama no contempla ninguna ruta de entrada desde los proveedores hacia el VPC** — todas las flechas hacia terceros son salientes. No existe un endpoint de callback publicado en el API Gateway para recibir la notificación de firma. Es decir, el flujo de firma digital **no tiene diseñado su camino de retorno**, y el código lo ha rellenado provisionalmente con un servicio de pruebas de terceros que quedó en el árbol productivo.
+
+La URL se envía al proveedor de firma en cada solicitud:
+
+```java
+// DocumentProcessService.java:64-73
+private Signer buildSignatureRequest(String documentId, String document,
+                                     ApplicationSignatureRequest client, String jwt) {
+    String headers = Constant.HEADERS.replace("JWT",jwt);
+    List<String> signature = List.of(client.getNombre(),client.getApellido(),client.getDni());
+    ApplicationSignDocumentRequestInner docIten = client.getDocumentos().stream()
+            .filter(doc->documentId.equals(doc.getIdDocumento())).findFirst().get();
+    return new Signer(document, docIten.getPage(), docIten.getPosition(),
+                      signature, Constant.CALLBACK, headers);
+}
+```
+
+El proveedor enviará la notificación de firma completada —con el identificador del documento, el estado y los datos que el proveedor incluya— a un endpoint fuera del control del banco. La URL contiene además un fragmento `#!/view/...`, propio de la interfaz web del servicio, no de su endpoint de recepción: la notificación no llegará a ningún sistema del banco, con lo que el flujo también queda funcionalmente incompleto.
+
+**(b) El token del callback nunca se sustituye.**
+
+`Constant.HEADERS` contiene el marcador en minúsculas (`Bearer jwt`) pero `replace` busca la cadena en mayúsculas (`"JWT"`). La cadena `"JWT"` no aparece en `"Authorization=Bearer jwt;Content-Type=application/json"`, por lo que **`replace` no sustituye nada** y el header enviado al proveedor es literalmente:
+
+```text
+Authorization=Bearer jwt
+```
+
+El JWT que sí se genera (`jwtUtil.generateToken()`, línea 87) nunca se transmite: solo se persiste en DynamoDB (línea 107) y se escribe en el log (línea 106, ver SEC-007).
+
+Añadido: aunque el bug se corrigiera, el token tendría **20 segundos de validez** pese a que el comentario indica una hora:
+
+```java
+// JwtUtil.java:38-39
+long now = System.currentTimeMillis();
+long expiration = now + 1000 * 20; // 1 hora
+```
+
+Un callback de firma se dispara cuando la persona firma, lo que puede tardar minutos u horas. El token estaría siempre expirado.
+
+#### Flujo
+
+```text
+POST /v1/signature/signer  (sin autenticación, SEC-001)
+   ↓
+DocumentProcessService.signtureDocument()
+   ↓
+buildSignatureRequest()  →  callbackUrl = https://webhook.site/…
+                            callbackHeaders = "Authorization=Bearer jwt"
+   ↓
+SignatureClient.signDocument()  →  POST {FACEPHI_BASE_URL}/signer
+   ↓
+Proveedor de firma almacena el callback y, al completarse la firma,
+notifica a webhook.site con un bearer trivial
+```
+
+#### Source
+
+Configuración estática del código (`Constant.CALLBACK`, `Constant.HEADERS`).
+
+#### Sink
+
+Petición HTTP saliente hacia el proveedor de firma, que registra el callback; y posteriormente la notificación del proveedor hacia el dominio de terceros.
+
+#### Escenario de explotación
+
+Quien conozca el identificador del webhook —presente en el repositorio— accede al panel público de `webhook.site` y observa las notificaciones de firma de documentos contractuales del banco: identificadores de documento, lotes, estados y cualquier metadato que el proveedor incluya. La URL es un UUID, pero está publicada en el código fuente, de modo que no ofrece protección alguna.
+
+En sentido inverso, si el flujo se corrigiera para apuntar a un endpoint real del banco manteniendo `Bearer jwt` como credencial, **cualquiera podría invocar el callback** y declarar documentos como firmados: el token es una constante conocida.
+
+#### Impacto
+
+* **Confidencialidad:** metadatos de operaciones de firma de contratos enviados a un servicio público de terceros.
+* **Integridad:** el flujo de firma no cierra correctamente; y el esquema de autenticación del callback es nulo.
+* **Negocio:** un proceso con valor probatorio (firma electrónica de contratos) depende de una infraestructura de pruebas ajena.
+
+#### Remediación
+
+```java
+// Código vulnerable
+public static final String CALLBACK = "https://webhook.site/#!/view/b9857938-…";
+public static final String HEADERS  = "Authorization=Bearer jwt;Content-Type=application/json";
+...
+String headers = Constant.HEADERS.replace("JWT", jwt);
+```
+
+```java
+// Código recomendado — properties externalizadas
+@ConfigurationProperties(prefix = "clients.signature")
+public record SignatureApiProperties(
+        String baseUrl,
+        String xApiKey,
+        String callbackUrl,       // endpoint propio del banco, por entorno
+        Integer callbackTtlSeconds
+) {}
+```
+
+```java
+// Código recomendado — construcción del header sin marcadores frágiles
+private Signer buildSignatureRequest(String documentId, String document,
+                                     ApplicationSignatureRequest client, String jwt) {
+
+    String headers = "Authorization=Bearer " + jwt + ";Content-Type=application/json";
+
+    ApplicationSignDocumentRequestInner docItem = client.getDocumentos().stream()
+            .filter(doc -> documentId.equals(doc.getIdDocumento()))
+            .findFirst()
+            .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST,
+                                                     List.of(Exceptions.TL0002)));   // ver SEC-028
+
+    return new Signer(document, docItem.getPage(), docItem.getPosition(),
+                      List.of(client.getNombre(), client.getApellido(), client.getDni()),
+                      properties.callbackUrl(), headers);
+}
+```
+
+```java
+// Código recomendado — JWT de callback con vida útil realista y claims verificables
+public String generateCallbackToken(String loteId, String documentId) {
+    Instant now = Instant.now();
+    return Jwts.builder()
+            .issuer("cpe-nxhbsc-bedigitsignature")
+            .audience().add("signature-callback").and()
+            .subject(loteId)
+            .id(UUID.randomUUID().toString())               // jti, para anti-replay
+            .claim("documentId", documentId)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(now.plus(properties.callbackTtlSeconds(), ChronoUnit.SECONDS)))
+            .signWith(secretKey, Jwts.SIG.HS256)
+            .compact();
+}
+```
+
+Y adicionalmente:
+
+1. **Diseñar y publicar la ruta de entrada del callback**, hoy ausente en la arquitectura: exponer un endpoint dedicado en el API Gateway (por ejemplo `/v1/signature/callback`), protegido por Imperva y el WAF como el resto del tráfico entrante, y con una política de origen restringida a los rangos IP del proveedor de firma.
+2. Implementar ese endpoint **validando la firma del JWT, `iss`, `aud`, `exp` y `jti`** (rechazando `jti` ya consumidos — ver SEC-037). El registro en DynamoDB debe pasar de indexarse por el JWT (SEC-031) a indexarse por `loteId`, y el callback debe localizar el lote por el `sub` del token, no por el token en sí.
+3. Externalizar `callbackUrl` por entorno y prohibir por política dominios de terceros en su valor.
+4. Añadir una regla de calidad que impida literales de dominios públicos de pruebas (`webhook.site`, `requestbin`, `ngrok`, `pipedream`) en el código.
+5. Mientras el endpoint no exista, **el flujo de firma no debe considerarse operativo**: hoy no hay forma de que el banco se entere de que un documento fue firmado.
+
+---
+
+### SEC-007 — Credenciales, tokens de acceso y clave criptográfica escritos en los logs
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-532 (Insertion of Sensitive Information into Log File), CWE-522
+**OWASP:** API8:2023 Security Misconfiguration
+**Proyecto/API:** beclaims, becreditrisk, becustombeprogrm, bedigitsignature
+
+#### Ubicación
+
+```text
+beclaims          · TokenService.java:50                 · log.warn("authRequest: {}", authRequest.toString())
+becreditrisk      · TokenService.java:87                 · log.warn("CachedToken valid: {}", cachedToken.toString())
+becustombeprogrm  · AesEncryptionService.java:33         · log.info("... method={}", transformation, aesProperties.getSecret())
+bedigitsignature  · DocumentProcessService.java:106      · log.info("Antes de guardar en DynamoDB: jwt = {}, ...", jwt, loteId)
+```
+
+#### Descripción
+
+Cuatro fugas distintas, todas confirmadas por el efecto de las anotaciones Lombok en los DTO implicados.
+
+**(a) Contraseña de integración de Contáctanos (beclaims).**
+
+```java
+// TokenService.java:45-50
+private synchronized void refreshToken(){
+    if(cachedToken!= null){ return; }
+    var authRequest = buildAuthRequest();
+    log.warn("authRequest: {}", authRequest.toString());
+```
+
+```java
+// AuthRequest.java:16-27
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
+@ToString                                   // <-- genera toString() con todos los campos
+public class AuthRequest {
+    @JsonProperty(value = "User")        private String user;
+    @JsonProperty(value = "Contrasenia") private String password;
+}
+```
+
+`@ToString` sin `@ToString.Exclude` produce `AuthRequest(user=…, password=…)`. La contraseña queda en el log en cada renovación de token, en nivel `WARN` (siempre activo con `root: WARN`).
+
+**(b) Access token OAuth2 de Modelica (becreditrisk).**
+
+```java
+// TokenService.java:83-87
+cachedToken =
+    new CachedToken(
+        tokenResponse.getToken(), Instant.now().plusSeconds(tokenResponse.getExpiresIn() - 30));
+
+log.warn("CachedToken valid: {}", cachedToken.toString());
+```
+
+```java
+// CachedToken.java:8-13
+@Data                        // <-- @Data incluye @ToString
+@AllArgsConstructor
+public class CachedToken {
+  private String accessToken;
+  private Instant expirationTime;
+}
+```
+
+El bearer completo del motor de riesgo crediticio se escribe en el log, junto con su momento de expiración — lo que indica al lector exactamente durante cuánto tiempo es utilizable.
+
+**(c) Clave AES de cifrado del payload (becustombeprogrm).**
+
+```java
+// AesEncryptionService.java:31-35
+public String encrypt(String value){
+    String transformation = resolveTransformation();
+    log.info("Iniciando encriptacion de payload. alg={}, method={}", transformation, aesProperties.getSecret());
+```
+
+El mensaje tiene dos marcadores `{}` y se pasan dos argumentos: el segundo, rotulado como `method`, es en realidad `aesProperties.getSecret()` — la clave AES en hexadecimal. Se registra en cada cifrado. Y por SEC-023, esa misma clave es el secreto de firma JWT del servicio.
+
+**(d) JWT de callback de firma (bedigitsignature).**
+
+```java
+// DocumentProcessService.java:105-109
+private Mono<String> saveDynamo(String loteId, String jwt, String documentId,String status){
+    log.info("Antes de guardar en DynamoDB: jwt = {}, loteId = {} ", jwt,loteId);
+    repository.putIfAbsent(new Entity(jwt,documentId,loteId,status));
+    return Mono.just("data guardado");
+}
+```
+
+#### Flujo
+
+```text
+Operación de negocio
+   ↓
+TokenService / AesEncryptionService / DocumentProcessService
+   ↓
+SLF4J → formato GLUONLOG → stdout del contenedor
+   ↓
+Agregador de logs corporativo (retención prolongada, acceso amplio)
+```
+
+#### Source
+
+No aplica: los valores provienen de la configuración interna, no de entrada del atacante. El vector es el acceso a los registros.
+
+#### Sink
+
+Sistema de logs centralizado.
+
+#### Escenario de explotación
+
+Cualquier persona con acceso de lectura al agregador de logs —perfil habitualmente concedido de forma amplia a desarrollo, soporte y observabilidad, y objetivo frecuente en un compromiso— extrae con una consulta simple la contraseña de Contáctanos, los bearer de Modelica, la clave AES y los JWT de firma. No requiere acceso al repositorio ni a los pods.
+
+Adicionalmente, los logs se conservan típicamente mucho más que la vida útil de un token, y sobreviven a la rotación de credenciales si esta no va acompañada de una purga.
+
+#### Impacto
+
+* **Confidencialidad:** compromiso de credenciales de integración y de material criptográfico.
+* **Integridad:** con la clave AES/JWT de `becustombeprogrm` es posible falsificar tokens hacia SKY y descifrar/forjar payloads.
+* **Cumplimiento:** almacenamiento de secretos en sistemas de registro, fuera del ámbito del gestor de secretos.
+
+#### Remediación
+
+```java
+// Código vulnerable (beclaims)
+log.warn("authRequest: {}", authRequest.toString());
+
+// Código recomendado — no registrar el objeto; y excluir el campo en el DTO
+log.debug("Solicitando token de Contáctanos para el usuario configurado");
+```
+
+```java
+// AuthRequest.java — recomendado
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
+@ToString
+public class AuthRequest {
+    @JsonProperty(value = "User")        private String user;
+    @ToString.Exclude                                    // <-- nunca en toString()
+    @JsonProperty(value = "Contrasenia") private String password;
+}
+```
+
+```java
+// Código vulnerable (becreditrisk)
+log.warn("CachedToken valid: {}", cachedToken.toString());
+
+// Código recomendado
+log.debug("Token renovado, expira en {}s",
+          Duration.between(Instant.now(), cachedToken.getExpirationTime()).toSeconds());
+```
+
+```java
+// CachedToken.java — recomendado
+@Data @AllArgsConstructor
+public class CachedToken {
+  @ToString.Exclude
+  private String accessToken;
+  private Instant expirationTime;
+}
+```
+
+```java
+// Código vulnerable (becustombeprogrm)
+log.info("Iniciando encriptacion de payload. alg={}, method={}", transformation, aesProperties.getSecret());
+
+// Código recomendado
+log.debug("Iniciando cifrado de payload. alg={}", transformation);
+```
+
+```java
+// Código vulnerable (bedigitsignature)
+log.info("Antes de guardar en DynamoDB: jwt = {}, loteId = {} ", jwt, loteId);
+
+// Código recomendado
+log.info("Persistiendo estado de firma. loteId={}, documentId={}", loteId, documentId);
+```
+
+Medidas transversales:
+
+1. Prohibir por convención el registro de objetos DTO completos; registrar campos concretos y no sensibles.
+2. Añadir `@ToString.Exclude` a todo campo que contenga credenciales, tokens o datos personales, y revisar el uso de `@Data` en DTO de seguridad.
+3. Configurar un *masking converter* en el appender GLUONLOG que redacte patrones conocidos (`Bearer\s+[A-Za-z0-9._-]+`, claves hexadecimales largas) como defensa en profundidad.
+4. Rotar los secretos ya expuestos en logs (coincide con SEC-003) y purgar los índices de log correspondientes.
+
+---
+
+### SEC-008 — Datos personales reales de clientes versionados en `data.sql`
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-359 (Exposure of Private Personal Information), CWE-540
+**OWASP:** API3:2023 Broken Object Property Level Authorization (exposición de datos)
+**Proyecto/API:** cpe-nxhbsc-becreditrisk
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-becreditrisk/src/main/resources/data.sql
+Lineas:  1-54
+Tabla:   CREDIT_RISK
+```
+
+#### Descripción
+
+El fichero contiene 54 sentencias `INSERT` con registros de riesgo crediticio que presentan todas las características de datos productivos: números de documento reales, código de tipo de documento (171), periodo (202603) y clasificaciones de riesgo del negocio. Ejemplos (documentos parcialmente enmascarados):
+
+```sql
+INSERT INTO CREDIT_RISK (PERIODO, COD_TIPO_DOCUMENTO, NRO_DOCUMENTO, COD_CMA, REF_CMA)
+VALUES (202603,171,'11274**','RCH_0002','UPLA - PLAFT');
+
+INSERT INTO CREDIT_RISK (PERIODO, COD_TIPO_DOCUMENTO, NRO_DOCUMENTO, COD_CMA, REF_CMA)
+VALUES (202603,171,'52377**','RCH_0001','UPLA - PEP');
+
+INSERT INTO CREDIT_RISK (PERIODO, COD_TIPO_DOCUMENTO, NRO_DOCUMENTO, COD_CMA, REF_CMA)
+VALUES (202603,171,'18820**','CMA_0012','Castigo, Deficiente o Peor en los últimos 48 meses');
+```
+
+La combinación de número de documento con marcas `UPLA - PLAFT` (prevención de lavado de activos), `UPLA - PEP` (persona expuesta políticamente) y clasificación de deuda constituye **dato personal sensible de la categoría más protegida**: asocia a una persona identificable con una sospecha de riesgo financiero o con exposición política.
+
+No son datos sintéticos plausibles: los identificadores tienen longitudes variables y realistas y las clasificaciones corresponden a la taxonomía interna real (`CMA_0004`, `CMA_0010`, `CMA_0012`, `RCH_0001`, `RCH_0002`).
+
+Aunque `spring.sql.init` no está activo en el perfil `pro` de este proyecto (`ddl-auto: validate` en los cuatro perfiles), **el problema no es la ejecución sino la presencia del fichero en el repositorio**, en el JAR y en la imagen del contenedor: el recurso está bajo `src/main/resources`, por lo que se empaqueta en todos los artefactos.
+
+#### Flujo
+
+```text
+data.sql (src/main/resources)
+   ↓ versionado en Git → historial, clones, forks, backups
+   ↓ empaquetado en el JAR → imagen de contenedor → registro de imágenes
+   ↓ accesible a cualquiera con acceso al repo, al artefacto o a la imagen
+```
+
+#### Source / Sink
+
+No aplica flujo de datos de atacante. La exposición es directa por el propio versionado.
+
+#### Escenario de explotación
+
+Cualquier persona con acceso de lectura al repositorio, al artefacto Maven o a la imagen del contenedor obtiene un listado nominal (por documento) de personas marcadas como PEP o con alertas PLAFT. Esa información tiene valor directo para fraude dirigido, ingeniería social y extorsión, y su divulgación desde el banco constituye una brecha notificable.
+
+#### Impacto
+
+* **Confidencialidad:** exposición de datos personales de categoría sensible.
+* **Cumplimiento:** infracción de la Ley 29733 de Protección de Datos Personales (Perú) y de la normativa interna de tratamiento de datos; posible obligación de notificación a la Autoridad Nacional de Protección de Datos Personales.
+* **Reputacional:** alto, por la naturaleza PEP/PLAFT de los registros.
+
+#### Remediación
+
+1. **Eliminar `data.sql` del repositorio** y purgarlo del historial (`git filter-repo --path src/main/resources/data.sql --invert-paths`), o registrar formalmente la exposición si la purga no es viable.
+2. Sustituirlo por datos sintéticos, con documentos claramente inválidos y en un fichero de **test**, nunca en `src/main/resources`:
+
+```sql
+-- src/test/resources/data-test.sql  (recomendado)
+INSERT INTO CREDIT_RISK (PERIODO, COD_TIPO_DOCUMENTO, NRO_DOCUMENTO, COD_CMA, REF_CMA)
+VALUES (202601, 171, '00000001', 'CMA_0012', 'Clasificación de prueba');
+INSERT INTO CREDIT_RISK (PERIODO, COD_TIPO_DOCUMENTO, NRO_DOCUMENTO, COD_CMA, REF_CMA)
+VALUES (202601, 171, '00000002', 'RCH_0001', 'Clasificación de prueba');
+```
+
+3. Restringir el empaquetado en el `pom.xml` para que los datos de prueba no lleguen nunca al artefacto:
+
+```xml
+<resource>
+  <directory>${project.basedir}/src/main/resources</directory>
+  <excludes>
+    <exclude>data.sql</exclude>
+  </excludes>
+</resource>
+```
+
+4. Añadir al pipeline una comprobación que bloquee ficheros con patrones de datos personales (documentos, correos, teléfonos) en `src/main/resources`.
+5. Escalar el hallazgo al Delegado de Protección de Datos para su evaluación como posible incidente.
+
+---
+
+### SEC-009 — Credenciales transmitidas por HTTP en claro hacia Contáctanos
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-319 (Cleartext Transmission of Sensitive Information)
+**OWASP:** A02:2021 Cryptographic Failures
+**Proyecto/API:** cpe-nxhbsc-beclaims
+
+> **Calibración con la arquitectura.** Evaluado solo desde el código, este hallazgo parecía Critical (credenciales en claro hacia una IP pública). El diagrama muestra que la ruta hacia Contáctanos es `Transit Gateway → Firewall Sur → GSNET → Sistemas Santander (Navarrete interno)`, es decir, **red corporativa interna, no Internet**. Eso reduce el conjunto de atacantes posibles y justifica rebajarlo a **High**. No lo elimina: sigue siendo tráfico con credenciales y datos personales sin cifrar atravesando varios saltos de red del grupo.
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-beclaims/src/main/resources/config/application-local.yml:19
+Archivo: cpe-nxhbsc-beclaims/src/main/java/.../infrastructure/adapters/output/client/TokenService.java:52-60, 69-74
+Archivo: cpe-nxhbsc-beclaims/src/main/java/.../infrastructure/config/WebClientConfig.java:105-110
+```
+
+#### Descripción
+
+El endpoint por defecto del proveedor Contáctanos utiliza **HTTP sin cifrar** contra una dirección IP:
+
+```yaml
+# application-local.yml:18-22
+api:
+  contactanos:
+    baseUrl: ${CONTACTANOS_BASE_URL:http://180.194.16.235/api_new}
+    userName: ${SEC_CONTACTANOS_USER_NAME:apibookclaim}
+    password: ${SEC_CONTACTANOS_PASSWORD:ApiB…}
+    timeout: ${CONTACTANOS_TIMEOUT:5000}
+```
+
+Sobre ese canal se envía la autenticación en el cuerpo de la petición:
+
+```java
+// TokenService.java:52-60, 69-74
+var response = tokenWebClient.post()
+        .uri(Constant.POST_TOKEN)
+        .contentType(MediaType.parseMediaType("application/json; charset=utf-8"))
+        .bodyValue(buildAuthRequest())
+        ...
+
+private AuthRequest buildAuthRequest() {
+    return AuthRequest.builder()
+            .user(apiProperties.getUserName())
+            .password(apiProperties.getPassword())
+            .build();
+}
+```
+
+y a continuación el token obtenido se adjunta como `Authorization: Bearer` en cada llamada de negocio (`WebClientConfig:112-119`), también por HTTP. El `WebClient` se construye con `baseUrl(apiProperties.getBaseUrl())`, sin ninguna comprobación de que el esquema sea `https`.
+
+El uso de una IP en lugar de un nombre DNS impide además cualquier validación de certificado si en algún momento se migrase a HTTPS.
+
+Este hallazgo es coherente con el waiver de seguridad conocido para la API Contáctanos (endpoint UAT alojado en segmento productivo, con plan de remediación por migración). El presente informe lo documenta desde el código: el defecto está codificado como valor por defecto de la aplicación.
+
+#### Flujo
+
+```text
+beclaims (pod)
+   ↓ POST http://180.194.16.235/api_new/…  {"User":"…","Contrasenia":"…"}   ← texto plano
+Red corporativa
+   ↓
+Contáctanos
+   ↓ respuesta con token
+beclaims
+   ↓ Authorization: Bearer <token>   ← texto plano en cada operación
+```
+
+#### Source
+
+Configuración de la aplicación.
+
+#### Sink
+
+Tráfico HTTP saliente en claro.
+
+#### Escenario de explotación
+
+Un observador en cualquier tramo de la ruta interna —el propio VPC, el Transit Gateway, el Firewall Sur, GSNET o el segmento de Navarrete— captura en claro el usuario y la contraseña de la integración y, después, los tokens y el contenido de los reclamos: nombre, tipo y número de documento, correo, teléfono y el PDF adjunto (`ComplaintBook.pdfBase64`).
+
+El atacante debe estar posicionado dentro de la red corporativa, lo que eleva el listón respecto a un escenario en Internet, pero es exactamente el escenario que la defensa en profundidad debe cubrir: un compromiso de cualquier workload con visibilidad de red en esa ruta convierte esto en una captura pasiva de credenciales.
+
+#### Impacto
+
+* **Confidencialidad:** credenciales de integración y datos personales de reclamantes expuestos en la red interna del grupo.
+* **Integridad:** un atacante en ruta puede alterar el contenido del reclamo o su resultado; no hay ninguna protección de integridad en el canal.
+* **Cumplimiento:** transmisión de datos personales sin cifrado, contraria a la política de cifrado en tránsito.
+
+> Este hallazgo es coherente con el waiver de seguridad ya registrado para la API Contáctanos (endpoint UAT alojado en segmento productivo, con plan de migración). El presente informe documenta su manifestación en el código y aporta un control compensatorio implementable desde la aplicación (validación de esquema en el arranque) mientras la migración se completa.
+
+#### Remediación
+
+1. Migrar el proveedor a HTTPS con nombre DNS y certificado válido. Es un cambio de infraestructura, pero el código debe **impedir** que se opere en claro:
+
+```java
+// Código recomendado — rechazar en el arranque cualquier baseUrl no cifrada
+@Bean
+public WebClient tokenWebClient(ApiProperties apiProperties) throws SSLException {
+    URI base = URI.create(apiProperties.getBaseUrl());
+    if (!"https".equalsIgnoreCase(base.getScheme())) {
+        throw new IllegalStateException(
+            "api.contactanos.baseUrl debe usar https; valor recibido: " + base.getScheme());
+    }
+    ...
+}
+```
+
+2. Eliminar el valor por defecto en claro (coincide con SEC-003):
+
+```yaml
+# Vulnerable
+baseUrl: ${CONTACTANOS_BASE_URL:http://180.194.16.235/api_new}
+
+# Recomendado
+baseUrl: ${CONTACTANOS_BASE_URL}
+```
+
+3. Rotar las credenciales de Contáctanos: han circulado en claro y además están versionadas.
+4. Mientras la migración no esté completa, exigir un túnel cifrado (mTLS a nivel de malla o VPN de sitio) y documentar el riesgo residual con fecha de cierre.
+
+---
+
+### SEC-010 — Fail-open: la API devuelve datos ficticios cuando falla el registro del reclamo
+
+**Severidad:** Critical · **Confianza:** CONFIRMADO · **Prioridad:** P0
+**CWE:** CWE-754 (Improper Check for Unusual or Exceptional Conditions), CWE-393 (Return of Wrong Status Code)
+**OWASP:** API8:2023 Security Misconfiguration
+**Proyecto/API:** cpe-nxhbsc-beclaims
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-beclaims/src/main/java/.../infrastructure/adapters/output/client/ClaimsAdapter.java
+Metodos: createClaims   · lineas 52-74
+         getClaims      · lineas 82-103
+         getReasons     · lineas 111-138
+         getSubReason   · lineas 146-175
+```
+
+#### Descripción
+
+Las cuatro operaciones capturan **cualquier** error del proveedor y lo sustituyen por una respuesta fabricada, devolviendo `200 OK`:
+
+```java
+// ClaimsAdapter.java:52-74
+@Override
+public ClaimsCreateResult createClaims(ClaimsCreate claimsCreate) {
+    var request = mapper.toClaimsCreateDto(claimsCreate);
+
+    return webClient.post()
+            .uri(Constant.POST_CREATE_CLAIMS)
+            .bodyValue(request)
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, ClaimsAdapter::handle4xxError)
+            .onStatus(HttpStatusCode::is5xxServerError, ClaimsAdapter::handle5xxError)
+            .bodyToMono(ClaimsCreateResultDTO.class)
+            .onErrorResume((ex -> Mono.just(getMockCreateClaims(ex))))   // <-- fail-open
+            .subscribeOn(Schedulers.boundedElastic())
+            .map(mapper::toClaimsCreateResult)
+            .block();
+}
+
+private static ClaimsCreateResultDTO getMockCreateClaims(Throwable ex) {
+    log.warn("Error invoke method create claims: {}, then return getMockCreate", ex.getMessage());
+    return ClaimsCreateResultDTO.builder()
+            .complaintBookId("56782902")        // <-- identificador fijo, inventado
+            .build();
+}
+```
+
+`onErrorResume` se aplica **después** de los manejadores de 4xx y 5xx, por lo que atrapa precisamente las excepciones que estos generan (`ClaimsValidationException`, `ClaimsUnauthorizedException`, `ClaimsNotFoundException`, `ExternalServiceException`), además de timeouts y errores de conexión.
+
+El resultado: si Contáctanos rechaza las credenciales (401), está caído (5xx), o la red falla, **el consumidor recibe `200 OK` con un número de reclamo que no existe**. El reclamo no se registró en ninguna parte.
+
+`getClaims` va más allá y devuelve datos de una persona ficticia:
+
+```java
+// ClaimsAdapter.java:95-103
+private static ClaimsResultDTO getMockClaimsResultDTO() {
+    return ClaimsResultDTO.builder()
+            .complaintBookId(Constant.COMPLAINT_BOOK_ID)
+            .claimNumber("REC-2026-000084")
+            .documentType(Constant.DOCUMENT_TYPE)
+            .documentTypeDescription("DNI")
+            .documentNumber("12345678")
+            .build();
+}
+```
+
+Un usuario consultando su reclamo recibiría el DNI y el número de expediente de otra persona (ficticia), presentados como reales.
+
+#### Flujo
+
+```text
+POST /v1/claims_book/claims
+   ↓
+ClaimsApiDelegateImpl.create()
+   ↓
+ClaimsUseCase → ClaimsAdapter.createClaims()
+   ↓
+WebClient → Contáctanos  →  401 / 500 / timeout
+   ↓
+onErrorResume → getMockCreateClaims()
+   ↓
+200 OK  {"complaintBookId": "56782902"}     ← el reclamo NO existe
+```
+
+#### Source
+
+Cualquier condición de error del proveedor: credenciales inválidas (probable, dadas SEC-003 y SEC-033), indisponibilidad, o timeout de 5 s con `CONTACTANOS_TIMEOUT:5000`.
+
+#### Sink
+
+Respuesta HTTP 200 al consumidor con datos fabricados.
+
+#### Escenario de explotación
+
+No requiere atacante: basta con que el proveedor falle. Pero es **provocable**: dado que no hay rate limiting (SEC-019) y el timeout es de 5 s, saturar el proveedor con peticiones concurrentes fuerza timeouts y, con ellos, que todos los reclamos legítimos de esa ventana se pierdan silenciosamente devolviendo confirmaciones falsas. Un atacante interesado en suprimir reclamos de clientes puede hacerlo sin dejar rastro visible para el usuario.
+
+#### Impacto
+
+* **Integridad:** pérdida silenciosa de registros. El sistema afirma haber hecho algo que no hizo.
+* **Negocio y cumplimiento:** el Libro de Reclamaciones es una obligación regulatoria en Perú (INDECOPI). Emitir un número de reclamo inexistente supone incumplimiento formal y priva al cliente de constancia de su reclamo, con exposición a sanción y a litigio.
+* **Confidencialidad:** menor, pero `getClaims` devuelve datos de un tercero (ficticio) como si fueran del solicitante.
+
+#### Remediación
+
+Eliminar los mocks del código productivo. Un fallo del proveedor debe propagarse como error.
+
+```java
+// Código vulnerable
+.bodyToMono(ClaimsCreateResultDTO.class)
+.onErrorResume((ex -> Mono.just(getMockCreateClaims(ex))))
+.subscribeOn(Schedulers.boundedElastic())
+.map(mapper::toClaimsCreateResult)
+.block();
+```
+
+```java
+// Código recomendado
+.bodyToMono(ClaimsCreateResultDTO.class)
+.subscribeOn(Schedulers.boundedElastic())
+.map(mapper::toClaimsCreateResult)
+.onErrorMap(ex -> !(ex instanceof BusinessException),
+            ex -> {
+                log.error("Fallo al registrar el reclamo en Contáctanos", ex);
+                return new BusinessException(HttpStatus.SERVICE_UNAVAILABLE,
+                                             List.of(Exceptions.TL9998));   // 503 explícito
+            })
+.block();
+```
+
+Complementariamente:
+
+1. **Si se necesita tolerancia a fallos**, no fabricar datos: implementar un patrón *store-and-forward* — persistir el reclamo en una tabla de pendientes con estado `PENDIENTE_ENVIO`, devolver `202 Accepted` con un identificador propio del banco, y reintentar de forma asíncrona. El cliente obtiene constancia real y el reclamo no se pierde.
+2. **Si los mocks existen para pruebas locales**, aislarlos con `@Profile("local")` o mediante un stub (WireMock) en los tests, nunca en el adaptador productivo.
+3. Añadir al contrato el código de error correspondiente (`503`) y documentarlo, como ya se hace con `TL0001`.
+4. Revisar `getReasons` y `getSubReason`: devolver catálogos inventados (`"Autenticacion del cliente"`, `"Interés"`, `"Comisiones"`) hace que el usuario clasifique su reclamo con motivos que el sistema destino no reconoce.
+
+---
+
+### SEC-011 — Contenido completo del documento en base64 escrito en el log
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-532, CWE-359 · **OWASP:** API8:2023
+**Proyecto/API:** cpe-nxhbsc-bedigitsignature
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-bedigitsignature/src/main/java/.../infrastructure/adapters/output/client/DocumentClient.java
+Metodo:  downloadAsBase64(Resource)   · lineas 76-85
+Linea:   80
+```
+
+#### Descripción
+
+```java
+private Mono<String> downloadAsBase64(Resource file) {
+    try{
+        byte[] bites = file.getInputStream().readAllBytes();
+        String base64 = Base64.getEncoder().encodeToString(bites);
+        log.info("archivo en base64: {}", base64);       // <-- documento completo al log
+        return Mono.just(base64);
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+}
+```
+
+Cada documento descargado desde `bedocmanagement` —contratos, formularios, documentos de identidad— se escribe íntegro en el log en nivel `INFO`. Además, `log.info("antes en obtener document, documentId: {}", documentId)` (línea 36) registra el identificador, lo que permite correlacionar contenido con documento.
+
+El servicio no impone límite de tamaño (`fileWebClient` admite hasta 20 MB en memoria, `WebClientConfig:69-75`), por lo que cada línea de log puede alcanzar ~27 MB de base64.
+
+#### Flujo
+
+```text
+POST /v1/signature/signer (sin auth)
+   ↓
+DocumentProcessService.processDocument() → DocumentClient.getDocument(documentId)
+   ↓
+POST bedocmanagement /v2/document_management/download_document_intern
+   ↓
+downloadAsBase64() → log.info("archivo en base64: {}", base64)
+   ↓
+Agregador de logs
+```
+
+#### Source
+
+`documentId` del cuerpo de la petición, no autenticada.
+
+#### Sink
+
+Log de aplicación.
+
+#### Escenario de explotación
+
+Combinado con SEC-001 y SEC-002, un atacante solicita la firma de identificadores de documento arbitrarios; aunque la operación termine en error, el contenido de cada documento ya ha quedado volcado al log, desde donde puede extraerse sin acceso a S3 ni a la API de documentos. Es una vía de exfiltración indirecta que evita los controles de acceso del bucket.
+
+En paralelo, un atacante puede saturar el almacenamiento de logs enviando lotes de documentos grandes (SEC-020).
+
+#### Impacto
+
+* **Confidencialidad:** documentos contractuales y de identidad accesibles desde el sistema de logs.
+* **Disponibilidad y coste:** volumen de logs desproporcionado; posible pérdida de trazas por rotación acelerada y coste de ingesta.
+
+#### Remediación
+
+```java
+// Código vulnerable
+String base64 = Base64.getEncoder().encodeToString(bites);
+log.info("archivo en base64: {}", base64);
+
+// Código recomendado
+String base64 = Base64.getEncoder().encodeToString(bites);
+log.debug("Documento descargado. documentId={}, bytes={}", documentId, bites.length);
+```
+
+Y sustituir el `catch` que envuelve en `RuntimeException` por una excepción de dominio (ver SEC-028):
+
+```java
+// Código recomendado
+} catch (IOException e) {
+    throw new BusinessException(HttpStatus.BAD_GATEWAY, List.of(Exceptions.TL9999));
+}
+```
+
+Añadir además un límite de tamaño explícito antes de leer el flujo completo, para no depender solo de `maxInMemorySize`.
+
+---
+
+### SEC-012 — Tokens biométricos y datos del documento de identidad escritos en el log
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-532, CWE-359 · **OWASP:** API8:2023
+**Proyecto/API:** cpe-nxhbsc-beidentbiometric
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-beidentbiometric/src/main/java/.../infrastructure/adapters/output/client/rest/FacephiAdapter.java
+Lineas:  84   · log.info("request postIdentityResult: {}", request.toString())
+         124  · log.warn("request postExtractDocumentDataResult: {}", request.toString())
+DTOs:    FacephiIdentityRequest.java:10-21        (@ToString)
+         FacephiExtractDocumentDataRequest.java   (@ToString)
+```
+
+#### Descripción
+
+`FacephiAdapter` registra el request antes de cada llamada. La mayoría de esos DTO no declaran `@ToString`, por lo que `{}` imprime solo la referencia del objeto — sin fuga, aunque el log resulte inútil. **Dos sí lo declaran**, y son precisamente los que transportan datos biométricos y del documento de identidad:
+
+```java
+// FacephiIdentityRequest.java:10-21
+@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+@ToString                        // <-- imprime todos los campos
+public class FacephiIdentityRequest {
+  private String token1;         // token biométrico
+  private String bestImageToken; // imagen facial seleccionada
+  private String method;
+  private Tracking tracking;
+}
+```
+
+```java
+// FacephiAdapter.java:82-84
+public WrapperExecution<IdentityResult> postIdentityResult(Identity identity) {
+    var request = mapper.toFacephiIdentityRequest(identity);
+    log.info("request postIdentityResult: {}", request.toString());
+```
+
+Lo mismo ocurre en la línea 124 con `FacephiExtractDocumentDataRequest`, cuyo campo `tokenOcr` contiene los datos extraídos del DNI.
+
+Es un contraste llamativo con el control implementado aguas abajo: antes de persistir en DynamoDB, `BiometricInputPort.cleanData()` **sí** trunca los campos largos:
+
+```java
+// BiometricInputPort.java:451-457
+if (value instanceof String str) {
+  if (str.length() > MAX_STRING_LENGTH) {      // 500
+    // TODO guardar en S3
+    return "[Content removed]";
+  }
+  return str;
+}
+```
+
+La sanitización protege la base de datos pero **no se aplica al log**, que recibe el objeto sin filtrar.
+
+#### Flujo
+
+```text
+POST /v1/identity_biometric/onboarding/identity   (sin auth)
+   ↓
+OnBoardingApiDelegateImpl.identity()
+   ↓
+BiometricInputPort.postIdentityResult()
+   ↓
+FacephiAdapter.postIdentityResult()
+   ↓  log.info("request postIdentityResult: {}", request.toString())   ← token1 + bestImageToken
+   ↓
+FacePhi
+   ↓
+BiometricInputPort → cleanData() → DynamoDB  ← aquí sí se trunca
+```
+
+#### Source
+
+Cuerpo de la petición de onboarding (imagen facial y datos de DNI aportados por el consumidor).
+
+#### Sink
+
+Log de aplicación.
+
+#### Impacto
+
+* **Confidencialidad:** datos biométricos —categoría especial de dato personal, no revocable— accesibles desde el sistema de logs, fuera del control de la tabla que sí los sanea.
+* **Cumplimiento:** tratamiento de datos biométricos fuera del sistema autorizado para ello.
+
+#### Remediación
+
+```java
+// Código vulnerable
+log.info("request postIdentityResult: {}", request.toString());
+
+// Código recomendado
+log.debug("Invocando FacePhi identity. trackingId={}, method={}",
+          request.getTracking() != null ? request.getTracking().getId() : null,
+          request.getMethod());
+```
+
+```java
+// FacephiIdentityRequest.java — recomendado
+@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+@ToString
+public class FacephiIdentityRequest {
+  @ToString.Exclude private String token1;
+  @ToString.Exclude private String bestImageToken;
+  private String method;
+  private Tracking tracking;
+}
+```
+
+Aplicar `@ToString.Exclude` de forma sistemática a `token1`, `token2`, `image`, `tokenOcr`, `oldRegisteredTemplateRaw` y `newRegisteredTemplateRaw` en todos los DTO de `client/dto/**`, y eliminar los `log.warn("request …: {}", request)` restantes, que no aportan información útil y solo generan ruido.
+
+Resolver además el `// TODO guardar en S3` de `cleanData`: hoy el contenido truncado se pierde, lo que puede afectar a la trazabilidad exigida en un proceso de onboarding.
+
+---
+
+### SEC-013 — `wiretap(true)`: el tráfico HTTP completo, incluidas las cabeceras de autenticación, se vuelca al log
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-532 · **OWASP:** API8:2023
+**Proyecto/API:** beclaims, becreditrisk, becustombeprogrm, bedigitsignature, beidentbiometric, bewatchscreening
+
+#### Ubicación
+
+```text
+beclaims          · WebClientConfig.java:65
+becreditrisk      · WebClientConfig.java:84
+becustombeprogrm  · WebClientConfig.java:33
+bedigitsignature  · WebClientConfig.java:89
+beidentbiometric  · WebClientConfig.java:64
+bewatchscreening  · WebClientConfig.java:64
+```
+
+#### Descripción
+
+Los seis servicios activan el *wiretap* de Reactor Netty en la construcción del `HttpClient`:
+
+```java
+// beidentbiometric/WebClientConfig.java:56-64
+return HttpClient.create()
+    .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP)
+                         .host(proxyProperties.getHost())
+                         .port(Integer.parseInt(proxyProperties.getPort())))
+    .secure(t -> t.sslContext(sslContext).handlerConfigurator((SslHandler sslHandler) -> {}))
+    .wiretap(true)                                   // <-- volcado completo
+```
+
+`wiretap(true)` instala un `LoggingHandler` en la categoría `reactor.netty.http.client.HttpClient` que registra **cabeceras y cuerpo** de peticiones y respuestas. Con esta forma de la sobrecarga, el formato por defecto incluye un volcado hexadecimal del contenido.
+
+Lo que atraviesa esos clientes: `Authorization: Bearer <token>` (inyectado por el `ExchangeFilterFunction` de `beclaims` y `becustombeprogrm`), `x-api-key` de FacePhi y Zytrust, `Ocp-Apim-Subscription-Key` de SKY, el `client_secret` de Modelica en el formulario de token, credenciales de Gesintel y Contáctanos, y los cuerpos con datos biométricos y documentales.
+
+**Consideración sobre explotabilidad:** el volcado solo se materializa si la categoría `reactor.netty.http.client.HttpClient` está en `DEBUG`. La configuración actual establece `logging.level.root: WARN`, por lo que en el estado presente **no se emite**. El riesgo es que la activación depende de un cambio de una línea de configuración —habitual durante una incidencia— que convierte instantáneamente el log en un repositorio de credenciales. Es un riesgo latente con probabilidad de materialización elevada, y por eso se clasifica como High y no como Medium.
+
+#### Flujo
+
+```text
+Microservicio → HttpClient(wiretap=true) → proveedor externo
+                      ↓ (si categoría en DEBUG)
+              LoggingHandler → cabeceras + cuerpo → stdout → agregador de logs
+```
+
+#### Impacto
+
+* **Confidencialidad:** exposición de todas las credenciales de integración y de los datos en tránsito, en el momento en que se eleve el nivel de log.
+* **Operativo:** volumen de logs inmanejable y degradación de rendimiento si se activa en producción.
+
+#### Remediación
+
+```java
+// Código vulnerable
+.wiretap(true)
+```
+
+```java
+// Código recomendado — desactivado por defecto, y nunca con volcado de cuerpo
+@Bean
+public HttpClient httpClient(HttpClientProperties props) throws SSLException {
+    HttpClient client = HttpClient.create()
+            .secure(spec -> spec.sslContext(sslContext))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, props.connectTimeoutMs())
+            .responseTimeout(Duration.ofMillis(props.responseTimeoutMs()));
+
+    if (props.wiretapEnabled()) {          // false en todos los perfiles salvo local
+        client = client.wiretap("reactor.netty.http.client.HttpClient",
+                                LogLevel.DEBUG, AdvancedByteBufFormat.SIMPLE);  // sin cuerpo
+    }
+    return client;
+}
+```
+
+Complementariamente, fijar de forma explícita el nivel de la categoría para que no pueda elevarse por un cambio global:
+
+```yaml
+logging.level:
+  reactor.netty.http.client.HttpClient: WARN
+```
+
+y restringir el acceso al endpoint `/actuator/loggers` (hoy `permitAll`, SEC-022), que permite elevar el nivel de log en caliente sin autenticación — lo que convierte este hallazgo en explotable de forma remota mientras SEC-022 no se corrija.
+
+---
+
+### SEC-014 — `GET /documents/{document_id}/versions` ignora el identificador y devuelve la tabla completa
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-200, CWE-405 (Asymmetric Resource Consumption)
+**OWASP:** API1:2023 BOLA · API3:2023
+**Proyecto/API:** cpe-nxhbsc-bedocmanagement
+
+#### Ubicación
+
+```text
+Archivo: cpe-nxhbsc-bedocmanagement/src/main/java/.../infrastructure/adapters/output/DocumentManagementAdapter.java
+Metodo:  getDocumentVersion(String id)   · lineas 187-190
+Archivo: .../infrastructure/config/BaseDynamoRepository.java
+Metodo:  findAll()                       · lineas 64-70
+Archivo: .../infrastructure/adapters/output/DocumentMapper.java:121-131
+```
+
+#### Descripción
+
+```java
+// DocumentManagementAdapter.java:187-190
+@Override
+public List<WrapperMySearchDocumentVersionResponse> getDocumentVersion(String id) {
+  var objectMetadataOptional = repository.findAll();      // <-- el parámetro 'id' no se usa
+  return mapper.getVersions(objectMetadataOptional);
+}
+```
+
+```java
+// BaseDynamoRepository.java:64-70
+public List<T> findAll() {
+    List<T> results = new ArrayList<>();
+    table.scan(ScanEnhancedRequest.builder().build())      // Scan completo, sin filtro ni paginación
+            .items()
+            .forEach(results::add);
+    return results;
+}
+```
+
+El parámetro `id` se recibe y se descarta. La operación ejecuta un `Scan` sin filtro sobre toda la tabla de documentos y devuelve una entrada por cada registro:
+
+```java
+// DocumentMapper.java:121-131
+return entity.stream().map(enty ->{
+    WrapperMySearchDocumentVersionResponse response = new WrapperMySearchDocumentVersionResponse();
+    response.setVersionCode(enty.getVersion()+"");
+    response.setVersionDescription(enty.getFileName());     // <-- nombre de archivo de TODOS
+    return response;
+}).collect(Collectors.toList());
+```
+
+El campo `versionDescription` expone el **nombre de fichero** de cada documento almacenado. Los nombres de documentos bancarios son habitualmente descriptivos (tipo de contrato, DNI del titular, fecha), por lo que el listado revela la estructura completa del repositorio documental.
+
+#### Flujo
+
+```text
+GET /v2/document_management/documents/cualquier-valor/versions   (sin auth)
+   ↓
+DocumentManagementApiDelegateImpl.searchDocumentVersions(documentId)
+   ↓
+DocumentManagementUseCase.getDocumentVersion(id)   ← id descartado
+   ↓
+BaseDynamoRepository.findAll() → Scan completo de la tabla
+   ↓
+200 OK con el nombre de archivo de todos los documentos del sistema
+```
+
+#### Source
+
+Cualquier valor en `{document_id}` — de hecho, ninguno: el resultado es independiente del parámetro.
+
+#### Sink
+
+Respuesta HTTP y `Scan` completo de DynamoDB.
+
+#### Escenario de explotación
+
+Una única petición sin autenticación enumera el repositorio documental completo. El atacante obtiene los nombres de todos los ficheros y, con ellos, información sobre qué clientes tienen qué contratos. Repetir la llamada consume capacidad de lectura de DynamoDB de forma desproporcionada (un `Scan` completo por petición), lo que constituye además un vector de denegación de servicio y de coste.
+
+#### Impacto
+
+* **Confidencialidad:** enumeración completa del repositorio documental.
+* **Disponibilidad y coste:** consumo de RCU desproporcionado; con peticiones concurrentes, agotamiento de la capacidad provisionada de la tabla y degradación de todas las operaciones que dependen de ella.
+
+#### Remediación
+
+```java
+// Código vulnerable
+public List<WrapperMySearchDocumentVersionResponse> getDocumentVersion(String id) {
+  var objectMetadataOptional = repository.findAll();
+  return mapper.getVersions(objectMetadataOptional);
+}
+```
+
+```java
+// Código recomendado — consulta por partition key, con autorización previa
+@Override
+public List<WrapperMySearchDocumentVersionResponse> getDocumentVersion(String documentId) {
+  authorizationService.assertCanAccessDocument(currentPrincipal(), documentId);   // ver SEC-002
+
+  List<FileEntity> versions = repository.queryByPartitionKey(documentId);
+  if (versions.isEmpty()) {
+      throw new NotFoundException("documento_no_encontrado",
+                                  "No se encontró el documento solicitado");
+  }
+  return mapper.getVersions(versions);
+}
+```
+
+```java
+// BaseDynamoRepository — recomendado: consulta acotada en lugar de scan
+public List<T> queryByPartitionKey(String partitionKeyValue) {
+    return table.query(QueryConditional.keyEqualTo(
+                    Key.builder().partitionValue(partitionKeyValue).build()))
+            .items()
+            .stream()
+            .toList();
+}
+```
+
+Adicionalmente: **eliminar `findAll()` del repositorio base**. Un método que escanea una tabla completa sin límite no debería existir en el árbol productivo; si se necesita para tareas administrativas, debe vivir en un proceso batch con paginación explícita (`Limit` + `LastEvaluatedKey`). Lo mismo aplica a `search()` (SEC-039).
+
+---
+
+### SEC-015 — Clave de objeto S3 y `Content-Type` construidos con datos del cliente sin sanear
+
+**Severidad:** High · **Confianza:** ALTA CONFIANZA · **Prioridad:** P1
+**CWE:** CWE-99 (Improper Control of Resource Identifier), CWE-434 (Unrestricted Upload of File with Dangerous Type), CWE-639
+**OWASP:** API3:2023 · API1:2023 · **Proyecto/API:** cpe-nxhbsc-bedocmanagement
+
+#### Ubicación
+
+```text
+Archivo: .../infrastructure/adapters/output/DocumentManagementAdapter.java
+Metodos: uploadDocument(...)                        · lineas 104-144
+         validateRequestAndGetFolderReference(...)  · lineas 146-168
+Archivo: .../application/validators/UploadDocumentValidator.java:11-26
+```
+
+#### Descripción
+
+La clave del objeto en S3 se compone concatenando dos valores que llegan en el cuerpo de la petición:
+
+```java
+// DocumentManagementAdapter.java:146-168
+private String validateRequestAndGetFolderReference(WrapperPostDocumentsRequest criteria, String id, String typeData) {
+    ...
+    String dni;
+    List<WrapperMySearchDocumentResponseOwnersInner> name = doc.getOwners();
+    if (name == null || name.isEmpty()) {
+      dni = "";
+    } else {
+      dni = name.get(0).getOwnerId()+"/";        // <-- ownerId del request, sin validar
+    }
+    if(typeData == null || typeData.isEmpty()){
+      return dni+doc.getName();                  // <-- name del request, sin sanear
+    }
+    return dni+id+typeData;
+}
+```
+
+```java
+// DocumentManagementAdapter.java:120-129
+String userFolder = validateRequestAndGetFolderReference(criteria,documentId,typeData);
+String key = PREFIJO_KEY+userFolder;
+
+PutObjectRequest request = PutObjectRequest.builder()
+        .bucket(bucketName)
+        .key(key)
+        .contentType(document.getMimeType())      // <-- MIME declarado por el cliente
+        .build();
+
+s3Client.putObject(request, RequestBody.fromBytes(fileBytes));
+```
+
+Tres problemas concurrentes:
+
+1. **`ownerId` no se valida contra ningún titular.** El solicitante decide en qué carpeta de cliente se deposita el documento. Combinado con SEC-002, permite colocar documentos en el espacio de cualquier cliente.
+2. **`name` no se sanea.** Las claves de S3 admiten `/` y cualquier carácter, y **no se normalizan**: el solicitante puede inyectar segmentos de ruta y escribir en prefijos arbitrarios del bucket. Como `putObject` sobrescribe sin condición, repetir un `ownerId` + `name` existentes **reemplaza el documento original**. La entrada en DynamoDB sí usa `putIfAbsent`, pero el objeto en S3 ya ha sido sobrescrito antes de esa comprobación (línea 129 precede a la 135).
+3. **El `Content-Type` almacenado lo fija el cliente.** Tika solo se invoca cuando `appId` es `"biometric"` (línea 117), y aun así solo para derivar la extensión, no para validar. Un documento con contenido HTML y `mimeType: text/html` se sirve como HTML ejecutable a través de la URL prefirmada que genera `downloadDocument` (líneas 218-235).
+
+El `UploadDocumentValidator` solo comprueba que el contenido sea base64 decodificable; no valida `name`, `ownerId`, `mimeType` ni tamaño.
+
+#### Flujo
+
+```text
+POST /v2/document_management/upload_document
+{ "document": { "folderReference": "<base64>", "name": "…", "mimeType": "text/html",
+                "owners": [ { "ownerId": "<DNI ajeno>" } ] } }
+   ↓
+UploadDocumentValidator.validate()        ← solo verifica que sea base64
+   ↓
+validateRequestAndGetFolderReference()    ← concatena ownerId + name
+   ↓
+s3Client.putObject(bucket, PREFIJO_KEY + ownerId + "/" + name, contentType=cliente)
+   ↓
+downloadDocument → URL prefirmada (10 min) → el navegador recibe el Content-Type declarado
+```
+
+#### Source
+
+`document.owners[0].ownerId`, `document.name`, `document.mimeType` del cuerpo de la petición.
+
+#### Sink
+
+`PutObjectRequest.key()` y `.contentType()`, y posteriormente la URL prefirmada de descarga.
+
+#### Escenario de explotación
+
+* **Sobrescritura:** el atacante conoce o infiere el `ownerId` y el `name` de un documento existente (SEC-014 se los proporciona: `versionDescription` devuelve los nombres de archivo de todos los documentos) y sube contenido propio con esa misma clave, reemplazando el contrato original en S3.
+* **Colocación arbitraria:** mediante `/` en `name`, deposita objetos en prefijos del bucket destinados a otros procesos.
+* **XSS almacenado:** sube HTML con `mimeType: text/html`; cuando ese documento se descarga vía URL prefirmada, el navegador lo ejecuta en el origen de S3. Si alguna aplicación interna abre documentos en un `iframe` o pestaña, el script se ejecuta con acceso a lo que ese origen permita.
+
+#### Impacto
+
+* **Integridad:** sustitución de documentos contractuales — con impacto probatorio directo.
+* **Confidencialidad:** ejecución de contenido activo servido desde el dominio de almacenamiento del banco.
+* **Cumplimiento:** documentos depositados bajo el identificador de un titular que no los aportó.
+
+#### Remediación
+
+```java
+// Código vulnerable
+String dni = name.get(0).getOwnerId() + "/";
+return dni + doc.getName();
+...
+.key(PREFIJO_KEY + userFolder)
+.contentType(document.getMimeType())
+```
+
+```java
+// Código recomendado
+private static final Set<String> ALLOWED_MIME =
+        Set.of("application/pdf", "image/jpeg", "image/png");
+private static final Pattern SAFE_NAME = Pattern.compile("^[A-Za-z0-9._-]{1,120}$");
+
+private String buildObjectKey(WrapperPostDocumentsRequest criteria, String documentId,
+                              byte[] fileBytes) {
+
+    String ownerId = Optional.ofNullable(criteria.getDocument().getOwners())
+            .filter(o -> !o.isEmpty())
+            .map(o -> o.get(0).getOwnerId())
+            .orElseThrow(() -> new BadRequestException("owner_requerido", "ownerId es obligatorio"));
+
+    authorizationService.assertCanWriteForOwner(currentPrincipal(), ownerId);   // ver SEC-002
+
+    if (!SAFE_NAME.matcher(criteria.getDocument().getName()).matches()) {
+        throw new BadRequestException("nombre_invalido",
+                "El nombre del documento contiene caracteres no permitidos");
+    }
+
+    // el nombre del cliente NO forma parte de la clave: se guarda como metadato
+    return PREFIJO_KEY + sha256Hex(ownerId) + "/" + documentId;
+}
+
+private String resolveContentType(byte[] fileBytes, String declared) {
+    String detected = new Tika().detect(fileBytes);          // siempre, no solo para 'biometric'
+    if (!ALLOWED_MIME.contains(detected)) {
+        throw new BadRequestException("tipo_no_permitido",
+                "Tipo de archivo no admitido: " + detected);
+    }
+    if (declared != null && !detected.equals(declared)) {
+        log.warn("MIME declarado ({}) distinto del detectado ({}); se usa el detectado",
+                 declared, detected);
+    }
+    return detected;                                          // se almacena el detectado
+}
+```
+
+```java
+// Subida: clave derivada, MIME detectado, cabecera de descarga forzada, y no sobrescribir
+PutObjectRequest request = PutObjectRequest.builder()
+        .bucket(bucketName)
+        .key(buildObjectKey(criteria, documentId, fileBytes))
+        .contentType(resolveContentType(fileBytes, document.getMimeType()))
+        .contentDisposition("attachment")                      // evita render en el navegador
+        .serverSideEncryption(ServerSideEncryption.AWS_KMS)    // KMS ya disponible en la plataforma
+        .metadata(Map.of("owner-id", ownerId, "original-name", document.getName()))
+        .build();
+```
+
+Complementariamente: usar el `documentId` (UUID ya generado en la línea 107) como parte inmutable de la clave, activar **versionado de objetos** en el bucket para que una sobrescritura no destruya el original, y aplicar cifrado con la clave KMS que la arquitectura ya provee.
+
+---
+
+### SEC-016 — Integraciones salientes sin timeout
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-1088 (Synchronous Access of Remote Resource without Timeout), CWE-400
+**OWASP:** API4:2023 Unrestricted Resource Consumption
+**Proyecto/API:** becustombeprogrm, beemailboxes, bedigitsignature
+
+#### Ubicación
+
+```text
+becustombeprogrm · WebClientConfig.java:20-34   · bean httpClient() compartido por SKY y Qurable
+beemailboxes     · RestTemplateConfig.java:28-63 · bean restTemplate() compartido por OTP y correo
+bedigitsignature · WebClientConfig.java:37-50   · documentWebClient
+bedigitsignature · WebClientConfig.java:68-75   · fileWebClient
+```
+
+#### Descripción
+
+Cuatro clientes HTTP se construyen sin ningún límite temporal:
+
+```java
+// becustombeprogrm/WebClientConfig.java:20-34
+@Bean
+public HttpClient httpClient() throws SSLException {
+    SslContext sslContext = SslContextBuilder.forClient()
+            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+            .build();
+
+    return HttpClient.create()
+            .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP)
+                                 .host(proxyProperties.getHost())
+                                 .port(Integer.parseInt(proxyProperties.getPort())))
+            .secure(ssl -> ssl.sslContext(sslContext))
+            .wiretap(true);
+    // sin CONNECT_TIMEOUT_MILLIS, sin responseTimeout, sin Read/WriteTimeoutHandler
+}
+```
+
+```java
+// bedigitsignature/WebClientConfig.java:37-50
+@Bean
+public WebClient documentWebClient(WebClient.Builder builder, DocumentApiProperties properties) {
+    return builder
+            .baseUrl(properties.baseUrl())
+            .defaultHeaders(headers -> { ... })
+            .build();        // sin clientConnector: usa el HttpClient por defecto, sin timeouts
+}
+```
+
+`beemailboxes` construye el `RestTemplate` con un `PoolingHttpClientConnectionManager` pero **no configura `RequestConfig`**, por lo que hereda los valores por defecto de Apache HttpClient 5 (sin límite de respuesta). Es especialmente crítico porque este cliente es el que habla con el proveedor de OTP y correo.
+
+El agravante es la combinación con el modelo de ejecución: todos los adaptadores llaman a `.block()` sobre el `Mono`, ocupando un hilo del pool de Tomcat durante toda la espera. Un proveedor que acepte la conexión y no responda inmoviliza hilos indefinidamente hasta agotar el pool.
+
+Contraste: `beclaims`, `becreditrisk`, `beidentbiometric` y `bewatchscreening` **sí** configuran `CONNECT_TIMEOUT_MILLIS`, `responseTimeout`, `ReadTimeoutHandler` y `WriteTimeoutHandler`. La práctica correcta existe en el código base; simplemente no se aplicó de forma consistente.
+
+#### Flujo
+
+```text
+Petición entrante → hilo de Tomcat
+   ↓
+Adapter → WebClient/RestTemplate sin timeout → .block()
+   ↓
+Proveedor externo no responde
+   ↓
+Hilo bloqueado indefinidamente; se repite con cada petición
+   ↓
+Agotamiento del pool → el servicio deja de atender cualquier petición
+```
+
+#### Escenario de explotación
+
+No requiere un atacante sofisticado: basta con que un proveedor se degrade. Pero es provocable — un atacante que consiga que el proveedor responda lentamente (o que ocupe su cuota, dado que no hay rate limiting, SEC-019) provoca la caída completa del microservicio. En `beemailboxes` esto significa que ni el OTP ni el correo funcionan; en `becustombeprogrm`, que el alta de clientes queda inoperante.
+
+#### Impacto
+
+* **Disponibilidad:** denegación de servicio completa del microservicio afectado, con propagación a cualquier servicio que dependa de él.
+* **Operativo:** los pods pueden quedar vivos ante el *liveness probe* mientras son incapaces de atender tráfico.
+
+#### Remediación
+
+```java
+// Código recomendado — becustombeprogrm
+@Bean
+public HttpClient httpClient(ProxyProperties proxyProperties, HttpClientProperties props) throws SSLException {
+    return HttpClient.create()
+            .proxy(p -> p.type(ProxyProvider.Proxy.HTTP)
+                         .host(proxyProperties.getHost())
+                         .port(Integer.parseInt(proxyProperties.getPort())))
+            .secure(spec -> spec.sslContext(sslContext))           // ver SEC-004
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, props.connectTimeoutMs())   // p. ej. 3000
+            .responseTimeout(Duration.ofMillis(props.responseTimeoutMs()))            // p. ej. 8000
+            .doOnConnected(conn -> conn
+                    .addHandlerLast(new ReadTimeoutHandler(props.readTimeoutMs(), TimeUnit.MILLISECONDS))
+                    .addHandlerLast(new WriteTimeoutHandler(props.writeTimeoutMs(), TimeUnit.MILLISECONDS)));
+}
+```
+
+```java
+// Código recomendado — beemailboxes
+RequestConfig requestConfig = RequestConfig.custom()
+        .setConnectionRequestTimeout(Timeout.ofSeconds(2))
+        .setResponseTimeout(Timeout.ofSeconds(8))
+        .build();
+
+CloseableHttpClient httpClient = HttpClients.custom()
+        .setConnectionManager(connectionManager)
+        .setDefaultRequestConfig(requestConfig)
+        .setProxy(proxy)
+        .build();
+```
+
+Además: aplicar `.timeout(Duration…)` en los `Mono` como red de seguridad, externalizar los valores por entorno, y revisar `bewatchscreening`, cuyo `GESINTEL_TIMEOUT` por defecto es de **500 ms** — el problema opuesto: un umbral tan bajo garantiza timeouts espurios contra un proveedor de AML que atraviesa Netskope.
+
+---
+
+### SEC-017 — Reintentos automáticos sobre operaciones no idempotentes
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-837 (Improper Enforcement of a Single, Unique Action), CWE-799
+**OWASP:** API4:2023 · **Proyecto/API:** cpe-nxhbsc-becustombeprogrm
+
+#### Ubicación
+
+```text
+Archivo: .../infrastructure/adapters/output/external/SKYServiceAdapter.java
+Metodo:  createUser(CreateUserRequest)   · lineas 49-102 (retry en linea 94)
+Archivo: .../infrastructure/config/WebClientRetryPolicy.java:16-27
+```
+
+#### Descripción
+
+```java
+// SKYServiceAdapter.java:52-95
+return webClient
+        .post()
+        .uri(Constant.URI_API_SKY)          // POST /v1/user  — alta de usuario
+        ...
+        .retryWhen(WebClientRetryPolicy.threeAttempts())     // <-- reintenta un POST de creación
+        .block();
+```
+
+```java
+// WebClientRetryPolicy.java:16-27
+public static Retry threeAttempts() {
+    return Retry.backoff(MAX_ATTEMPTS - 1, BACKOFF)     // 2 reintentos, 300 ms
+            .filter(WebClientRetryPolicy::isRetryable);
+}
+
+private static boolean isRetryable(Throwable throwable) {
+    if (throwable instanceof WebClientResponseException wcre) {
+        return wcre.getStatusCode().is5xxServerError();
+    }
+    return throwable instanceof java.io.IOException
+            || throwable instanceof java.util.concurrent.TimeoutException;
+}
+```
+
+La política reintenta ante 5xx, `IOException` y `TimeoutException`. Esos tres casos comparten una propiedad esencial: **son ambiguos**. Un timeout o un corte de conexión no indican que la operación no se ejecutara — solo que no se recibió la confirmación. El proveedor puede haber creado el usuario y haber fallado al responder.
+
+No existe clave de idempotencia en la petición: `CreateUserRequest` no incluye ningún identificador de transacción único que permita al proveedor detectar el duplicado. El único indicio de que el sistema ya sufre este problema está en el propio código: existe una tabla de "casos a regularizar" en DynamoDB (`AltaUsuarioService:117`, `log.info("Caso a regularizar registrado en DynamoDB…")`) para gestionar altas fallidas manualmente.
+
+El problema se agrava porque este mismo cliente **no tiene timeout** (SEC-016): sin límite de respuesta, `TimeoutException` no llega a producirse por el cliente, pero sí `IOException` ante cortes de conexión, y cada uno dispara un reintento.
+
+#### Flujo
+
+```text
+POST /v1/customer_benefit_programs/register_customer
+   ↓
+AltaUsuarioService → SKYServiceAdapter.createUser()
+   ↓
+POST SKY /v1/user  → el proveedor crea el usuario → la respuesta se pierde (timeout/reset)
+   ↓
+retryWhen → segundo POST → el proveedor responde 409 "usuario ya registrado"
+   ↓
+ExternalServiceException(TL0016)  → el cliente recibe un error pese a que el alta se realizó
+```
+
+o, si el proveedor no deduplica:
+
+```text
+   ↓  dos o tres altas del mismo cliente en SKY
+```
+
+#### Impacto
+
+* **Integridad:** duplicación de altas en el programa de beneficios, o altas realizadas que se reportan como fallidas — ambos casos generan discrepancia entre los sistemas y trabajo manual de regularización.
+* **Negocio:** un alta duplicada en un programa de puntos/beneficios tiene efecto económico directo.
+
+#### Remediación
+
+```java
+// Código vulnerable
+.retryWhen(WebClientRetryPolicy.threeAttempts())
+```
+
+Dos alternativas, en orden de preferencia:
+
+**(a) Idempotencia real** — la correcta si el proveedor la soporta:
+
+```java
+// Código recomendado
+String idempotencyKey = criteria.getIdempotencyKey();   // estable por operación de negocio,
+                                                        // p. ej. UUID v5 sobre (documentNumber, programId)
+return webClient
+        .post()
+        .uri(Constant.URI_API_SKY)
+        .header("Idempotency-Key", idempotencyKey)
+        .header("Ocp-Apim-Subscription-Key", SKY_SUBSCRIPTION_KEY)
+        ...
+        .retryWhen(WebClientRetryPolicy.threeAttempts())   // ahora sí es seguro reintentar
+        .block();
+```
+
+**(b) Reintento restringido a fallos inequívocos** — si el proveedor no ofrece idempotencia:
+
+```java
+// WebClientRetryPolicy — recomendado
+public static Retry threeAttemptsForReads() {           // solo para GET
+    return Retry.backoff(MAX_ATTEMPTS - 1, BACKOFF).filter(WebClientRetryPolicy::isRetryable);
+}
+
+public static Retry connectOnlyForWrites() {            // para POST/PUT/PATCH
+    return Retry.backoff(MAX_ATTEMPTS - 1, BACKOFF)
+            .filter(t -> t instanceof ConnectException          // la petición nunca salió
+                      || t instanceof ConnectTimeoutException);
+}
+```
+
+Un `ConnectException` garantiza que la petición no llegó al proveedor; un `ReadTimeout` o un `reset` tras el envío, no. Solo el primero es seguro para una escritura.
+
+Complementariamente: mantener el registro en la tabla de regularización, pero acompañarlo de un proceso de conciliación automática que consulte al proveedor por la clave de idempotencia antes de dar el alta por fallida.
+
+---
+
+### SEC-018 — El cuerpo del error del proveedor se propaga al consumidor
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-209 (Generation of Error Message Containing Sensitive Information), CWE-497
+**OWASP:** API8:2023 · **Proyecto/API:** becustombeprogrm, bedigitsignature
+
+#### Ubicación
+
+```text
+becustombeprogrm · SKYServiceAdapter.java:104-131  · extractSkyErrorDetail(String)
+becustombeprogrm · ControllerAdvice.java:20-39     · description ← ExternalServiceException.getDetail()
+bedigitsignature · Util.java:99-111                · handleError(String)
+bedigitsignature · DocumentProcessService.java:124-129, 142-149 · error.getMessage() → ErrorDTO.description
+```
+
+#### Descripción
+
+Dos cadenas independientes llevan el texto de error del proveedor hasta la respuesta del consumidor.
+
+**(a) `becustombeprogrm` → SKY.** Cuando el cuerpo de error no encaja en la estructura esperada, se devuelve completo:
+
+```java
+// SKYServiceAdapter.java:104-131
+private String extractSkyErrorDetail(String rawBody) {
+    try {
+        JsonNode root = objectMapper.readTree(rawBody);
+        ...
+        return !sb.isEmpty() ? sb.toString() : rawBody;      // <-- cuerpo íntegro del proveedor
+    } catch (Exception ex) {
+        log.warn("No se pudo parsear el body de error de SKY: {}", rawBody);
+        return rawBody;                                       // <-- cuerpo íntegro del proveedor
+    }
+}
+```
+
+Ese valor viaja como `detail` de la excepción y el `ControllerAdvice` lo publica tal cual:
+
+```java
+// ControllerAdvice.java:28-32
+item.setDescription(
+        ex instanceof ExternalServiceException externalServiceException
+                ? externalServiceException.getDetail()        // <-- al consumidor
+                : violation.getDescription()
+);
+```
+
+**(b) `bedigitsignature` → DMS/Zytrust.** El helper compone un mensaje que incluye estado y cuerpo:
+
+```java
+// Util.java:99-111
+return response -> response.bodyToMono(String.class)
+        .defaultIfEmpty("")
+        .flatMap(body -> Mono.error(
+                new SantanderException(
+                        String.format("%s. Status=%s, body=%s", message,
+                                      response.statusCode(), body))));
+```
+
+y ese mensaje acaba en la respuesta de negocio:
+
+```java
+// DocumentProcessService.java:124-129
+.onErrorResume(error -> {
+    log.error(error.getMessage());
+    return Mono.just(buildUniqueResponse(error.getMessage(), documentId));   // <-- mensaje completo
+});
+
+// DocumentProcessService.java:142-149
+if(Constant.ERROR.equals(applicationSignatureData.getEstado())){
+    ErrorDTO errorDTO = new ErrorDTO();
+    errorDTO.code("TL9999");
+    errorDTO.setLevel("error");
+    errorDTO.setMessage("Service unavailable");
+    errorDTO.setDescription(result);          // <-- "…Status=…, body=…" del proveedor
+    applicationSignatureData.setError(errorDTO);
+}
+```
+
+Es una desviación del propio estándar del proyecto: el resto de servicios mapea correctamente a códigos `TL*` con descripciones controladas.
+
+#### Flujo
+
+```text
+Consumidor → API → Proveedor (SKY / DMS / Zytrust)
+                        ↓ 4xx con cuerpo de error propio
+                   extractSkyErrorDetail / Util.handleError
+                        ↓ texto íntegro
+                   ErrorItem.description / ErrorDTO.description
+                        ↓
+                   Respuesta HTTP al consumidor
+```
+
+#### Source
+
+Respuesta del proveedor externo — **no confiable**, y fuera del control del banco.
+
+#### Sink
+
+Cuerpo de la respuesta HTTP devuelta al consumidor.
+
+#### Escenario de explotación
+
+El atacante envía peticiones deliberadamente malformadas para provocar errores del proveedor y recolectar sus mensajes. Con ello obtiene: nombres de campos internos del proveedor, rutas y hostnames de su infraestructura, versiones de su stack, identificadores de correlación, y en ocasiones fragmentos de datos de otras peticiones. Es reconocimiento gratuito de una infraestructura de tercero, publicado por la API del banco.
+
+Hay además un riesgo de segundo orden: el texto proviene del proveedor y se devuelve sin codificar. Si el consumidor lo renderiza en una interfaz sin escapar, el proveedor —o quien comprometa su respuesta, especialmente dado SEC-004— controla contenido que se ejecuta en el cliente.
+
+#### Impacto
+
+* **Confidencialidad:** divulgación de detalles internos de sistemas de terceros y, por transitividad, del acoplamiento del banco con ellos.
+* **Integridad:** contenido no confiable propagado al consumidor sin neutralizar.
+* **Acoplamiento:** el consumidor termina dependiendo de textos de error del proveedor que pueden cambiar sin aviso.
+
+#### Remediación
+
+```java
+// Código vulnerable
+return !sb.isEmpty() ? sb.toString() : rawBody;
+...
+errorDTO.setDescription(result);
+```
+
+```java
+// Código recomendado — el detalle va al log con correlación; al consumidor, un código estable
+private String handleSkyError(String rawBody, String correlationId) {
+    log.error("Error de SKY. correlationId={}, body={}", correlationId, rawBody);   // solo al log
+    return "Error al procesar la solicitud en el sistema de beneficios. " +
+           "Referencia: " + correlationId;                                          // al consumidor
+}
+```
+
+```java
+// Código recomendado — bedigitsignature
+.onErrorResume(error -> {
+    String correlationId = UUID.randomUUID().toString();
+    log.error("Fallo procesando documento {}. correlationId={}", documentId, correlationId, error);
+    return Mono.just(buildErrorResponse(documentId, "TL9999",
+            "Servicio no disponible. Referencia: " + correlationId));
+});
+```
+
+Regla general: **el detalle técnico va al log con un identificador de correlación; al consumidor va el código `TL*` y ese identificador**. Así el soporte puede reconstruir el caso sin que el detalle salga del perímetro. Revisar en la misma línea `handle4xxError`/`handle5xxError` de `ClaimsAdapter` (líneas 178-201), que propagan `errorBody.getMessage()` del proveedor a la excepción de dominio.
+
+---
+
+### SEC-019 — Ausencia de limitación de peticiones y amplificación de recursos
+
+**Severidad:** High · **Confianza:** ALTA CONFIANZA · **Prioridad:** P1
+**CWE:** CWE-770 (Allocation of Resources Without Limits), CWE-799
+**OWASP:** API4:2023 Unrestricted Resource Consumption · API6:2023 · **Proyecto/API:** todos
+
+#### Descripción
+
+No existe ningún mecanismo de limitación en el código: ni bucket de tokens, ni `@RateLimiter` de Resilience4j, ni contadores por consumidor, ni bulkhead, ni circuit breaker. La única búsqueda que devuelve resultados sobre resiliencia es `WebClientRetryPolicy` — que **añade** carga en lugar de contenerla (SEC-017).
+
+El diagrama sitúa Imperva y el API Gateway delante, y ambos pueden aplicar cuotas. Eso mitiga el escenario volumétrico simple, y por ello el hallazgo no se clasifica como Critical. Pero hay dos efectos que ninguna cuota de borde resuelve:
+
+**(a) Amplificación asimétrica.** Una única petición legítima genera un número de operaciones internas y externas que el solicitante controla:
+
+```java
+// bedigitsignature/DocumentProcessService.java:48-61
+String loteId = UUID.randomUUID().toString();
+return Flux.fromIterable(request.getDocumentos())        // <-- lista sin límite (SEC-020)
+        .flatMap(document -> processDocument(document.getIdDocumento(), request, loteId),
+                 MAX_CONCURRENCY)                        // 5 en paralelo
+        .collectList()
+        ...
+```
+
+Cada elemento de `documentos` desencadena una llamada a `bedocmanagement` (que descarga de S3) **y** una llamada al proveedor de firma. Con N documentos: `1 petición → 2N llamadas`, y el contrato **no limita N** (`ApplicationSignDocumentRequest` es un array sin `maxItems`). Una cuota de 10 peticiones por minuto en el gateway no impide que cada una de esas 10 genere miles de operaciones internas.
+
+Lo mismo aplica a `becreditrisk`, donde una petición dispara cuatro consultas a RDS más una llamada a Modellica, y a `bedocmanagement`, donde `search_documents` ejecuta un `Scan` completo de DynamoDB (SEC-039).
+
+**(b) Abuso funcional del envío de correo y OTP.** El endpoint `POST /{emailbox_id}/send_email` genera un OTP contra Celmedia y envía un correo al destinatario indicado en el cuerpo. Sin límite por destinatario ni por sujeto, permite: consumir la cuota contratada con Celmedia, usar la infraestructura de correo del banco para enviar mensajes con plantilla corporativa a direcciones arbitrarias, y saturar el buzón de una víctima concreta.
+
+#### Impacto
+
+* **Disponibilidad:** agotamiento de capacidad de DynamoDB, del pool de conexiones a RDS y de los hilos de Tomcat (agravado por SEC-016).
+* **Coste:** consumo de cuota de proveedores facturados por uso (Celmedia, Modellica, FacePhi) y de RCU/WCU de DynamoDB.
+* **Reputacional:** envío de correo desde la identidad corporativa a destinatarios elegidos por el solicitante.
+
+#### Remediación
+
+Defensa en dos planos, porque el borde no cubre el interior:
+
+**1. Acotar la amplificación en el contrato y en el código:**
+
+```yaml
+# digitalsignatureapi.yaml — recomendado
+ApplicationSignDocumentRequest:
+  type: array
+  minItems: 1
+  maxItems: 10                      # límite explícito
+  items:
+    type: object
+    required: [idDocumento, page, position]
+    properties:
+      idDocumento: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9._-]+$' }
+```
+
+```java
+// Código recomendado — validación defensiva además del contrato
+if (request.getDocumentos() == null || request.getDocumentos().isEmpty()
+        || request.getDocumentos().size() > MAX_DOCUMENTS_PER_BATCH) {
+    throw new BusinessException(HttpStatus.BAD_REQUEST, List.of(Exceptions.TL0002));
+}
+```
+
+**2. Limitar por sujeto en las operaciones sensibles**, no solo por IP en el borde:
+
+```java
+// Código recomendado — beemailboxes
+@Bean
+public RateLimiterRegistry rateLimiterRegistry() {
+    return RateLimiterRegistry.of(RateLimiterConfig.custom()
+            .limitForPeriod(3)                            // 3 OTP
+            .limitRefreshPeriod(Duration.ofMinutes(15))   // por cada 15 min
+            .timeoutDuration(Duration.ZERO)
+            .build());
+}
+
+public WrapperSendEmail sendMailing(WrapperRequestSendEmail criteria, String flow) {
+    RateLimiter limiter = registry.rateLimiter("otp:" + subjectId(criteria));
+    if (!limiter.acquirePermission()) {
+        throw new BusinessException(HttpStatus.TOO_MANY_REQUESTS, List.of(Exceptions.TL0019));
+    }
+    ...
+}
+```
+
+**3. Configurar cuotas por `client_id` en el API Gateway** (usage plans) además de las reglas volumétricas de Imperva, y **añadir circuit breakers** (Resilience4j) en las llamadas a proveedores para que su degradación no se propague.
+
+---
+
+### SEC-020 — Payloads base64 sin límite de tamaño ni restricciones de formato
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-400, CWE-20 (Improper Input Validation) · **OWASP:** API4:2023
+**Proyecto/API:** bedigitsignature, bedocmanagement, beidentbiometric, beclaims
+
+#### Ubicación
+
+```text
+bedigitsignature · api/digitalsignatureapi.yaml:251-280  · ApplicationSignatureRequest (sin required, sin maxLength)
+bedocmanagement  · openapi.yaml (0 maxLength, 0 pattern en todo el fichero)
+beclaims         · api/claimsapi.yaml (0 maxLength, 0 pattern)
+bedocmanagement  · DocumentManagementAdapter.java:115  · Base64.getDecoder().decode(...)
+```
+
+#### Descripción
+
+Los contratos de los servicios que reciben documentos e imágenes carecen de restricciones. El caso más claro:
+
+```yaml
+# digitalsignatureapi.yaml:251-267
+ApplicationSignatureRequest:
+  type: object
+  properties:                     # <-- sin bloque 'required'
+    nombre:    { type: string, example: Miguel }
+    apellido:  { type: string, example: Quezada }
+    dni:       { type: string, example: 783582695 }
+    foto:      { type: string, example: "JPEG/PNG en base 64" }   # <-- sin maxLength
+    documentos:
+      $ref: '#/components/schemas/ApplicationSignDocumentRequest' # <-- array sin maxItems
+```
+
+Recuento de restricciones por contrato:
+
+| Contrato | `maxLength` | `pattern` |
+| -------- | ----------: | --------: |
+| beclaims | 0 | 0 |
+| bedigitsignature | 0 | 0 |
+| bedocmanagement | 0 | 0 |
+| becreditrisk | 1 | 0 |
+| beknowyocustomer | 54 | 50 |
+
+`beknowyocustomer` demuestra que el estándar existe y se aplica correctamente en algunos contratos; los que manejan binarios son precisamente los que carecen de él.
+
+En el código, el contenido se materializa íntegro en memoria antes de cualquier comprobación:
+
+```java
+// bedocmanagement/DocumentManagementAdapter.java:115
+byte[] fileBytes = Base64.getDecoder().decode(document.getFolderReference());
+```
+
+`spring.servlet.multipart.max-file-size: 50MB` está configurado en varios perfiles, pero **no aplica**: el contenido no viaja como multipart sino como cadena base64 dentro de un JSON. Para el cuerpo JSON no hay límite configurado, y `server.max-http-request-header-size: 128KB` solo acota las cabeceras.
+
+Como `foto`, `documentos` y los campos de identidad carecen incluso de `required`, el código recibe `null` donde asume valor, lo que enlaza con SEC-028.
+
+#### Escenario de explotación
+
+Enviar un cuerpo JSON con un base64 de varios cientos de MB. El servicio lo decodifica completo en el heap (`decode` asigna un array del tamaño resultante), lo re-codifica para el log (SEC-011) y lo mantiene en memoria durante toda la llamada al proveedor. Con peticiones concurrentes se alcanza `OutOfMemoryError` y el pod se reinicia. Repetido, produce un ciclo de reinicios que deja el servicio permanentemente indisponible.
+
+#### Impacto
+
+* **Disponibilidad:** agotamiento de memoria y reinicio de pods.
+* **Coste:** volumen desproporcionado de logs (agravado por SEC-011) y de almacenamiento en S3.
+
+#### Remediación
+
+```yaml
+# Recomendado — contrato
+ApplicationSignatureRequest:
+  type: object
+  required: [nombre, apellido, dni, documentos]
+  properties:
+    nombre:   { type: string, minLength: 1, maxLength: 80,  pattern: "^[\\p{L} .'-]+$" }
+    apellido: { type: string, minLength: 1, maxLength: 80,  pattern: "^[\\p{L} .'-]+$" }
+    dni:      { type: string, pattern: "^[0-9]{8}$" }
+    foto:     { type: string, maxLength: 2800000 }        # ~2 MB en base64
+    documentos:
+      type: array
+      minItems: 1
+      maxItems: 10
+```
+
+```java
+// Recomendado — validación defensiva en el adaptador
+private static final int MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
+
+byte[] fileBytes;
+try {
+    String content = document.getFolderReference();
+    if (content.length() > (MAX_DOCUMENT_BYTES / 3) * 4 + 4) {          // longitud base64
+        throw new BadRequestException("archivo_excede_tamano",
+                "El documento supera el tamaño máximo permitido");
+    }
+    fileBytes = Base64.getDecoder().decode(content);
+} catch (IllegalArgumentException ex) {
+    throw new BadRequestException("base64_invalido", "El formato base64 del archivo es inválido");
+}
+```
+
+Y limitar el tamaño del cuerpo a nivel de servidor y de gateway:
+
+```yaml
+server:
+  tomcat:
+    max-swallow-size: 12MB
+    max-http-form-post-size: 12MB
+```
+
+Añadir además el límite equivalente en el API Gateway, para que el cuerpo excesivo se rechace antes de alcanzar el pod.
+
+---
+
+### SEC-021 — Endpoint interno expuesto en el contrato público y confianza transitiva entre APIs
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-668 (Exposure of Resource to Wrong Sphere), CWE-441 · **OWASP:** API1:2023 · API5:2023
+**Proyecto/API:** bedocmanagement ← bedigitsignature
+
+#### Ubicación
+
+```text
+bedocmanagement  · src/main/resources/openapi.yaml:272 · POST /download_document_intern
+bedocmanagement  · DocumentManagementApiDelegateImpl.java:57-61
+bedocmanagement  · DocumentManagementAdapter.java:240-274 (downloadDocumentIntern, generateDownloadUrlIntern)
+bedigitsignature · infrastructure/utils/Constant.java:21 · POST_DOCUMENT
+bedigitsignature · infrastructure/config/WebClientConfig.java:37-50 · documentWebClient
+bedigitsignature · src/main/resources/config/application.yml · clients.document.x-santander-client-id: 123
+```
+
+#### Descripción
+
+`bedocmanagement` publica dos operaciones de descarga en el mismo contrato:
+
+* `POST /download_document` — devuelve una **URL prefirmada** de S3 con validez de 10 minutos;
+* `POST /download_document_intern` — devuelve **el binario completo** del documento en la respuesta.
+
+La segunda, cuyo nombre indica uso interno, está declarada en el mismo `openapi.yaml`, bajo la misma ruta base `/v2/document_management` y con el mismo esquema de seguridad. No hay ninguna separación: ni un contrato distinto, ni un puerto distinto, ni un `scope` diferenciado, ni un `securityScheme` propio.
+
+`bedigitsignature` la consume con un cliente que envía **credenciales estáticas y triviales**:
+
+```java
+// bedigitsignature/WebClientConfig.java:38-50
+@Bean
+public WebClient documentWebClient(WebClient.Builder builder, DocumentApiProperties properties) {
+    return builder
+            .baseUrl(properties.baseUrl())
+            .defaultHeaders(headers -> {
+                headers.set("channel", properties.channel());                     // "App-Nube"
+                headers.set("society", properties.society());                     // "scp"
+                headers.set("x-santander-client-id", properties.xSantanderClientId());  // "123"
+            })
+            .build();
+}
+```
+
+```yaml
+# bedigitsignature/src/main/resources/config/application.yml
+clients:
+  document:
+    base-url: ${DOCUMENT_URL}
+    x-santander-client-id: 123        # <-- literal, en el fichero base, sin variable de entorno
+    channel: App-Nube
+    society: scp
+```
+
+Y `bedocmanagement` **no valida ninguna de esas tres cabeceras**: no hay un solo `getHeader(...)` ni `@RequestHeader` en todo el proyecto. Son decorativas. La confianza es incondicional.
+
+Esto configura el patrón de confianza transitiva descrito en el modelo de amenazas:
+
+```text
+Consumidor externo
+   ↓ (autenticado por Cognito en el borde, pero sin autorización de objeto — SEC-002)
+bedigitsignature   ← acepta cualquier documentId sin comprobar propiedad
+   ↓ (llamada este-oeste, sin autenticación — SEC-001)
+bedocmanagement    ← confía en que quien llama ya validó
+   ↓
+S3: binario completo del documento
+```
+
+Ninguno de los dos valida. El primero asume que el borde lo hizo; el segundo asume que el primero lo hizo.
+
+#### Flujo (cadena completa)
+
+```text
+POST /v1/signature/signer  { "documentos": [ { "idDocumento": "<id ajeno>" } ] }
+   ↓
+DocumentProcessService.processDocument()
+   ↓
+DocumentClient.getDocument(documentId)
+   ↓
+POST {DOCUMENT_URL}/v2/document_management/download_document_intern
+      headers: channel=App-Nube, society=scp, x-santander-client-id=123
+   ↓
+DocumentManagementAdapter.downloadDocumentIntern()  ← sin autorización
+   ↓
+s3Client.getObject(...)  → InputStreamResource
+   ↓
+DocumentClient.downloadAsBase64()  → log.info("archivo en base64: {}") (SEC-011)
+```
+
+#### Source
+
+`documentos[].idDocumento` del cuerpo de la petición de firma; o, en acceso directo, `document.documentId` del cuerpo de `download_document_intern`.
+
+#### Sink
+
+`s3Client.getObject()` y el binario devuelto.
+
+#### Escenario de explotación
+
+* **Vía externa:** un usuario autenticado por Cognito solicita la firma de un `idDocumento` que no le pertenece. `bedigitsignature` no comprueba propiedad, `bedocmanagement` tampoco, y el contenido del documento acaba en el log (SEC-011) y en la petición al proveedor de firma.
+* **Vía este-oeste:** cualquier pod del VPC invoca directamente `download_document_intern` con las tres cabeceras conocidas —publicadas en el repositorio— y descarga cualquier documento del bucket, evitando por completo Akamai, Imperva, el WAF, Cognito y el API Gateway.
+
+#### Impacto
+
+* **Confidencialidad:** descarga arbitraria de documentos contractuales y de identidad.
+* **Arquitectura:** un endpoint destinado a consumo interno publicado con el mismo nivel de exposición que las operaciones de cliente.
+
+#### Remediación
+
+1. **Separar el plano interno del externo.** Retirar `download_document_intern` del contrato público y publicarlo en un contrato interno, con su propio `securityScheme` y un `scope` dedicado:
+
+```yaml
+# openapi-internal.yaml — recomendado
+components:
+  securitySchemes:
+    ServiceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - ServiceAuth: [document.read.internal]
+```
+
+2. **Autenticar la llamada entre servicios.** Sustituir las cabeceras estáticas por un token de cliente obtenido por client-credentials contra Cognito, o —preferible— mTLS de malla con identidad de workload:
+
+```java
+// Código vulnerable
+.defaultHeaders(headers -> {
+    headers.set("x-santander-client-id", properties.xSantanderClientId());  // "123"
+})
+
+// Código recomendado
+.filter((request, next) -> serviceTokenProvider.getToken()      // client_credentials + scope
+        .flatMap(token -> next.exchange(ClientRequest.from(request)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .build())))
+```
+
+3. **Validar en el receptor.** `bedocmanagement` debe exigir el `scope` interno y aplicar autorización de objeto (SEC-002) — no dar por hecho que el llamante ya validó.
+4. **Aislar en red.** `NetworkPolicy` que restrinja el acceso al puerto de `bedocmanagement` a los pods que legítimamente lo consumen.
+5. Eliminar el literal `x-santander-client-id: 123` del `application.yml` base y externalizarlo (relacionado con SEC-003).
+
+---
+
+### SEC-022 — Actuator accesible sin autenticación con detalle completo
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-200, CWE-732 · **OWASP:** API8:2023 · **Proyecto/API:** todos
+
+#### Ubicación
+
+```text
+<cada-proyecto>/src/main/resources/config/application.yml
+  management.endpoint.health.show-details: ALWAYS
+<cada-proyecto>/.../infrastructure/config/SecurityConfig.java
+  .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+```
+
+#### Descripción
+
+Los once servicios exponen `/actuator/**` con `permitAll` explícito y `show-details: ALWAYS`, sin restringir el conjunto de endpoints publicados (`management.endpoints.web.exposure.include` no aparece en ninguna configuración, por lo que rige el valor por defecto de Spring Boot: `health` e `info`).
+
+Con `show-details: ALWAYS`, `/actuator/health` publica el detalle de cada indicador: estado y detalles del `DataSource` (incluido el producto y la versión de base de datos), `diskSpace` con rutas y capacidad, y el estado de los indicadores personalizados. Es información de reconocimiento directa sobre la infraestructura interna.
+
+**El riesgo mayor es condicional pero relevante.** Si en algún momento se ampliara la exposición —por ejemplo `management.endpoints.web.exposure.include: "*"`, un cambio de una línea y práctica habitual en diagnóstico— quedarían accesibles sin autenticación:
+
+* `/actuator/env` y `/actuator/configprops` — **todas las propiedades de configuración, incluidos los secretos** de SEC-003 resueltos en tiempo de ejecución (Spring enmascara por patrón de nombre, pero `sky.key`, `qurable.token` o `aes.secret` no siempre encajan en los patrones por defecto);
+* `/actuator/loggers` — permite **elevar el nivel de log en caliente** vía `POST`, lo que activa el volcado de `wiretap` (SEC-013) y convierte ese hallazgo en explotable remotamente;
+* `/actuator/heapdump` — volcado completo de memoria, con tokens y datos en claro;
+* `/actuator/mappings`, `/beans`, `/threaddump`.
+
+En el estado actual, con la exposición por defecto, solo `health` e `info` están accesibles. Se clasifica como High por el detalle expuesto, por el `permitAll` explícito que anula cualquier protección del framework, y porque el margen entre el estado actual y el escenario grave es un único cambio de configuración.
+
+#### Escenario de explotación
+
+Desde el plano este-oeste (SEC-001), cualquier pod consulta `/actuator/health` de los once servicios y obtiene un mapa de la infraestructura: qué servicios usan qué bases de datos, su estado y su versión. Si la exposición se amplía, `POST /actuator/loggers/reactor.netty.http.client.HttpClient` con `{"configuredLevel":"DEBUG"}` activa el volcado de todo el tráfico con credenciales, sin autenticación.
+
+#### Impacto
+
+* **Confidencialidad:** reconocimiento de infraestructura; potencialmente secretos y volcados de memoria.
+* **Integridad operativa:** modificación del nivel de log en producción sin autenticación.
+
+#### Remediación
+
+```yaml
+# Código vulnerable
+management:
+  endpoint.health:
+    show-details: ALWAYS
+```
+
+```yaml
+# Código recomendado
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus      # lista blanca explícita
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized          # detalle solo con rol autorizado
+      probes:
+        enabled: true                        # /health/liveness y /health/readiness
+  server:
+    port: 8081                               # puerto de gestión separado, no publicado en el NLB
+```
+
+```java
+// Código recomendado — SecurityConfig
+.requestMatchers(HttpMethod.GET, "/actuator/health/liveness",
+                                 "/actuator/health/readiness").permitAll()   // sondas de K8s
+.requestMatchers("/actuator/**").hasAuthority("SCOPE_ops.monitor")
+```
+
+Publicar el actuator en un puerto separado (`management.server.port`) y no incluirlo en el `Service` expuesto al NLB es la medida más efectiva: las sondas de Kubernetes acceden por el puerto de gestión y ningún consumidor externo lo alcanza.
+
+---
+
+### SEC-023 — Debilidades en la emisión de JWT máquina-a-máquina
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-1270 (Generation of Incorrect Security Tokens), CWE-613 (Insufficient Session Expiration), CWE-1204 (Generation of Weak Initialization Vector — por reutilización de clave)
+**OWASP:** API2:2023 · **Proyecto/API:** becustombeprogrm, bedigitsignature
+
+#### Ubicación
+
+```text
+becustombeprogrm · .../adapters/output/external/SkyTokenService.java:36-53
+becustombeprogrm · src/main/resources/config/application-local.yml:13-17
+bedigitsignature · .../infrastructure/utils/JwtUtil.java:30-47
+```
+
+#### Descripción
+
+Los tokens que estos servicios emiten hacia sus proveedores presentan cuatro defectos:
+
+```java
+// SkyTokenService.java:36-53
+public String generateToken() {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("partnerId", "BSPE"); // opcional
+
+    SecretKey secretKey = Keys.hmacShaKeyFor(
+            jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+
+    long now = System.currentTimeMillis();
+    long expiration = now + 1000 * 60 * 60; // 1 hora
+
+    return Jwts.builder()
+            .setClaims(claims)
+            .setIssuedAt(new Date(now))
+            .setExpiration(new Date(expiration))
+            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .compact();
+}
+```
+
+**(a) Sin `iss`, `aud` ni `jti`.** El token no declara emisor ni destinatario, por lo que el receptor no puede verificar que fue emitido para él. Si el mismo secreto se usa con dos proveedores, un token emitido para uno es válido en el otro. La ausencia de `jti` impide cualquier control anti-replay (SEC-037).
+
+**(b) La clave AES y la clave de firma JWT son el mismo valor.**
+
+```yaml
+# becustombeprogrm/application-local.yml:13-17
+aes:
+  method: /CBC/PKCS5Padding
+  secret: 9b7c2d4e…9d01        # 64 hex = 32 bytes
+
+jwt:
+  secret: 9b7c2d4e…9d01        # <-- idéntico
+```
+
+Y en los perfiles superiores se mantienen como dos variables distintas (`SEC_SKY_ENCRYPT_SECRET`, `SEC_SKY_JWT_SECRET`), pero nada garantiza que se les asigne un valor diferente. Reutilizar una clave para cifrado simétrico y para firma HMAC viola la separación de propósito criptográfico: el compromiso de una operación compromete la otra, y ciertos ataques sobre uno de los usos pueden filtrar información del otro. Además, esa clave se escribe en los logs (SEC-007).
+
+**(c) Expiración de 20 segundos en `bedigitsignature`, documentada como una hora.**
+
+```java
+// JwtUtil.java:38-39
+long now = System.currentTimeMillis();
+long expiration = now + 1000 * 20; // 1 hora
+```
+
+`1000 * 20` son 20 segundos. El comentario dice lo contrario. Este token está destinado al callback de firma (SEC-006), que se dispara cuando la persona firma el documento — minutos u horas después. El token estaría siempre expirado. Actualmente el defecto queda enmascarado porque el token ni siquiera llega a enviarse (bug de `replace`, SEC-006).
+
+**(d) API obsoleta.** `setClaims`, `setIssuedAt`, `setExpiration` y `signWith(key, SignatureAlgorithm)` están deprecados desde jjwt 0.12; el proyecto usa 0.11.5 (SEC-034). Además, `setClaims(map)` **reemplaza** el conjunto de claims, por lo que cualquier claim registrado añadido antes se perdería.
+
+#### Impacto
+
+* **Confidencialidad e integridad:** un token sin `aud` es reutilizable frente a cualquier receptor que comparta el secreto; la reutilización de clave amplía el radio de un compromiso.
+* **Disponibilidad funcional:** con 20 segundos de vida, el callback de firma no puede autenticarse — el flujo no cierra.
+* **Trazabilidad:** sin `jti` no hay forma de invalidar un token concreto ni de detectar su reutilización.
+
+#### Remediación
+
+```java
+// Código vulnerable
+return Jwts.builder()
+        .setClaims(claims)
+        .setIssuedAt(new Date(now))
+        .setExpiration(new Date(expiration))
+        .signWith(secretKey, SignatureAlgorithm.HS256)
+        .compact();
+```
+
+```java
+// Código recomendado (jjwt 0.12.x)
+public String generateToken(String audience, Duration ttl) {
+    Instant now = Instant.now();
+    return Jwts.builder()
+            .issuer("cpe-nxhbsc-becustombeprogrm")
+            .audience().add(audience).and()
+            .subject(partnerId)
+            .id(UUID.randomUUID().toString())            // jti
+            .claim("partnerId", "BSPE")
+            .issuedAt(Date.from(now))
+            .notBefore(Date.from(now))
+            .expiration(Date.from(now.plus(ttl)))
+            .signWith(signingKey, Jwts.SIG.HS256)
+            .compact();
+}
+```
+
+Y en configuración:
+
+```yaml
+# Recomendado — claves separadas, sin valores por defecto
+aes:
+  method: ${SEC_SKY_ENCRYPT_METHOD}
+  secret: ${SEC_SKY_ENCRYPT_SECRET}      # clave de cifrado, exclusiva
+
+jwt:
+  secret: ${SEC_SKY_JWT_SECRET}          # clave de firma, distinta y rotada por separado
+  ttl-seconds: ${SKY_JWT_TTL:3600}
+```
+
+Acciones adicionales:
+
+1. **Verificar en el arranque que `aes.secret != jwt.secret`** y fallar si coinciden.
+2. Corregir la expiración de `bedigitsignature` y externalizarla; un TTL de callback debe cubrir el tiempo real del proceso de firma (SEC-006).
+3. Migrar a **jjwt 0.12.x** y actualizar la API (SEC-034).
+4. Considerar la migración a claves asimétricas (RS256/ES256) para los tokens dirigidos a terceros: evita compartir un secreto simétrico con el proveedor y permite rotación sin coordinación.
+
+---
+
+### SEC-047 — Enumeración diferencial: tres respuestas distintas ante el mismo recurso inexistente
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-204 (Observable Response Discrepancy), CWE-203
+**OWASP:** API1:2023 Broken Object Level Authorization
+**Proyecto/API:** cpe-nxhbsc-bedocmanagement
+
+#### Ubicación
+
+```text
+Archivo: .../infrastructure/adapters/output/DocumentManagementAdapter.java
+Métodos: downloadDocument(...)   · líneas 61-71   → 404
+         getDocument(...)        · líneas 178-185 → 200 con objeto vacío
+         deleteDocument(...)     · líneas 200-215 → 204
+```
+
+#### Descripción
+
+Tres operaciones consultan el mismo registro por el mismo identificador y responden de forma distinta cuando no existe:
+
+```java
+// downloadDocument:65-67  → 404
+if (fileEntity.isEmpty()) {
+  throw new NotFoundException("documento_no_encontrado", "No se encontro el documento solicitado");
+}
+
+// getDocument:180-182  → 200 con cuerpo vacío
+if(objectMetadataOptional.isEmpty()){
+  return new WrapperMySearchDocumentResponse();
+}
+
+// deleteDocument:202-204  → 204, igual que si hubiera borrado
+if (fileEntityOptional.isEmpty()){
+  return null;
+}
+```
+
+La diferencia entre `404` y `200` convierte el par de endpoints en un **oráculo de existencia**: sin acceder al contenido, el solicitante distingue qué identificadores existen. Es el paso previo habitual a la explotación de SEC-002, y elimina el único obstáculo práctico que tendría un atacante — no conocer los identificadores válidos.
+
+`deleteDocument` devolviendo `204` en ambos casos tiene el problema inverso: oculta si la operación tuvo efecto, lo que dificulta detectar un borrado abusivo en los registros.
+
+#### Flujo
+
+```text
+GET /v2/document_management/documents/<id-candidato>
+   ↓
+200 + cuerpo vacío  → el identificador NO existe
+200 + metadatos     → el identificador SÍ existe  → explotar vía SEC-002/SEC-048
+```
+
+#### Source
+
+`document_id` (path) y `document.documentId` (cuerpo).
+
+#### Sink
+
+Código de estado y forma del cuerpo de la respuesta.
+
+#### Escenario de explotación
+
+Iterar identificadores contra `GET /documents/{id}` y quedarse con los que devuelven cuerpo no vacío. Se obtiene el inventario de identificadores válidos sin generar un solo error, lo que además reduce la probabilidad de disparar alertas basadas en tasa de 4xx.
+
+#### Impacto
+
+* **Confidencialidad:** habilita la explotación dirigida de SEC-002, SEC-048 y SEC-049.
+* **Detección:** un barrido que solo produce respuestas 200 es más difícil de detectar que uno que genera 404 masivos.
+
+#### Remediación
+
+Unificar el comportamiento: la misma condición debe producir la misma respuesta en las tres operaciones, y esa respuesta debe ser `404` **después** de comprobar la titularidad (ver SEC-002), de modo que "no existe" y "no es tuyo" sean indistinguibles.
+
+```java
+// Código vulnerable — tres comportamientos distintos
+if(objectMetadataOptional.isEmpty()){
+  return new WrapperMySearchDocumentResponse();      // 200 vacío
+}
+
+// Código recomendado — comportamiento único
+FileEntity file = repository.getByKey(documentId, null)
+        .filter(f -> authorizationService.puedeAcceder(currentPrincipal(), f))
+        .orElseThrow(() -> new NotFoundException(
+                "documento_no_encontrado", "No se encontró el documento solicitado"));
+```
+
+Devolver `404` en lugar de `403` cuando el documento existe pero pertenece a otro titular es deliberado: un `403` confirmaría su existencia.
+
+---
+
+### SEC-048 — El documento de identidad del titular se devuelve en los metadatos
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-359 (Exposure of Private Personal Information), CWE-213
+**OWASP:** API3:2023 Broken Object Property Level Authorization
+**Proyecto/API:** cpe-nxhbsc-bedocmanagement
+
+#### Ubicación
+
+```text
+Archivo: .../infrastructure/adapters/output/DocumentMapper.java
+Métodos: toEntity(...)  · líneas 71-90   (escritura)
+         getMapper(...) · líneas 111-118 (lectura)
+```
+
+#### Descripción
+
+En la subida, el identificador del titular se almacena en el campo `name` de la entidad:
+
+```java
+// DocumentMapper.java:78-82
+if (documentRequest.getOwners().isEmpty()){
+    entity.setName("NUBE");
+} else {
+    entity.setName(documentRequest.getOwners().get(0).getOwnerId());   // <-- DNI del titular
+}
+```
+
+Y en la consulta de metadatos ese mismo campo se publica en la respuesta:
+
+```java
+// DocumentMapper.java:111-118
+public WrapperMySearchDocumentResponse getMapper(FileEntity entity){
+    WrapperMySearchDocumentResponse response = new WrapperMySearchDocumentResponse();
+    response.setName(entity.getName());                 // <-- devuelve el ownerId
+    response.setDocumentId(entity.getCustomerId());
+    ...
+}
+```
+
+El campo `name` de la respuesta —que por su nombre parecería el nombre del documento— contiene en realidad el **documento de identidad del titular**. El nombre real del fichero está en `fileName`, que no se devuelve (ver SEC-051).
+
+#### Flujo
+
+```text
+GET /v2/document_management/documents/{document_id}
+   ↓
+DocumentManagementAdapter.getDocument()
+   ↓
+DocumentMapper.getMapper()  → response.name = FileEntity.name = ownerId
+   ↓
+200 {"name": "<DNI del titular>", "documentId": "...", ...}
+```
+
+#### Source
+
+`document_id` en la ruta, sin control de titularidad (SEC-002).
+
+#### Sink
+
+Cuerpo de la respuesta HTTP.
+
+#### Escenario de explotación
+
+Encadenado, produce la extracción completa del repositorio documental con su titular:
+
+```text
+SEC-014  GET /documents/{cualquiera}/versions  → nombres de fichero de TODOS los documentos
+SEC-047  GET /documents/{id}                   → identificar cuáles existen
+SEC-048  GET /documents/{id}                   → DNI del titular de cada uno
+```
+
+Dos llamadas por documento bastan para construir la relación completa *documento → titular*.
+
+#### Impacto
+
+* **Confidencialidad:** exposición de datos personales identificativos asociados a documentación contractual.
+* **Cumplimiento:** tratamiento y divulgación de identificadores personales fuera de la finalidad de la operación (Ley 29733).
+
+#### Remediación
+
+```java
+// Código vulnerable
+response.setName(entity.getName());        // ownerId
+
+// Código recomendado — devolver el nombre del fichero, no el titular
+response.setName(entity.getFileName());
+```
+
+Y corregir el modelo para que el titular viaje en un campo con nombre correcto y solo se devuelva cuando el solicitante sea ese titular:
+
+```java
+// Código recomendado
+if (authorizationService.esTitular(currentPrincipal(), entity)) {
+    response.setOwnerId(mask(entity.getOwnerId()));   // enmascarado incluso para el titular
+}
+```
+
+Revisar en la misma línea el resto de `WrapperMySearchDocumentResponse`: aplicar el principio de mínima exposición y devolver solo los campos que el consumidor necesita.
+
+---
+
+### SEC-049 — Borrado de documentos sin verificación de titularidad ni de existencia
+
+**Severidad:** High · **Confianza:** CONFIRMADO · **Prioridad:** P1
+**CWE:** CWE-639 (Authorization Bypass Through User-Controlled Key), CWE-284
+**OWASP:** API1:2023 Broken Object Level Authorization
+**Proyecto/API:** cpe-nxhbsc-bedocmanagement
+
+#### Ubicación
+
+```text
+Archivo: .../infrastructure/adapters/output/DocumentManagementAdapter.java
+Método:  deleteDocument(String documentId)  · líneas 200-215
+Endpoint: DELETE /v2/document_management/documents/{document_id}
+```
+
+#### Descripción
+
+```java
+@Override
+public Void deleteDocument(String documentId) {
+  Optional<FileEntity> fileEntityOptional = repository.getByKey(documentId,null);
+  if (fileEntityOptional.isEmpty()){
+    return null;                                  // 204, como si hubiera borrado
+  }
+  FileEntity fileEntity = fileEntityOptional.get();
+
+  String key = fileEntity.getUrl();
+  s3Client.deleteObject(DeleteObjectRequest.builder()
+          .bucket(bucketName).key(key).build());  // borra el objeto en S3
+  repository.delete(fileEntity);                  // y el registro en DynamoDB
+  return null;
+}
+```
+
+El identificador llega del solicitante y **no se comprueba a quién pertenece el documento**. La operación es destructiva y afecta a los dos almacenes: el binario en S3 y la metadata en DynamoDB.
+
+Agrava el problema que el bucket no tenga versionado verificable desde el código (SEC-015): sin él, el borrado es irreversible.
+
+Además devuelve `204` tanto si borró como si el documento no existía, lo que impide distinguir en los registros un borrado real de un intento fallido.
+
+#### Flujo
+
+```text
+DELETE /v2/document_management/documents/<id ajeno>
+Authorization: Bearer <token válido de cualquier consumidor>
+   ↓
+DocumentManagementApiDelegateImpl.removeDocument()
+   ↓
+deleteDocument()  ← sin comprobación de titularidad
+   ↓
+s3Client.deleteObject()  +  repository.delete()
+   ↓
+204 No Content
+```
+
+#### Source
+
+`document_id` en la ruta.
+
+#### Sink
+
+`s3Client.deleteObject()` y `repository.delete()`.
+
+#### Escenario de explotación
+
+Con los identificadores obtenidos vía SEC-014 y SEC-047, un consumidor con token válido puede eliminar documentación contractual de cualquier cliente. No requiere privilegios especiales ni conocimiento interno: el `document_id` es el único dato necesario, y es enumerable.
+
+#### Impacto
+
+* **Integridad y disponibilidad:** destrucción de documentación contractual, potencialmente irreversible.
+* **Negocio y cumplimiento:** pérdida de evidencia documental con valor probatorio; posible incumplimiento de obligaciones de conservación.
+
+#### Remediación
+
+```java
+// Código recomendado
+@Override
+public Void deleteDocument(String documentId) {
+  FileEntity file = repository.getByKey(documentId, null)
+          .orElseThrow(() -> new NotFoundException(
+                  "documento_no_encontrado", "No se encontró el documento solicitado"));
+
+  authorizationService.assertEsTitular(currentPrincipal(), file);   // 404 si no lo es
+
+  auditService.registrarBorrado(currentPrincipal(), documentId);    // traza previa
+
+  s3Client.deleteObject(DeleteObjectRequest.builder()
+          .bucket(bucketName).key(file.getUrl()).build());
+  repository.delete(file);
+  return null;
+}
+```
+
+Complementariamente, y con independencia del control de acceso:
+
+1. **Activar versionado en el bucket** para que un borrado sea reversible.
+2. **Considerar borrado lógico** (`status = deleted` + TTL) en lugar de físico, dado el valor probatorio de estos documentos.
+3. **Auditar toda operación destructiva** con el principal, el objeto y la marca temporal.
+
+---
+
+## 6. Hallazgos de severidad Medium
+
+Los siguientes hallazgos están confirmados en el código y documentados con su ubicación exacta. Se presentan de forma más concisa por su menor impacto individual; varios de ellos, sin embargo, contribuyen a las cadenas de ataque de la §7.
+
+### SEC-024 — Cifrado AES sin autenticación y con transformación tomada de configuración
+
+**CWE-353 · becustombeprogrm · `AesEncryptionService.java:30-46, 61-67`**
+
+```java
+@SuppressWarnings("java:S5542")        // <-- supresión de la regla "cipher should be robust"
+public String encrypt(String value){
+    String transformation = resolveTransformation();   // p. ej. "AES" + "/CBC/PKCS5Padding"
+    ...
+    Cipher cipher = Cipher.getInstance(transformation);
+    cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+```
+
+El IV se genera con `SecureRandom` y se antepone al texto cifrado — eso es correcto. El problema es que **AES/CBC no proporciona integridad**: el receptor no puede detectar si el texto cifrado fue manipulado, lo que abre la puerta a ataques de tipo padding oracle si el proveedor devuelve errores distinguibles (y de hecho `SKYServiceAdapter` distingue explícitamente el estado 406 como "Error de desencriptado", líneas 61-67 — exactamente el oráculo que ese ataque necesita).
+
+Además, `resolveTransformation()` toma el modo de una propiedad externa, por lo que un cambio de configuración a `/ECB/PKCS5Padding` degradaría el cifrado sin cambio de código. La supresión `@SuppressWarnings("java:S5542")` oculta esta advertencia al análisis estático.
+
+```java
+// Código recomendado — AES-GCM (cifrado autenticado), transformación fija
+private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+private static final int GCM_TAG_BITS = 128;
+private static final int GCM_IV_BYTES = 12;
+
+public String encrypt(String value) {
+    byte[] iv = new byte[GCM_IV_BYTES];
+    SecureRandom.getInstanceStrong().nextBytes(iv);
+
+    Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+    cipher.init(Cipher.ENCRYPT_MODE, keySpec, new GCMParameterSpec(GCM_TAG_BITS, iv));
+    byte[] encrypted = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
+    ...
+}
+```
+
+Si el proveedor SKY impone AES/CBC, mantenerlo pero **añadir un HMAC-SHA256 sobre IV+ciphertext** con una clave distinta (encrypt-then-MAC), y eliminar la supresión de la regla dejando constancia del acuerdo con el proveedor.
+
+### SEC-025 — Swagger UI y `/v3/api-docs` habilitados en todos los perfiles
+
+**Severidad: Low** (rebajado desde Medium: el API Gateway no publica estas rutas) · **CWE-200 · todos · `application.yml`, `SecurityConfig`**
+
+`springdoc.swagger-ui.path: /swagger-ui.html` esta definido en el `application.yml` base de los once proyectos, sin `springdoc.api-docs.enabled: false` en ningún perfil, y `SecurityConfig` lo declara `permitAll` de forma explícita. Desde el plano este-oeste, cualquier pod obtiene el contrato completo de los once servicios: rutas, esquemas y modelos de datos.
+
+```yaml
+# Recomendado — application-pro.yml / application-pre.yml / application-cert.yml
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+```
+
+### SEC-026 — Cabeceras del consumidor alimentan el motor de decisión de riesgo
+
+**CWE-807 · becreditrisk · `CreditRiskDelegateImpl.java:33-42`**
+
+```java
+var app = httpServletRequest.getHeader("society");
+var channel = httpServletRequest.getHeader("channel");
+var response = useCase.validateCreditRisk(
+        mapper.toCreditRiskValidateCriteria(creditRiskValidateRequest, app, channel));
+```
+
+`society` y `channel` llegan sin validar desde el consumidor y forman parte de los `globalParameters` que se envían a Modellica. El solicitante declara en qué sociedad y por qué canal opera; si el motor de decisión aplica reglas distintas según esos valores —que es su propósito—, el solicitante influye en el resultado de la evaluación de riesgo.
+
+```java
+// Código recomendado
+private static final Set<String> ALLOWED_SOCIETIES = Set.of("SCP", "BSP");
+private static final Set<String> ALLOWED_CHANNELS  = Set.of("APP", "WEB", "OFICINA");
+
+String society = require(httpServletRequest.getHeader("society"), ALLOWED_SOCIETIES, "society");
+String channel = require(httpServletRequest.getHeader("channel"), ALLOWED_CHANNELS, "channel");
+```
+
+Preferible aún: derivar ambos valores de los claims del token de Cognito o del `client_id` registrado, no de cabeceras que el llamante controla.
+
+### SEC-027 — `forward-headers-strategy: framework` con proxies encadenados
+
+**CWE-348 · todos · `application.yml`** · Confianza: REQUIERE VALIDACIÓN
+
+Los once servicios habilitan `server.forward-headers-strategy: framework`, lo que hace que Spring reconstruya el esquema, host y **IP de origen** a partir de `X-Forwarded-*`. La cadena tiene cinco saltos (Akamai → Imperva → WAF → API Gateway → PrivateLink → NLB), y no hay configuración de proxies de confianza. Si algún tramo no normaliza `X-Forwarded-For`, un valor inyectado por el cliente podría falsear la IP de origen registrada en los logs y en cualquier decisión basada en ella.
+
+No se identificó ninguna lógica de negocio que dependa de la IP de origen, por lo que el impacto actual se limita a la trazabilidad. Verificar con el equipo de plataforma que Imperva y el API Gateway sobrescriben (no anexan) la cabecera, y considerar `ForwardedHeaderFilter` con lista de proxies de confianza.
+
+### SEC-028 — Excepciones no controladas producen respuestas 500
+
+**CWE-248 · 5 proyectos**
+
+Ninguno de los `ControllerAdvice` declara un manejador para `Exception.class`; solo cubren `BusinessException`, `MethodArgumentNotValidException` y `HttpMessageNotReadableException`. `bedigitsignature` y `bedocmanagement` no tienen `ControllerAdvice` en absoluto. Puntos confirmados que lanzan excepciones no mapeadas con entrada controlada por el solicitante:
+
+| Ubicación | Excepción | Disparador |
+| --------- | --------- | ---------- |
+| `bedigitsignature/DocumentProcessService.java:71` | `NoSuchElementException` | `.findFirst().get()` con `idDocumento` inexistente |
+| `bedigitsignature/DocumentProcessService.java:49` | `NullPointerException` | `documentos` ausente (sin `required` en el contrato) |
+| `beemailboxes/OTPServiceAdapter.java:105` | `NullPointerException` | `attachments` y `metadata` ambos nulos |
+| `beemailboxes/OTPServiceAdapter.java:106` | `NumberFormatException` | `templateId` no numérico |
+| `beemailboxes/OTPServiceAdapter.java:109` | `IndexOutOfBoundsException` | `flow` inexistente en la tabla |
+| `becustombeprogrm/QurableServiceAdapter.java:169-177` | `IllegalArgumentException` | `benefit_program_id` distinto de `UP`/`DOWN` |
+| `bedocmanagement/FileSearchMapper.java:51-76` | `IllegalArgumentException`, `NumberFormatException` | `keyId`/`keyValue` inválidos |
+
+```java
+// Código recomendado — .get() sustituido por control explícito
+ApplicationSignDocumentRequestInner docItem = client.getDocumentos().stream()
+        .filter(doc -> documentId.equals(doc.getIdDocumento()))
+        .findFirst()
+        .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, List.of(Exceptions.TL0002)));
+```
+
+```java
+// Código recomendado — manejador de último recurso en cada ControllerAdvice
+@ExceptionHandler(Exception.class)
+public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+    String correlationId = UUID.randomUUID().toString();
+    log.error("Error no controlado. correlationId={}", correlationId, ex);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ErrorResponse.builder().errors(List.of(ErrorItem.builder()
+                    .code(Exceptions.TL9999.getCode())
+                    .message(Exceptions.TL9999.getMessage())
+                    .level("error")
+                    .description("Referencia: " + correlationId)     // sin detalle interno
+                    .build())).build());
+}
+```
+
+### SEC-029 — `ddl-auto: update` y `sql.init.mode: always` en producción
+
+**CWE-16 · beproducoffering · `application-pro.yml`**
+
+```yaml
+jpa:
+  hibernate:
+    ddl-auto: update          # Hibernate modifica el esquema en producción
+  defer-datasource-initialization: true
+sql:
+  init:
+    mode: always              # ejecuta schema.sql/data.sql en cada arranque
+```
+
+`ddl-auto: update` permite que un cambio en una entidad Java altere el esquema de la base de datos productiva sin control de cambios ni revisión. `sql.init.mode: always` ejecuta scripts de inicialización en cada arranque. Los demás proyectos con RDS (`becreditrisk`) usan correctamente `validate`.
+
+```yaml
+# Recomendado
+jpa:
+  hibernate:
+    ddl-auto: validate
+sql:
+  init:
+    mode: never
+```
+
+Los cambios de esquema deben gestionarse con una herramienta de migración versionada (Liquibase/Flyway).
+
+### SEC-030 — `patchConsent` nunca actualiza el consentimiento
+
+**CWE-670 · bedatacomanagment · `DataConsentManagementAdapter.java:75-93`**
+
+```java
+Optional<ConsentEntity> entityList = consentRepository.getByKeyAndSk(partyId, consentId);
+if (entityList.isEmpty()) {
+    throw new SantanderException("El consentimiento que intenta actualizar no existe");
+}
+consentRepository.putIfAbsent(mapper.toEntityUpdate(criteria, partyId, consentId));   // <-- putIfAbsent
+```
+
+`putIfAbsent` aplica la condición `attribute_not_exists(id) AND attribute_not_exists(sk)`. Como el método acaba de comprobar que el registro **sí** existe, la escritura falla siempre con `ConditionalCheckFailedException`, capturada por el `catch (Exception)` y convertida en un 500 genérico. **La revocación o modificación de un consentimiento de tratamiento de datos nunca se persiste.**
+
+Es un defecto funcional con consecuencia de cumplimiento directa: si un titular revoca su consentimiento, el sistema informa de un error y el consentimiento previo permanece vigente.
+
+```java
+// Código recomendado
+consentRepository.update(mapper.toEntityUpdate(criteria, partyId, consentId));
+```
+
+```java
+// BaseDynamoRepository — recomendado
+public T update(T item) {
+    return table.updateItem(UpdateItemEnhancedRequest.builder(itemClass)
+            .item(item)
+            .ignoreNulls(true)                       // actualización parcial
+            .build());
+}
+```
+
+### SEC-031 — El JWT se usa como clave primaria en DynamoDB
+
+**CWE-522 · bedigitsignature · `Entity.java:53-73`, `DocumentProcessService.java:107`**
+
+```java
+@DynamoDbBean
+public class Entity {
+    private String jwt;
+    ...
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("documentNumber")      // <-- el atributo se llama "documentNumber"
+    public String getJwt() { return jwt; }
+```
+
+Un token de autenticación se almacena en claro como clave de partición. Las claves primarias aparecen en índices, en backups, en exportaciones a S3, en `Contributor Insights` y en las métricas de claves calientes de DynamoDB — todos ellos lugares donde un secreto no debería estar. Además, el atributo se denomina `documentNumber`, lo que induce a error a cualquiera que consulte la tabla o construya una consulta sobre ella.
+
+```java
+// Código recomendado
+@DynamoDbBean
+public class SignatureBatchEntity {
+    private String loteId;
+    private String documentId;
+    private String jwtId;        // solo el 'jti', no el token
+    private String estado;
+    private Instant createdAt;
+    private Long ttl;            // expiración automática
+
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("loteId")
+    public String getLoteId() { return loteId; }
+
+    @DynamoDbSortKey
+    @DynamoDbAttribute("documentId")
+    public String getDocumentId() { return documentId; }
+}
+```
+
+El callback debe localizar el lote por `loteId` (obtenido del `sub` del token que él mismo presenta y valida), no por el token almacenado.
+
+### SEC-032 — Código de prueba activo en la ruta productiva
+
+**CWE-489 · bedigitsignature · `DocumentClient.java:34-46`**
+
+```java
+public Mono<String> getDocument(String documentId) {
+    log.info("antes en obtener document, documentId: {}", documentId);
+    if(documentId.equals("CONTRATO_CLIENTE")){
+        try {
+            ClassPathResource resource = new ClassPathResource("test.pdf");
+            byte[] pdfBytes = resource.getInputStream().readAllBytes();
+            String fileBase64 = Base64.getEncoder().encodeToString(pdfBytes);
+            return Mono.just(fileBase64);
+        } catch (Exception ex){ return Mono.empty(); }
+    }
+    ...
+```
+
+Un valor mágico en la entrada desvía el flujo a un documento empaquetado en el JAR, evitando por completo la consulta a `bedocmanagement`. Permite enviar a firmar un PDF de pruebas como si fuera un contrato real. Además, `documentId.equals(...)` lanza `NullPointerException` si el valor es nulo (SEC-028).
+
+```java
+// Código recomendado
+public Mono<String> getDocument(String documentId) {
+    Objects.requireNonNull(documentId, "documentId es obligatorio");
+    return documentWebClient.post()
+            .uri(Constant.POST_DOCUMENT)
+            ...
+}
+```
+
+El caso de prueba debe cubrirse con un stub en los tests (WireMock/MockWebServer), no con una rama condicional en el adaptador productivo. Retirar también `test.pdf` de `src/main/resources`.
+
+### SEC-033 — Token cacheado indefinidamente y sin renovación
+
+**CWE-613 · beclaims · `TokenService.java:31-67`**
+
+```java
+private String cachedToken;
+
+public String getToken(){
+    if(cachedToken == null) {          // <-- única condición de renovación
+        refreshToken();
+    }
+    return cachedToken;
+}
+
+private synchronized void refreshToken(){
+    if(cachedToken!= null){ return; }
+    var authRequest = buildAuthRequest();
+    log.warn("authRequest: {}", authRequest.toString());          // SEC-007
+
+    var response = tokenWebClient.post()
+            ...
+            .bodyValue(buildAuthRequest())     // <-- se construye por segunda vez
+            ...
+```
+
+El token se obtiene una vez y no se renueva nunca mientras viva el pod. Cuando el token expire en el proveedor, todas las llamadas devolverán 401 — que, por SEC-010, se convierten en respuestas mock exitosas, ocultando el fallo por completo. `becreditrisk` y `bewatchscreening` sí gestionan la expiración; `beclaims` no.
+
+Detalle adicional: `buildAuthRequest()` se invoca dos veces (líneas 49 y 55), lo que evidencia que el registro de la línea 50 se añadió para depuración y quedó en el código.
+
+```java
+// Código recomendado — alineado con becreditrisk
+private volatile CachedToken cachedToken;
+
+public String getToken() {
+    if (isTokenValid()) return cachedToken.getAccessToken();
+    refreshToken();
+    return cachedToken.getAccessToken();
+}
+
+private synchronized void refreshToken() {
+    if (isTokenValid()) return;
+    var authRequest = buildAuthRequest();                          // una sola vez
+    var response = tokenWebClient.post().uri(Constant.POST_TOKEN)
+            .bodyValue(authRequest)
+            ...
+            .block();
+    if (response == null || response.getToken() == null) {
+        throw new ClaimsValidationException(Constant.MESSAGE_INVALID_CREDENTIALS);
+    }
+    cachedToken = new CachedToken(response.getToken(),
+                                  Instant.now().plusSeconds(TOKEN_TTL_SECONDS - 30));
+}
+
+private boolean isTokenValid() {
+    return cachedToken != null && Instant.now().isBefore(cachedToken.getExpirationTime());
+}
+```
+
+### SEC-034 — Deriva de versiones y mezcla de majors incompatibles
+
+**CWE-1104 · todos · `pom.xml`**
+
+Ver el detalle en la seccion 12 (Dependency Security Review). Resumen: tres versiones distintas del parent corporativo (1.5.1, 1.5.2, 1.6.0), tres de Jackson (2.18.8, 2.21.4, 2.21.5), tres de Netty (4.1.135, 4.1.136, 4.2.13) y dos de AWS SDK STS (2.40.13, 2.42.33) conviviendo entre proyectos del mismo dominio.
+
+El caso con riesgo tecnico inmediato es `bedatacomanagment`, que combina **dos lineas mayores de Netty en el mismo artefacto**: `netty-handler` y `netty-resolver-dns` en 4.1.135.Final junto a `netty-codec-http`, `netty-codec-http2` y `netty-transport-native-epoll` en 4.2.13.Final. Netty no garantiza compatibilidad binaria entre 4.1.x y 4.2.x, por lo que la combinacion puede producir `NoSuchMethodError` en tiempo de ejecucion.
+
+### SEC-035 — `assert` usado para control de flujo
+
+**CWE-617 · beemailboxes · `JsonTokenProvider.java:56`, `XmlTokenProvider.java:116`**
+
+```java
+ResponseEntity<OTPTokenResponse> response = restTemplate.postForEntity(...);
+OTPTokenResponse data = response.getBody();
+
+assert data != null;                       // <-- inactivo salvo con -ea
+cachedToken = data.getData().getAccessToken();
+```
+
+Las aserciones de Java están **desactivadas por defecto** en tiempo de ejecución. La comprobación no se ejecuta y la línea siguiente produce `NullPointerException`, que se propaga hasta un 500 (SEC-028). El código transmite una garantía que no existe.
+
+```java
+// Código recomendado
+OTPTokenResponse data = response.getBody();
+if (data == null || data.getData() == null) {
+    throw new BusinessException(HttpStatus.BAD_GATEWAY, List.of(Exceptions.TL9999));
+}
+```
+
+### SEC-036 — `XmlMapper` sin endurecimiento explícito
+
+**CWE-611 · beemailboxes · `XmlApiClient.java:31, 124`** · Confianza: REQUIERE VALIDACIÓN
+
+```java
+private final XmlMapper xmlMapper = new XmlMapper();
+...
+ResponseOTP responseOTP = xmlMapper.readValue(response.getBody(), ResponseOTP.class);
+```
+
+Se deserializa XML procedente del proveedor de correo sin configurar explícitamente el parser. Las versiones actuales de Woodstox —el backend por defecto de `jackson-dataformat-xml`— deshabilitan las entidades externas por defecto, por lo que **no se confirma explotabilidad**; pero la configuración depende de la biblioteca subyacente y no del código, lo que la hace frágil ante cambios de dependencia. Dado que la respuesta del proveedor es una entrada no confiable (SEC-004 permite además su manipulación en tránsito), conviene fijarlo explícitamente:
+
+```java
+// Código recomendado
+private static XmlMapper hardenedXmlMapper() {
+    XMLInputFactory factory = XMLInputFactory.newFactory();
+    factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    return new XmlMapper(new XmlFactory(factory));
+}
+```
+
+Declarar además el bean como singleton de Spring en lugar de instanciarlo por componente.
+
+### SEC-037 — Ausencia de idempotencia y de protección anti-replay
+
+**CWE-799 · bedigitsignature, becustombeprogrm, beemailboxes**
+
+Ninguna operación de escritura acepta una clave de idempotencia, y ninguna incorpora `timestamp`, `nonce` o identificador de petición para detectar reenvíos. Operaciones afectadas y su efecto ante un reenvío:
+
+| Operación | Efecto de la repetición |
+| --------- | ----------------------- |
+| `POST /v1/signature/signer` | Nuevo `loteId` y nueva solicitud de firma al proveedor por cada llamada |
+| `POST /register_customer` | Alta duplicada en SKY (agravado por el retry, SEC-017) |
+| `POST /{emailbox_id}/send_email` | Nuevo OTP y nuevo correo en cada llamada |
+| `POST /consent_relationships` | Consentimiento duplicado con nuevo UUID |
+
+```java
+// Código recomendado — patrón general
+public ApplicationSignatureResponse signtureDocument(ApplicationSignatureRequest request,
+                                                     String idempotencyKey) {
+    Optional<StoredResponse> previous = idempotencyStore.find(idempotencyKey);
+    if (previous.isPresent()) {
+        return previous.get().response();          // misma respuesta, sin repetir el efecto
+    }
+    ApplicationSignatureResponse response = doSign(request);
+    idempotencyStore.save(idempotencyKey, response, Duration.ofHours(24));
+    return response;
+}
+```
+
+Declarar `Idempotency-Key` como cabecera requerida en los contratos de las operaciones de escritura, y usar el TTL nativo de DynamoDB para la tabla de idempotencia.
+
+### SEC-038 — Datos externos escritos en el log sin neutralizar
+
+**CWE-117 · 6 proyectos** · Confianza: REQUIERE VALIDACIÓN
+
+Valores controlados por el solicitante se interpolan directamente en mensajes de log:
+
+```java
+bedigitsignature/DocumentClient.java:36      log.info("antes en obtener document, documentId: {}", documentId);
+becustombeprogrm/AltaUsuarioService.java:36  log.info("Iniciando alta de usuario. documentNumber={}", documentNumber);
+becustombeprogrm/QurableServiceAdapter.java:158  log.info("Usuario no encontrado en Qurable. documentNumber={}", documentNumber);
+```
+
+Si un valor contiene `\n` o `\r`, puede inyectar líneas falsas en el log. El formato configurado es `GLUONLOG`, que serializa a JSON y previsiblemente escapa los caracteres de control — de ahí la clasificación como *requiere validación*. Debe confirmarse con el equipo del framework; si el escape no está garantizado, sanear en origen:
+
+```java
+// Código recomendado
+private static String safe(String value) {
+    return value == null ? "null" : value.replaceAll("[\\r\\n\\t]", "_");
+}
+log.info("Obteniendo documento. documentId={}", safe(documentId));
+```
+
+Nota adicional: varios de estos registros escriben el número de documento del cliente en nivel `INFO`. Aun sin inyección, es dato personal en logs con retención prolongada; conviene enmascararlo (`****5678`).
+
+### SEC-039 — `search_documents` ejecuta un Scan completo de DynamoDB
+
+**CWE-405 · bedocmanagement · `BaseDynamoRepository.java:76-92`, `DocumentManagementAdapter.java:79-96`**
+
+```java
+public List<T> search(FileSearch search) {
+    ExpressionBuilder builder = new ExpressionBuilder();
+    Expression expression = builder.build(search);
+
+    ScanEnhancedRequest request = ScanEnhancedRequest.builder()
+            .filterExpression(expression)      // <-- filtro, no condición de clave
+            .build();
+    ...
+}
+```
+
+En DynamoDB, `filterExpression` se aplica **después** de leer los elementos: el `Scan` recorre la tabla completa y consume capacidad por todo lo leído, no por lo devuelto. Sin paginación ni `Limit`, cada búsqueda es una lectura íntegra de la tabla de documentos. Combinado con la ausencia de autorización (SEC-002), permite además localizar documentos de cualquier titular.
+
+**Aspecto positivo confirmado:** `ExpressionBuilder` construye la expresión con marcadores (`#n0`, `:v0`) y `expressionNames`/`expressionValues`, y `FileSearchMapper.mapField` valida el campo contra el enum `FileField`. **No existe inyección de expresión** — es una implementación correcta y merece señalarse como control existente (§13).
+
+```java
+// Código recomendado — índice secundario global + consulta acotada
+public List<T> searchByOwner(String ownerId, FileSearch search, int limit, Map<String, AttributeValue> startKey) {
+    return table.index("owner-index")
+            .query(QueryEnhancedRequest.builder()
+                    .queryConditional(QueryConditional.keyEqualTo(
+                            Key.builder().partitionValue(ownerId).build()))
+                    .filterExpression(new ExpressionBuilder().build(search))
+                    .limit(limit)
+                    .exclusiveStartKey(startKey)
+                    .build())
+            .stream().flatMap(p -> p.items().stream()).toList();
+}
+```
+
+### SEC-040 — La respuesta de watchlist screening indica siempre "Match Found"
+
+**CWE-393 · bewatchscreening · `GesintelAdapter.java:100-115`**
+
+```java
+private static WatchListResolutionResponse buildResponse(String codeResponse) {
+    String description = Constant.CODES_RESPONSE.getOrDefault(codeResponse, Constant.MESSAGE_CODE_NOT_FOUND);
+    return WatchListResolutionResponse.builder()
+            .validationResult(ValidationResult.builder()
+                    .result(Constant.MESSAGE_MATCH_FOUND)      // <-- constante: siempre "Match Found"
+                    .build())
+            .antiMoneyLaundering(...riskSourceCode(codeResponse)...)
+            .build();
+}
+```
+
+`buildResponse` se invoca tanto cuando hay coincidencias (`CODE_RESPONSE_0` = "bloqueados") como cuando no las hay (`CODE_RESPONSE_1` = "sin observacion"), y en ambos casos fija `validationResult.result` a `"Match Found"`. La distinción real solo aparece en `riskSourceCode`.
+
+Un consumidor que lea el campo `result` —el nombre sugiere que es el veredicto— concluirá que **toda persona consultada tiene coincidencia en listas AML**. En un proceso de onboarding esto se traduce en falsos positivos sistemáticos o, si el consumidor ignora el campo por poco fiable, en la pérdida de una señal de control.
+
+```java
+// Código recomendado
+private static WatchListResolutionResponse buildResponse(String codeResponse) {
+    boolean hasMatch = Constant.CODE_RESPONSE_0.equals(codeResponse)
+                    || Constant.CODE_RESPONSE_2.equals(codeResponse);
+    return WatchListResolutionResponse.builder()
+            .validationResult(ValidationResult.builder()
+                    .result(hasMatch ? Constant.MESSAGE_MATCH_FOUND : Constant.MESSAGE_NO_MATCH)
+                    .build())
+            ...
+}
+```
+
+Confirmar la semántica esperada con el equipo funcional y con Gesintel antes de aplicar el cambio, ya que consumidores existentes pueden haberse adaptado al comportamiento actual.
+
+---
+
+### SEC-050 — El path variable determina el verbo HTTP hacia el proveedor
+
+**CWE-470 · becustombeprogrm · `QurableServiceAdapter.java:80-92, 169-178`**
+
+```java
+public WrapperTier updateTiers(String action, UpdateTierRequest updateTierRequest) {
+    HttpMethod method = resolveHttpMethod(action);      // action = {benefit_program_id}
+    ...
+    webClient.method(method).uri(Constant.URI_API_SKY_TIER)
+
+private HttpMethod resolveHttpMethod(String action) {
+    return switch (action) {
+        case "UP"   -> HttpMethod.PATCH;
+        case "DOWN" -> HttpMethod.DELETE;
+        default -> throw new IllegalArgumentException("Acción inválida: " + action);
+    };
+}
+```
+
+El path variable `{benefit_program_id}` de `PATCH /categories/{benefit_program_id}` no identifica un recurso: **selecciona el método HTTP** que se ejecutará contra el proveedor Qurable, incluido `DELETE`.
+
+Hoy el conjunto está acotado a dos valores y no es explotable más allá de provocar un 500 con cualquier otro (`IllegalArgumentException` sin manejador, ver SEC-028). El riesgo es de diseño: un parámetro controlado por el consumidor gobierna la semántica de una llamada saliente destructiva, y basta con añadir un caso al `switch` para que pase a serlo.
+
+Un revisor externo lo marcará aunque hoy esté acotado, porque el patrón es el que precede a las vulnerabilidades de este tipo.
+
+```java
+// Código recomendado — la acción es parte del contrato, no del identificador
+public WrapperTier updateTiers(String benefitProgramId, UpdateTierRequest request) {
+    HttpMethod method = switch (request.getAction()) {          // enum del contrato
+        case UP   -> HttpMethod.PATCH;
+        case DOWN -> HttpMethod.DELETE;
+    };
+    ...
+}
+```
+
+Si el contrato no puede cambiarse, mantener el `switch` pero validar antes con un enum y devolver `400` con código `TL*` en lugar de propagar `IllegalArgumentException`.
+
+### SEC-051 — Campos cruzados en `FileEntity`: `customerId` no contiene el cliente
+
+**CWE-1109 · bedocmanagement · `FileEntity.java:18-36`, `DocumentMapper.java:71-90`**
+
+Los nombres de los campos no corresponden con lo que almacenan:
+
+| Campo Java | Atributo DynamoDB | Contenido real |
+|---|---|---|
+| `customerId` | `id` (partition key) | **UUID del documento** (`entity.setCustomerId(documentId)`) |
+| `name` | `filename` (sort key) | **`ownerId` del titular** |
+| `fileName` | — | Nombre real del fichero |
+
+```java
+// DocumentManagementAdapter.java:107,132
+String documentId = UUID.randomUUID().toString();
+FileEntity entity = mapper.toEntity(criteria, documentId, key);
+
+// DocumentMapper.java:81,84,88
+entity.setName(documentRequest.getOwners().get(0).getOwnerId());   // titular -> name
+entity.setFileName(documentRequest.getName());                     // fichero -> fileName
+entity.setCustomerId(id);                                          // documentId -> customerId
+```
+
+No es explotable por sí solo, pero es una **trampa activa** para la remediación de SEC-002: lo natural al implementar la comprobación de titularidad es compararla contra `customerId`, y eso no valida nada — compararía el identificador del documento consigo mismo, dando siempre acceso.
+
+La comprobación debe hacerse contra `name`. Se documenta como hallazgo propio precisamente porque induce a error: durante esta revisión se interpretó mal en una primera lectura, y la recomendación tuvo que corregirse.
+
+```java
+// Código recomendado — renombrar para que el modelo diga lo que guarda
+@DynamoDbBean
+public class FileEntity {
+    private String documentId;    // era customerId  (partition key "id")
+    private String ownerId;       // era name        (sort key "filename")
+    private String fileName;
+    ...
+    @DynamoDbPartitionKey @DynamoDbAttribute("id")
+    public String getDocumentId() { return documentId; }
+
+    @DynamoDbSortKey @DynamoDbAttribute("filename")
+    public String getOwnerId() { return ownerId; }
+}
+```
+
+Los `@DynamoDbAttribute` mantienen los nombres físicos, por lo que **el renombrado no exige migrar datos**. Es refactor de código, no de esquema.
+
+---
+
+## 7. Hallazgos de severidad Low e informativos
+
+### SEC-041 — Generador de códigos con PRNG no criptográfico (código muerto)
+
+**CWE-338 · beemailboxes · `UtilsOtp.java:22-36`**
+
+```java
+public static String generarNumeroPar8Digitos() {
+    var numero = ThreadLocalRandom.current().nextInt(LIMIT1, LIMIT2);
+    if (numero % TEMP_2 != ZERO) { numero++; }        // fuerza que sea par
+    ...
+}
+```
+
+Dos debilidades: `ThreadLocalRandom` no es criptográficamente seguro (su estado es predecible a partir de salidas observadas), y forzar la paridad **reduce el espacio de códigos a la mitad** (45 millones en lugar de 90). La clase no se referencia desde ningún punto del código —el OTP real lo emite Celmedia—, por lo que hoy es código muerto y se clasifica como Low.
+
+Debe eliminarse. Si en algún momento se necesitara generar códigos internamente:
+
+```java
+// Código recomendado
+private static final SecureRandom RANDOM = new SecureRandom();
+
+public static String generateOtp() {
+    return String.format("%08d", RANDOM.nextInt(100_000_000));   // sin restricción de paridad
+}
+```
+
+### SEC-042 — Endpoints internos y hostnames de infraestructura en el repositorio
+
+**CWE-200 · becreditrisk, beclaims, beemailboxes**
+
+Valores versionados que describen la infraestructura interna:
+
+```text
+becreditrisk/application-local.yml:15   jdbc:postgresql://db-nexhub.sva.cloud.scf.dev.corp:5432/CPED3AE1RDANEXHUBGENE001_DDB01
+*/src/test/resources/config/*.properties  https://srvnuarintra.santander.dev.corp/pkm/v1/publicKey
+*/src/test/resources/config/*.properties  https://srvnuarintra.santander.dev.corp/sts
+beemailboxes/Constant.java:9            https://otpsantander.celmediamobile.pe/oauth/token
+beclaims/application-local.yml:19       http://180.194.16.235/api_new
+*/application-local.yml                 proxy.sig.umbrella.com:443
+```
+
+Además, los nombres de tablas DynamoDB (`cpei3ae1dynnexhubgene012`, `cped3ae1dynnexhubgene014`) y de la base de datos revelan la convención de nomenclatura corporativa, útil para un atacante que ya tenga acceso a la cuenta AWS. Externalizar por variable de entorno sin valor por defecto.
+
+### SEC-043 — `automountServiceAccountToken: true` en despliegue productivo
+
+**CWE-250 · todos · `.gluon/cd/pro/values-pro.yaml`**
+
+```yaml
+serviceAccount:
+  name: nexhub-tec-services-pro-sa
+  automountServiceAccountToken: true
+```
+
+El token del ServiceAccount se monta en el pod. Es necesario para IRSA (que los servicios usan correctamente para asumir roles), pero el token de Kubernetes queda accesible en el sistema de ficheros del contenedor y podría emplearse contra la API de Kubernetes si el rol asociado tuviera permisos. Verificar que el `ClusterRole`/`Role` vinculado a `nexhub-tec-services-pro-sa` concede el mínimo imprescindible, y desactivar el montaje en los servicios que no interactúen con la API de Kubernetes (IRSA usa la proyección del token de OIDC, configurable de forma independiente).
+
+### SEC-044 — Política de cabeceras inadecuada para APIs JSON
+
+**CWE-1021 · todos · `SecurityConfig`**
+
+```java
+.headers(headers -> headers.contentSecurityPolicy(
+        csp -> csp.policyDirectives("default-src 'self'; script-src 'self'; object-src 'none';")));
+```
+
+La CSP configurada es propia de una aplicación web con HTML; para una API que devuelve JSON no aporta protección. Las cabeceras que sí son relevantes en este contexto no se declaran explícitamente:
+
+```java
+// Código recomendado
+.headers(headers -> headers
+        .contentTypeOptions(Customizer.withDefaults())            // X-Content-Type-Options: nosniff
+        .httpStrictTransportSecurity(hsts -> hsts
+                .includeSubDomains(true)
+                .maxAgeInSeconds(31536000))
+        .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
+        .cacheControl(Customizer.withDefaults())                  // evita cacheo de respuestas
+        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'")));
+```
+
+Nota sobre CSRF: `csrf(AbstractHttpConfigurer::disable)` esta presente en los once servicios y **es correcto** en este contexto — son APIs sin estado, sin cookies de sesión (`spring.session.store-type: none`) y con autenticación por cabecera. No se reporta como vulnerabilidad. Del mismo modo, **no se identificó ninguna configuración CORS**, lo que también es adecuado para APIs consumidas desde backends y desde una app móvil.
+
+### SEC-045 — `jwks.json` presente pero no utilizado
+
+**Informativo · beclaims · `src/main/resources/jwks.json`**
+
+El fichero contiene dos claves RSA públicas (`kty: RSA`, `use: sig`, `alg: RS256`) con `kid` en formato base64, característico de Amazon Cognito. **Solo contiene material público**, por lo que no constituye una exposición de secretos. Está declarado explícitamente en los recursos empaquetados del `pom.xml` (`<include>**/jwks.json</include>`), pero ninguna clase lo referencia.
+
+Es un vestigio de una implementación de validación de JWT que se dejó a medias — coherente con SEC-001. Al implementar la validación (SEC-001), **no debe usarse este fichero**: un JWKS estático provoca una caída del servicio en la primera rotación de claves de Cognito. Debe resolverse dinámicamente vía `issuer-uri`, y el fichero eliminarse.
+
+### SEC-046 — Superficie declarada muy superior a la implementada
+
+**Informativo · todos · contratos OpenAPI**
+
+| Proyecto | Operaciones declaradas | Implementadas | No implementadas |
+| -------- | ---------------------: | ------------: | ---------------: |
+| beknowyocustomer | 20 | 2 | 18 |
+| bedocmanagement | 10 | 7 | 3 |
+| bedatacomanagment | 8 | 3 | 5 |
+| beidentbiometric | 13 | 13 | 0 |
+| **Total** | **67** | **~26** | **~41** |
+
+Con el patrón `delegatePattern` del generador, las operaciones sin implementación devuelven `501 Not Implemented` desde el método por defecto de la interfaz. No es una vulnerabilidad, pero: publica en el contrato una superficie que no existe, dificulta razonar sobre qué está realmente expuesto, y el propio contrato revela modelos de datos completos de funcionalidad futura.
+
+Recomendación: mantener los contratos alineados con lo implementado, y publicar en el API Gateway únicamente las rutas con implementación real.
+
+---
+
+### SEC-052 — Endpoints declarados que responden 501 Not Implemented
+
+**CWE-1059 · beknowyocustomer, bedatacomanagment · contratos + delegates**
+
+Con el patrón `delegatePattern` del generador OpenAPI, las operaciones sin implementación heredan el método por defecto de la interfaz, que devuelve `501 Not Implemented`:
+
+```java
+// beknowyocustomer/HelloApiDelegateImpl.java:33-35
+@Override
+public ResponseEntity<WrapperGetKnowYourCustomerResolution> getKycInformation(
+        String partyId, String expand, String kycResolutionId) {
+    return CreateApiDelegate.super.getKycInformation(partyId, expand, kycResolutionId);
+}
+```
+
+`beknowyocustomer` declara 20 operaciones e implementa 2; `bedatacomanagment` implementa 3 de 8.
+
+No es una vulnerabilidad: un `501` no expone datos ni permite acción alguna. Pero un `501` **confirma que el endpoint existe en el contrato**, lo que un revisor externo reporta como gestión deficiente del inventario de APIs (OWASP API9:2023). Y una superficie declarada que triplica la implementada dificulta razonar sobre qué está realmente expuesto.
+
+Recomendación: alinear los contratos con lo implementado, o publicar en el API Gateway únicamente las rutas con implementación real, de modo que las demás no sean alcanzables.
+
+---
+
+## 8. Cadenas de ataque
+
+Los hallazgos individuales adquieren su gravedad real al encadenarse. Se documentan las cuatro cadenas con evidencia confirmada en el código.
+
+### CH-1 — Extracción masiva de datos de clientes con un token legítimo
+
+```text
+Usuario legítimo de la app móvil
+   ↓ autenticación correcta contra Amazon Cognito              [el perímetro lo permite]
+   ↓ Akamai → Imperva → AWS WAF → API Gateway                  [todos lo aceptan: el token es válido]
+SEC-001  el backend descarta el JWT → no conoce al llamante
+   +
+SEC-002  customer_id / documentNumber / party_id se usan sin comprobar propiedad
+   +
+SEC-019  cuotas del gateway limitan el ritmo, no el alcance
+   =
+Enumeración de clientes con posición de tarjetas (beproducoffering),
+perfil crediticio con marcas PEP/PLAFT (becreditrisk),
+consentimientos de datos (bedatacomanagment) y score KYC (beknowyocustomer)
+   +
+SEC-001  sin identidad en los registros → sin atribución forense
+```
+
+**Severidad de la cadena: Critical.** Es la única que atraviesa el perímetro completo sin necesitar ninguna condición adicional.
+
+### CH-2 — Descarga arbitraria de documentos por vía lateral
+
+```text
+Pod comprometido en la subred privada (o cualquier workload con ruta al NLB)
+   ↓                                                          [no pasa por WAF/Cognito/APIGW]
+SEC-001  ningún servicio autentica el tráfico este-oeste
+   +
+SEC-021  /download_document_intern acepta cabeceras estáticas (x-santander-client-id: 123),
+         valores publicados en el repositorio, y no las valida
+   +
+SEC-014  /documents/{id}/versions devuelve los nombres de archivo de TODOS los documentos
+   =
+Enumeración del repositorio documental + descarga del binario de cualquier documento
+   +
+SEC-011  el contenido queda además volcado en base64 en el log
+```
+
+**Severidad de la cadena: Critical.** Requiere un punto de apoyo dentro del VPC, pero a partir de ahí no encuentra ningún control.
+
+### CH-3 — Sustitución de un documento contractual
+
+```text
+SEC-014  obtener el nombre de archivo del documento objetivo
+   +
+SEC-002  conocer o inferir el ownerId del titular
+   +
+SEC-015  POST /upload_document con el mismo ownerId + name
+         → la clave S3 se reconstruye idéntica → putObject sobrescribe
+   =
+El contrato original en S3 queda reemplazado por contenido del atacante
+   +
+SEC-015  con mimeType: text/html, el documento sustituto se sirve como HTML ejecutable
+         a través de la URL prefirmada de descarga
+```
+
+**Severidad de la cadena: High.** El control que la rompería —versionado de objetos en el bucket— no es verificable desde el código.
+
+### CH-4 — Autorización de una operación con un OTP ajeno
+
+```text
+SEC-001  POST /{emailbox_id}/send_email accesible sin restricción de sujeto
+   ↓ el atacante solicita un OTP para su propia dirección de correo
+   ↓ lo recibe legítimamente
+SEC-005  validCode() busca el OTP como clave primaria, sin comprobar a quién pertenece
+   +
+SEC-005  la condición de éxito es `status != null` — cualquier respuesta del proveedor vale
+   +
+SEC-019  sin límite de intentos ni de generación
+   =
+El OTP del atacante autoriza una operación asociada a otra persona
+```
+
+Vía alternativa, sin necesidad de generar nada:
+
+```text
+SEC-005  log.info("OTP generado: {}", otp)  →  OTP en claro en el agregador de logs
+   +
+SEC-022  POST /actuator/loggers sin autenticación (si la exposición se amplía)
+   =
+Lectura en tiempo real de los OTP de todos los usuarios
+```
+
+**Severidad de la cadena: Critical.**
+
+### CH-5 — Extracción y destrucción del repositorio documental con token válido
+
+```text
+Usuario legítimo con token de Cognito válido
+   ↓                                                    [el perímetro lo acepta: el token es correcto]
+SEC-014  GET /documents/{cualquiera}/versions
+         → nombres de fichero de TODOS los documentos
+   +
+SEC-047  GET /documents/{id}  → 200 con cuerpo / 200 vacío
+         → distingue qué identificadores existen, sin generar un solo 404
+   +
+SEC-048  GET /documents/{id}  → campo `name` = DNI del titular
+         → relación completa documento → titular
+   +
+SEC-002  sin comprobación de titularidad
+   =
+Inventario documental completo con su titular
+   ↓
+SEC-049  DELETE /documents/{id}
+   =
+Destrucción de documentación contractual ajena, potencialmente irreversible
+```
+
+**Severidad de la cadena: Critical.** Es enteramente ejecutable desde fuera con un token válido, sin ninguna condición adicional: ni acceso a la red interna, ni compromiso previo, ni bypass del gateway. Los cinco hallazgos están en el mismo servicio.
+
+---
+
+## 9. Matriz consolidada
+
+| ID | Sev. | Conf. | Proyecto | Archivo | Línea | Hallazgo | Riesgo | Sugerencia de corrección | Prio. |
+| -- | ---- | ----- | -------- | ------- | ----: | -------- | ------ | ------------------------ | ----- |
+| SEC-001 | Critical | CONF | Todos | `SecurityConfig.java` / `config/application.yml` | 31-42 / 22-25 | `anyRequest().permitAll()` + `security.enabled: false` | Sin autenticación en T4/T5 | `oauth2ResourceServer` con `issuer-uri` de Cognito; `anyRequest().authenticated()`; mTLS o token de servicio en este-oeste | P0 |
+| SEC-002 | Critical | CONF | 8 proyectos | `HelloApiDelegateImpl.java`, `CreditRiskManagementInputPort.java`, `DataConsentManagementAdapter.java` | 64-72, 46-77, 37-93 | Identificadores de objeto sin control de propiedad | BOLA: datos de cualquier cliente | `AuthorizationService.assertCanAccessCustomer(jwt, id)` antes de cada acceso; `scope` explícito para acceso masivo | P0 |
+| SEC-003 | Critical | CONF | 6 proyectos | `application-local/cert/pre.yml`, `Constant.java` | varias / 28 | 18 secretos versionados | Compromiso de proveedores y BD | Rotar los 18; eliminar defaults; migrar a Secrets Manager; `gitleaks` en CI | P0 |
+| SEC-004 | Critical | CONF | 7 proyectos | `WebClientConfig.java`, `RestTemplateConfig.java` | 52-54, 31-42 | `InsecureTrustManagerFactory` / `TrustStrategy → true` / `NoopHostnameVerifier` | MITM en salida a terceros | Truststore con CA de Netskope; eliminar `handlerConfigurator` vacío | P0 |
+| SEC-005 | Critical | CONF | beemailboxes | `OTPServiceAdapter.java` | 60-80, 98-114 | OTP sin vínculo a usuario, sin límite, en path y en log | Bypass de 2FA | Clave = transactionId; validar sujeto; contador de intentos; TTL; OTP fuera del path y del log | P0 |
+| SEC-006 | Critical | CONF | bedigitsignature | `Constant.java` | 64-65 | Callback a `webhook.site`; `replace("JWT")` no sustituye | Fuga a tercero; callback sin autenticación | `callbackUrl` por entorno; construir el header sin marcador; publicar endpoint propio con validación de JWT | P0 |
+| SEC-007 | Critical | CONF | 4 proyectos | `TokenService.java`, `AesEncryptionService.java`, `DocumentProcessService.java` | 50, 87, 33, 106 | Password, access token, clave AES y JWT en logs | Credenciales en el agregador | `@ToString.Exclude`; registrar metadatos, no objetos; masking en el appender | P0 |
+| SEC-008 | Critical | CONF | becreditrisk | `data.sql` | 1-54 | DNI reales con marcas PLAFT/PEP | Brecha de datos sensibles | Eliminar y purgar historial; datos sintéticos en `src/test`; excluir del empaquetado | P0 |
+| SEC-009 | High | CONF | beclaims | `application-local.yml` | 19 | `http://` hacia Contáctanos (GSNET) | Credenciales en claro en red interna | Migrar a HTTPS; validar esquema en el arranque; rotar credenciales | P1 |
+| SEC-010 | Critical | CONF | beclaims | `ClaimsAdapter.java` | 63, 69-74, 90, 119, 154 | `onErrorResume` → mock con `complaintBookId` fijo | Reclamos perdidos con confirmación falsa | Eliminar mocks; propagar 503; store-and-forward con reintento asíncrono | P0 |
+| SEC-011 | High | CONF | bedigitsignature | `DocumentClient.java` | 80 | Documento base64 completo en log | Exfiltración vía logs | `log.debug` con `documentId` y tamaño | P1 |
+| SEC-012 | High | CONF | beidentbiometric | `FacephiAdapter.java` | 84, 124 | `token1`, `bestImageToken`, `tokenOcr` en log | Biometría en logs | `@ToString.Exclude` en los DTO; registrar solo `trackingId` | P1 |
+| SEC-013 | High | CONF | 6 proyectos | `WebClientConfig.java` | 65, 84, 33, 89, 64, 64 | `wiretap(true)` | Volcado de credenciales al elevar el log | Condicionar por propiedad; `AdvancedByteBufFormat.SIMPLE`; fijar la categoría a `WARN` | P1 |
+| SEC-014 | High | CONF | bedocmanagement | `DocumentManagementAdapter.java` | 188 | `getDocumentVersion` ignora el id y hace `findAll()` | Enumeración del repositorio + DoS | `queryByPartitionKey`; eliminar `findAll()` del repositorio base | P1 |
+| SEC-015 | High | ALTA | bedocmanagement | `DocumentManagementAdapter.java` | 120-129, 146-168 | Clave S3 y `Content-Type` desde el request | Sobrescritura de documentos; XSS almacenado | Clave derivada de hash + UUID; MIME detectado con Tika; `contentDisposition: attachment`; versionado del bucket | P1 |
+| SEC-016 | High | CONF | 3 proyectos | `WebClientConfig.java`, `RestTemplateConfig.java` | 20-34, 28-63, 37-50 | Clientes HTTP sin timeout | Agotamiento del pool de hilos | `CONNECT_TIMEOUT_MILLIS` + `responseTimeout` + `Read/WriteTimeoutHandler`; `RequestConfig` en Apache | P1 |
+| SEC-017 | High | CONF | becustombeprogrm | `SKYServiceAdapter.java` | 94 | Retry sobre `POST /v1/user` | Altas duplicadas | `Idempotency-Key`; o restringir el retry a `ConnectException` | P1 |
+| SEC-018 | High | CONF | becustombeprogrm, bedigitsignature | `SKYServiceAdapter.java`, `Util.java` | 104-131, 99-111 | `rawBody` del proveedor al consumidor | Divulgación de infraestructura de terceros | Detalle al log con `correlationId`; al consumidor, código `TL*` + referencia | P1 |
+| SEC-019 | High | ALTA | Todos | — | — | Sin rate limiting; amplificación 1→2N | Agotamiento de recursos y de cuota | `maxItems` en contratos; `RateLimiter` por sujeto; usage plans en el gateway; circuit breakers | P1 |
+| SEC-020 | High | CONF | 4 proyectos | contratos + `DocumentManagementAdapter.java` | 115 | base64 sin `maxLength`; arrays sin `maxItems` | OOM y reinicio de pods | `maxLength`/`maxItems`/`pattern` en el contrato; validación de tamaño antes de decodificar | P1 |
+| SEC-021 | High | CONF | bedocmanagement, bedigitsignature | `openapi.yaml`, `WebClientConfig.java` | 272, 38-50 | Endpoint interno en contrato público; cabeceras estáticas no validadas | Descarga arbitraria por vía lateral | Contrato interno con `scope` propio; token de servicio o mTLS; `NetworkPolicy` | P1 |
+| SEC-022 | High | CONF | Todos | `application.yml`, `SecurityConfig.java` | — | `/actuator/**` `permitAll` + `show-details: ALWAYS` | Reconocimiento; `loggers` habilita SEC-013 | `exposure.include` explícito; `when-authorized`; `management.server.port` separado | P1 |
+| SEC-023 | High | CONF | becustombeprogrm, bedigitsignature | `SkyTokenService.java`, `JwtUtil.java` | 36-53, 30-47 | JWT sin `iss`/`aud`/`jti`; AES key = JWT key; exp 20 s | Token reutilizable; radio de compromiso ampliado | Claims registrados completos; claves separadas y verificadas en el arranque; migrar a jjwt 0.12 | P1 |
+| SEC-024 | Medium | CONF | becustombeprogrm | `AesEncryptionService.java` | 30-46 | AES/CBC sin autenticación; transformación configurable | Manipulación de texto cifrado; padding oracle | AES/GCM con transformación fija; o encrypt-then-MAC | P2 |
+| SEC-025 | Low | CONF | Todos | `application.yml` | — | Swagger habilitado en todos los perfiles | Contrato completo por vía lateral | `springdoc.api-docs.enabled: false` en pro/pre/cert | P3 |
+| SEC-026 | Medium | CONF | becreditrisk | `CreditRiskDelegateImpl.java` | 36-37 | `society`/`channel` sin validar hacia Modellica | Influencia en la decisión de riesgo | Lista blanca; preferible derivar del token | P2 |
+| SEC-027 | Medium | REQ | Todos | `application.yml` | — | `forward-headers-strategy: framework` | IP de origen falsificable en logs | Verificar normalización en Imperva/APIGW; `ForwardedHeaderFilter` con proxies de confianza | P2 |
+| SEC-028 | Medium | CONF | 5 proyectos | varios | ver §6 | `.get()`, `get(0)`, `Integer.valueOf` sin control | 500 con posible detalle interno | `orElseThrow` con código `TL*`; handler `Exception.class` con `correlationId` | P2 |
+| SEC-029 | Medium | CONF | beproducoffering | `application-pro.yml` | — | `ddl-auto: update`, `sql.init.mode: always` | Alteración de esquema en producción | `validate` + `never`; migraciones con Liquibase/Flyway | P2 |
+| SEC-030 | Medium | CONF | bedatacomanagment | `DataConsentManagementAdapter.java` | 83 | `putIfAbsent` en una actualización | La revocación de consentimiento nunca se aplica | `updateItem` con `ignoreNulls` | P2 |
+| SEC-031 | Medium | CONF | bedigitsignature | `Entity.java` | 57-67 | JWT como partition key, atributo `documentNumber` | Token en índices y backups | PK = `loteId`, SK = `documentId`; almacenar solo `jti`; TTL | P2 |
+| SEC-032 | Medium | CONF | bedigitsignature | `DocumentClient.java` | 37-46 | Rama `CONTRATO_CLIENTE` → PDF del classpath | Firma de un documento de pruebas | Eliminar la rama; stub en tests; retirar `test.pdf` | P2 |
+| SEC-033 | Medium | CONF | beclaims | `TokenService.java` | 38-43 | Token cacheado sin expiración | Fallo permanente enmascarado por SEC-010 | `CachedToken` con expiración, como en becreditrisk | P2 |
+| SEC-034 | Medium | CONF | Todos | `pom.xml` | — | 3 versiones de parent; Netty 4.1.x + 4.2.x en bedatacomanagment | Incompatibilidad binaria; build fragil | Unificar parent en 1.6.0; BOM comun; una sola linea de Netty | P2 |
+| SEC-035 | Medium | CONF | beemailboxes | `JsonTokenProvider.java`, `XmlTokenProvider.java` | 56, 116 | `assert` para control de flujo | NPE → 500 | `if (…) throw new BusinessException(...)` | P2 |
+| SEC-036 | Medium | REQ | beemailboxes | `XmlApiClient.java` | 31, 124 | `XmlMapper` sin endurecer | XXE si cambia el backend | `XMLInputFactory` con DTD y entidades externas deshabilitadas | P2 |
+| SEC-037 | Medium | CONF | 3 proyectos | varios | — | Sin `Idempotency-Key` ni `jti`/`nonce` | Duplicación y replay | Cabecera `Idempotency-Key` requerida; almacén con TTL | P2 |
+| SEC-038 | Medium | REQ | 6 proyectos | varios | — | Datos externos en logs sin neutralizar | Log injection; PII en logs | Confirmar escape de GLUONLOG; sanear CR/LF; enmascarar documentos | P2 |
+| SEC-039 | Medium | CONF | bedocmanagement | `BaseDynamoRepository.java` | 76-92 | `Scan` completo con `filterExpression` | Coste y DoS; BOLA | GSI por `ownerId` + `query` con `limit` y paginación | P2 |
+| SEC-040 | Medium | ALTA | bewatchscreening | `GesintelAdapter.java` | 100-115 | `result` siempre `"Match Found"` | Falsos positivos AML sistemáticos | Derivar `result` del código de respuesta | P2 |
+| SEC-041 | Low | CONF | beemailboxes | `UtilsOtp.java` | 22-36 | `ThreadLocalRandom` + paridad forzada (código muerto) | Predecibilidad si se usara | Eliminar; si se necesita, `SecureRandom` sin restricción de paridad | P3 |
+| SEC-042 | Low | CONF | 3 proyectos | `application-local.yml`, test properties | — | Hostnames internos y nombres de tablas | Reconocimiento de infraestructura | Externalizar sin defaults | P3 |
+| SEC-043 | Low | CONF | Todos | `values-pro.yaml` | — | `automountServiceAccountToken: true` | Token de K8s accesible en el pod | Revisar permisos del SA; desactivar donde no se use la API de K8s | P3 |
+| SEC-044 | Low | CONF | Todos | `SecurityConfig.java` | 44-49 | CSP de app web en una API JSON | Cabeceras de seguridad no alineadas | `nosniff`, HSTS, `frameOptions: deny`, `cache-control` | P3 |
+| SEC-045 | Info | CONF | beclaims | `jwks.json` | — | JWKS estático sin uso | Rotura ante rotación si se llegara a usar | Eliminar; resolver el JWKS vía `issuer-uri` | P3 |
+| SEC-046 | Info | CONF | Todos | contratos OpenAPI | — | 67 declaradas / ~26 implementadas | Superficie documentada enganosa | Alinear contratos; publicar en el gateway solo lo implementado | P3 |
+| SEC-047 | High | CONF | bedocmanagement | `DocumentManagementAdapter.java` | 61-71, 178-185, 200-215 | Tres respuestas distintas ante recurso inexistente | Oráculo de existencia; habilita SEC-002/048/049 | Unificar en 404 tras comprobar titularidad | P1 |
+| SEC-048 | High | CONF | bedocmanagement | `DocumentMapper.java` | 111-118 | El campo `name` devuelve el DNI del titular | Exposición de datos personales | `setName(entity.getFileName())`; titular solo al titular y enmascarado | P1 |
+| SEC-049 | High | CONF | bedocmanagement | `DocumentManagementAdapter.java` | 200-215 | Borrado sin verificar titularidad ni existencia | Destrucción de documentación contractual | Comprobar titularidad; auditar; versionado de bucket; borrado lógico | P1 |
+| SEC-050 | Medium | CONF | becustombeprogrm | `QurableServiceAdapter.java` | 80-92, 169-178 | El path variable elige el verbo HTTP saliente | Semántica destructiva gobernada por el consumidor | La acción va en el cuerpo como enum; validar y devolver 400 | P2 |
+| SEC-051 | Medium | CONF | bedocmanagement | `FileEntity.java`, `DocumentMapper.java` | 18-36, 71-90 | `customerId` guarda el id del documento, no el cliente | Induce a implementar mal el control de SEC-002 | Renombrar campos manteniendo `@DynamoDbAttribute` | P2 |
+| SEC-052 | Low | CONF | beknowyocustomer, bedatacomanagment | contratos + delegates | — | Endpoints declarados que responden 501 | Inventario de APIs deficiente (API9) | Alinear contratos; publicar solo lo implementado | P3 |
+
+---
+
+## 10. Integration Security Matrix
+
+| API | Consume | Autenticación | TLS | Validación cert. | Token | Timeout | Retry | Riesgo |
+| --- | ------- | ------------- | --- | ---------------- | ----- | ------- | ----- | ------ |
+| beclaims | Contáctanos (GSNET) | Usuario/contraseña en JSON | **HTTP** | n/a | Bearer propietario, **sin expiración** (SEC-033) | 5000 ms | No | **CRÍTICO** |
+| becreditrisk | Modellica / DataView360 | OAuth2 `client_credentials` | HTTPS | **Desactivada** | Bearer con expiración correcta; **loggeado** (SEC-007) | 5000 ms | No | **CRÍTICO** |
+| becustombeprogrm | SKY Airline | JWT HS256 propio + `Ocp-Apim-Subscription-Key` | HTTPS | **Desactivada** | Sin `iss`/`aud`/`jti`; clave = clave AES (SEC-023) | **Ninguno** | **3 intentos sobre POST** | **CRÍTICO** |
+| becustombeprogrm | Qurable | Token estático de configuración | HTTPS | **Desactivada** | Token fijo, sin rotación | **Ninguno** | 3 intentos | **ALTO** |
+| bedigitsignature | bedocmanagement (interno) | **Cabeceras estáticas** (`x-santander-client-id: 123`) | Según `DOCUMENT_URL` | n/a (sin connector) | Ninguno | **Ninguno** | No | **CRÍTICO** |
+| bedigitsignature | FacePhi / Zytrust | `x-api-key` | HTTPS + proxy | **Desactivada** | API key estática | 50 000 ms | No | **CRÍTICO** |
+| bedocmanagement | AWS S3 + DynamoDB | IRSA + `AssumeRole` | HTTPS (SDK) | Por defecto (correcta) | STS temporal, autorrenovado | SDK | SDK | BAJO |
+| beemailboxes | Celmedia OTP | OAuth2 `client_credentials` (Basic) | HTTPS | **Desactivada + hostname** | Bearer con expiración | **Ninguno** | No | **CRÍTICO** |
+| beemailboxes | Acoustic / Celmedia correo | OAuth2 `refresh_token` **hardcodeado** | HTTP en `url-send-mail` por defecto | **Desactivada + hostname** | Bearer con expiración | **Ninguno** | No | **CRÍTICO** |
+| beidentbiometric | FacePhi | `x-api-key` (dos claves distintas) | HTTPS + proxy | **Desactivada** | API key estática | 10 000 ms | No | **ALTO** |
+| beknowyocustomer | DynamoDB | IRSA + `AssumeRole` | HTTPS (SDK) | Por defecto (correcta) | STS temporal | SDK | SDK | BAJO |
+| beproducoffering | RDS Postgres | Usuario/contraseña | Según `SEC_RDS_DB_URL` | No verificable | n/a | Hikari 20 000 ms | n/a | MEDIO |
+| bewatchscreening | Gesintel / AMLUpdate | Usuario/contraseña → token | HTTPS | **Desactivada** | Token con expiración correcta | **500 ms** (demasiado bajo) | No | **ALTO** |
+
+**Lectura de la matriz:**
+
+* **Ninguna integración usa mTLS.** No se encontró un solo `keyManager`, `KeyStore` de cliente ni certificado de cliente en el código. Toda la autenticación saliente es por API key, contraseña o bearer.
+* **Siete de trece integraciones tienen la validación de certificado desactivada** (SEC-004).
+* **Cuatro no tienen ningún timeout** (SEC-016), y una lo tiene demasiado bajo.
+* **Las únicas integraciones con postura correcta son las de AWS** (IRSA + STS AssumeRole + SDK con validación por defecto).
+
+---
+
+## 11. Security Hotspots
+
+| Proyecto | Archivo / Componente | Riesgo | Motivo |
+| -------- | -------------------- | ------ | ------ |
+| Todos | `infrastructure/config/SecurityConfig.java` | **CRÍTICO** | `anyRequest().permitAll()`; punto único donde se restablecería la autenticación de las 11 APIs |
+| Todos | `src/main/resources/config/application.yml` | **CRÍTICO** | `santander.security.enabled: false` + `white-list: /**` + actuator con detalle |
+| beemailboxes | `adapters/output/OTPServiceAdapter.java` | **CRÍTICO** | Genera, persiste, registra y valida el OTP; concentra el bypass de 2FA completo |
+| beemailboxes | `infrastructure/constants/Constant.java` | **CRÍTICO** | Refresh token OAuth2 hardcodeado |
+| bedigitsignature | `infrastructure/utils/Constant.java` | **CRÍTICO** | Callback a `webhook.site` y cabecera con token literal |
+| bedigitsignature | `adapters/output/DocumentProcessService.java` | **CRÍTICO** | Orquesta firma, JWT, callback y persistencia; concentra SEC-006, SEC-007, SEC-018, SEC-028, SEC-031 |
+| bedocmanagement | `adapters/output/DocumentManagementAdapter.java` | **CRÍTICO** | Construcción de claves S3, MIME del cliente, `findAll()`, sin autorización, enumeración diferencial y borrado sin control (SEC-014, 015, 039, 047, 049) |
+| bedocmanagement | `adapters/output/DocumentMapper.java` | **ALTO** | Publica el DNI del titular y cruza los campos del modelo (SEC-048, SEC-051) |
+| beclaims | `adapters/output/client/ClaimsAdapter.java` | **CRÍTICO** | Cuatro fail-open con datos fabricados sobre un proceso regulado |
+| 7 proyectos | `infrastructure/config/WebClientConfig.java` / `RestTemplateConfig.java` | **CRÍTICO** | Trust-all, `wiretap`, ausencia de timeouts — el mismo patrón replicado |
+| becustombeprogrm | `infrastructure/util/AesEncryptionService.java` | **ALTO** | Clave AES en logs, cifrado sin autenticación, supresión de la regla de análisis |
+| becreditrisk / beclaims / bewatchscreening | `.../client/TokenService.java` | **ALTO** | Manejo de credenciales y tokens; tres implementaciones divergentes del mismo patrón |
+| beidentbiometric | `adapters/output/client/rest/FacephiAdapter.java` | **ALTO** | Trece llamadas con datos biométricos; dos con volcado al log |
+| becreditrisk | `src/main/resources/data.sql` | **ALTO** | Datos personales sensibles versionados |
+| Todos | `.github/workflows/security.yml` | **MEDIO** | El *gate* de seguridad de CI no incluye detección de secretos ni SAST propio |
+
+---
+
+## 12. Dependency Security Review
+
+**Metodología y limitación.** Esta sección se basa exclusivamente en las versiones declaradas en los `pom.xml`. **No se ejecutó ningún análisis de composición de software** (OWASP Dependency-Check, Snyk, Trivy) porque el entorno de revisión no dispone de acceso a la base de datos de vulnerabilidades. **No se afirma la existencia de ningún CVE**: hacerlo sin verificación sería inventar evidencia. Las observaciones son de gestión de versiones y de soporte.
+
+**Valoración general: correcta.** Es el área mejor gestionada del conjunto. Las versiones fijadas son actuales y muestran un esfuerzo deliberado de mantenimiento (Spring Boot 3.5.14, Spring Security 6.5.11, Netty 4.1.136, Jackson 2.21.5, Tomcat 10.1.55, log4j 2.25.4, commons-lang3 3.18.0, httpclient5 5.6.4).
+
+| Proyecto | Dependencia | Versión | Severidad | CVE | Riesgo | Recomendación |
+| -------- | ----------- | ------- | --------- | --- | ------ | ------------- |
+| becustombeprogrm, bedigitsignature, beemailboxes | `io.jsonwebtoken:jjwt-*` | 0.11.5 | Medium | **No verificado** | Línea 0.11.x sin mantenimiento activo; API usada (`setClaims`, `signWith(key, alg)`) deprecada en 0.12 | Migrar a **0.12.x** y actualizar la API (ver SEC-023) |
+| beclaims, becreditrisk, bedatacomanagment, beidentbiometric, bewatchscreening | `jackson-databind` | 2.18.8 | Low | **No verificado** | Cinco proyectos por detrás de los otros cinco (2.21.5) | Unificar en la versión más reciente |
+| beclaims, bedatacomanagment | `netty-handler`, `netty-resolver-dns` | 4.1.135.Final | Low | **No verificado** | Una versión por detrás del resto (4.1.136) | Unificar |
+| bedatacomanagment | `netty-codec-http`, `netty-codec-http2`, `netty-transport-native-epoll` | 4.2.13.Final | Medium | n/a | **Mezcla de líneas 4.1.x y 4.2.x en el mismo proyecto** (`netty-handler` 4.1.135 + `netty-codec-http` 4.2.13); riesgo de incompatibilidad binaria | Fijar una única línea de Netty |
+| becreditrisk, becustombeprogrm, bedatacomanagment, beidentbiometric | `software.amazon.awssdk:sts` | 2.40.13 | Low | **No verificado** | Desalineada con `apache-client` 2.42.33 del mismo proyecto | Usar el BOM `aws-sdk-bom` |
+| Todos | `santander-spring-boot-starter-parent` | 1.5.1 / 1.5.2 / 1.6.0 | Medium | n/a | Tres versiones del parent corporativo entre servicios del mismo dominio | Unificar en 1.6.0 |
+| beclaims | `tomcat-embed-core` | 10.1.55 (`<scope>compile</scope>`) | Low | n/a | El scope explícito `compile` sobre una dependencia gestionada por el starter puede duplicar la clase en el artefacto | Retirar el `<scope>` |
+
+**Observación de proceso.** El patrón dominante en los `pom.xml` es la **sobrescritura manual de versiones transitivas** (Netty, Jackson, Spring, Tomcat fijados uno a uno). Es sintomático de remediación reactiva ante hallazgos de escaneo: funciona, pero es frágil y genera exactamente la deriva que muestra la tabla. La solución estructural es que el parent corporativo gestione esas versiones mediante `dependencyManagement`, y que los proyectos no las fijen.
+
+**Recomendaciones:**
+
+1. Ejecutar **OWASP Dependency-Check** o **Snyk** sobre los once proyectos para obtener el inventario real de CVE; esta revisión no puede sustituir esa comprobación.
+2. Incorporar el análisis SCA como *gate* bloqueante en `.github/workflows/security.yml` (hoy solo invoca el workflow reutilizable de imagen).
+3. Unificar el parent en 1.6.0 y eliminar los overrides manuales que ese parent ya cubra.
+4. Resolver la mezcla de líneas de Netty en `bedatacomanagment` — es el único caso con riesgo técnico inmediato de la tabla.
+
+---
+
+## 13. Existing Security Controls
+
+Controles correctamente implementados, que deben preservarse:
+
+| Control | Ubicación | Valoración |
+| ------- | --------- | ---------- |
+| **Perímetro de red completo** | Akamai → Imperva → AWS WAF → Cognito → API Gateway → PrivateLink → NLB → subred privada | Sólido. Es lo que hoy sostiene la seguridad del conjunto |
+| **Credenciales AWS por IRSA + STS AssumeRole** | `DynamoDBConfig`, `S3Config` (todos los proyectos) | Correcto. Sin claves estáticas, con renovación asíncrona y roles por servicio |
+| **Secretos de producción vía Kubernetes Secrets** | `.gluon/cd/pro/values-pro.yaml` (`secretKeyRef`, `optional: false`) | Correcto. El mecanismo existe y funciona — el problema es que no se usa de forma exclusiva |
+| **Contenedor sin privilegios** | `Dockerfile` (todos): `USER 20000:20000`, imagen base corporativa, build multi-etapa con capas de Spring Boot | Correcto |
+| **Sanitización antes de persistir datos biométricos** | `BiometricInputPort.cleanData()` (`beidentbiometric`, líneas 445-469) | Correcto. Trunca cadenas > 500 caracteres antes de escribir en DynamoDB |
+| **Construcción segura de expresiones DynamoDB** | `ExpressionBuilder` + `FileSearchMapper.mapField` (`bedocmanagement`) | Correcto. Marcadores `#n`/`:v` y campos validados contra enum: **sin inyección** |
+| **Consultas JPA parametrizadas** | `CmaRepository.java:18` (`becreditrisk`) | Correcto. Único `@Query` del conjunto, con `:documentNumber` vinculado |
+| **URLs prefirmadas con vida corta** | `DocumentManagementAdapter.generateDownloadUrl` — 10 minutos | Correcto |
+| **Validación de campos obligatorios en KYC** | `OnboardingValidator` (`beknowyocustomer`) | Correcto y exhaustivo — es el estándar que deberían seguir los demás |
+| **Validación de formato de identificador** | `CustomerIdValidator` (`beproducoffering`) | Correcto en su alcance (formato); insuficiente como autorización (SEC-002) |
+| **Envelope de error corporativo** | `ControllerAdvice` + enums `Exceptions` con códigos `TL*` (7 proyectos) | Correcto. Códigos estables sin detalle interno — salvo las excepciones de SEC-018 |
+| **Manejo de expiración de token** | `TokenService` de `becreditrisk` y `bewatchscreening` | Correcto. Es el patrón que `beclaims` debería adoptar (SEC-033) |
+| **Timeouts completos en clientes HTTP** | `WebClientConfig` de `beclaims`, `becreditrisk`, `beidentbiometric`, `bewatchscreening` | Correcto. Connect + response + read + write |
+| **Gestión de versiones de dependencias** | `pom.xml` (todos) | Buena. Versiones actuales, con esfuerzo evidente de mantenimiento |
+| **Pipeline con etapas de calidad y seguridad** | `.github/workflows/` (quality, security, version-validation) | Base correcta; ampliable con SCA y detección de secretos |
+| **CSRF deshabilitado** | `SecurityConfig` (todos) | **Correcto, no es un hallazgo.** APIs sin estado, sin cookies (`session.store-type: none`), autenticación por cabecera |
+| **Ausencia de configuración CORS** | — | **Correcto, no es un hallazgo.** Consumo desde backends y app móvil, no desde navegador |
+| **Apagado ordenado** | `server.shutdown: graceful` + `lifecycle.timeout-per-shutdown-phase: 2m` | Correcto |
+
+---
+
+## 14. Falsos positivos descartados
+
+Coincidencias textuales analizadas y **descartadas** tras seguir el flujo completo:
+
+| Patrón | Ubicación | Por qué NO es vulnerabilidad |
+| ------ | --------- | ---------------------------- |
+| `csrf.disable()` | `SecurityConfig` (11) | API stateless sin cookies de sesión; CSRF no aplica |
+| Inyección SQL | `CmaRepository.java:18` | Único `@Query` del conjunto; usa binding `:documentNumber`, sin concatenación |
+| Inyección en DynamoDB | `ExpressionBuilder.java` | Marcadores `#n`/`:v` con `expressionNames`/`expressionValues`; campo validado contra enum `FileField` |
+| Inyección de comandos | — | No hay `Runtime.exec` ni `ProcessBuilder` en ningún proyecto |
+| Deserialización insegura | — | No hay `ObjectInputStream`, `enableDefaultTyping` ni `activateDefaultTyping` |
+| SSRF | `QurableServiceAdapter.java:137, 194` | Las URI usan plantillas (`{key}`) con valores codificados por `DefaultUriBuilderFactory`; las URL base provienen de configuración, no del request. **No se identificó ningún punto donde el solicitante controle el host de destino** |
+| Path traversal en `getFileName` | `OTPServiceAdapter.java:143-146` | La ruta S3 procede de `FlujoEntity` (DynamoDB), no del request |
+| `jwks.json` | `beclaims` | Contiene solo material público (`n`, `e`); no es exposición de secretos (SEC-045, informativo) |
+| Race condition | `TokenService` (varios) | `synchronized` + doble comprobación correctamente aplicados; `volatile` en `becreditrisk` |
+| Mass assignment | Delegates + mappers | Se usa MapStruct con mapeo explícito hacia entidades; no hay binding directo request→entidad |
+
+---
+
+## 15. Top 10 riesgos (probabilidad × impacto)
+
+| # | Riesgo | Hallazgos | Prob. | Impacto | Justificación |
+| - | ------ | --------- | ----- | ------- | ------------- |
+| 1 | **Extracción de datos de clientes con un token legítimo (BOLA)** | SEC-002, SEC-001 | Alta | Crítico | Atraviesa el perímetro completo sin condiciones adicionales; CH-1 |
+| 2 | **Bypass del segundo factor** | SEC-005, SEC-019 | Alta | Crítico | Tres vías independientes de explotación; CH-4 |
+| 3 | **Compromiso de proveedores por secretos versionados** | SEC-003 | Alta | Crítico | 18 credenciales en el repositorio, dos de ellas en perfiles CERT/PRE sin variable de entorno |
+| 4 | **Fuga de credenciales y datos sensibles por logs** | SEC-007, SEC-005, SEC-011, SEC-012, SEC-013 | Alta | Alto | Cinco fugas independientes; el acceso al agregador de logs suele ser amplio |
+| 5 | **Pérdida silenciosa de reclamos con confirmación falsa** | SEC-010 | Alta | Alto | No requiere atacante; impacto regulatorio directo (INDECOPI) |
+| 6 | **Acceso lateral sin autenticación entre servicios** | SEC-001, SEC-021 | Media | Crítico | Requiere apoyo en el VPC, pero después no hay ningún control; CH-2 |
+| 7 | **MITM en las integraciones con terceros** | SEC-004 | Media | Crítico | Siete servicios; datos biométricos y credenciales en tránsito |
+| 8 | **Brecha de datos personales sensibles versionados** | SEC-008 | Alta | Alto | Ya materializada: los datos están en el repositorio |
+| 9 | **Denegación de servicio por ausencia de timeouts y límites** | SEC-016, SEC-019, SEC-020 | Media | Alto | Provocable con peticiones legítimas; afecta a OTP y correo |
+| 10 | **Sustitución de documentos contractuales** | SEC-015, SEC-014, SEC-002 | Media | Alto | Impacto probatorio; CH-3 |
+
+> **Revisión v1.4.** Con los hallazgos SEC-047 a SEC-049, la cadena **CH-5** (extracción y destrucción del repositorio documental) pasa a competir por el primer puesto: es ejecutable de extremo a extremo con un token válido, sin ninguna condición adicional, y sus cinco hallazgos están en el mismo servicio. Al planificar, tratarla al nivel de CH-1.
+
+---
+
+## 16. Remediation Roadmap
+
+### P0 — Inmediato (antes de cualquier despliegue a producción)
+
+| Acción | Hallazgos | Esfuerzo |
+| ------ | --------- | -------- |
+| Rotar los 18 secretos expuestos, coordinando con cada proveedor | SEC-003 | 2-3 días |
+| Eliminar los valores por defecto de secretos y `Constant.REFRESH_VALUE` | SEC-003 | 4 h |
+| Eliminar `data.sql` y purgar el historial; escalar al DPO | SEC-008 | 1 día |
+| Eliminar el callback a `webhook.site` y externalizar `callbackUrl` | SEC-006 | 4 h |
+| Eliminar los cuatro fail-open de `ClaimsAdapter` | SEC-010 | 4 h |
+| Eliminar los registros de credenciales, tokens, OTP y clave AES | SEC-005, SEC-007 | 1 día |
+| Restaurar la validación TLS con la CA de Netskope en el truststore | SEC-004 | 2-3 días |
+| Implementar autorización de objeto en las 8 APIs afectadas | SEC-002 | 1-2 semanas |
+| Activar `oauth2ResourceServer` con el JWKS de Cognito y `anyRequest().authenticated()` | SEC-001 | 1 semana |
+| Rediseñar el flujo OTP (vínculo a sujeto, intentos, TTL, fuera del path) | SEC-005 | 1 semana |
+
+### P1 — Próximo release
+
+| Acción | Hallazgos |
+| ------ | --------- |
+| Añadir timeouts a los cuatro clientes sin ellos; ajustar el de Gesintel | SEC-016 |
+| Corregir `getDocumentVersion` y eliminar `findAll()` del repositorio base | SEC-014 |
+| Unificar la respuesta ante recurso inexistente en las tres operaciones | SEC-047 |
+| Dejar de devolver el `ownerId` en el campo `name` de los metadatos | SEC-048 |
+| Comprobar titularidad y auditar en el borrado de documentos | SEC-049 |
+| Sanear la construcción de claves S3 y validar el MIME con Tika | SEC-015 |
+| Separar el contrato interno y autenticar el tramo este-oeste | SEC-021 |
+| Restringir el actuator y moverlo a `management.server.port` | SEC-022 |
+| Corregir la emisión de JWT (claims, TTL, separación de claves) | SEC-023 |
+| Introducir `Idempotency-Key` y ajustar la política de retry | SEC-017, SEC-037 |
+| Dejar de propagar el cuerpo de error del proveedor | SEC-018 |
+| Añadir `maxLength`/`maxItems`/`pattern` a los contratos y validación de tamaño | SEC-020 |
+| Aplicar rate limiting por sujeto y usage plans por `client_id` | SEC-019 |
+| Migrar Contáctanos a HTTPS y validar el esquema en el arranque | SEC-009 |
+| Eliminar `wiretap(true)` y fijar el nivel de la categoría | SEC-013 |
+| Eliminar el volcado de documentos y biometría en logs | SEC-011, SEC-012 |
+
+### P2 — Backlog de seguridad
+
+SEC-050 (acción fuera del path), SEC-051 (renombrar campos de `FileEntity`), SEC-024 (AES-GCM), SEC-026 (validación de cabeceras), SEC-027 (proxies de confianza), SEC-028 (manejadores de excepción), SEC-029 (`ddl-auto: validate` + migraciones), SEC-030 (`updateItem`), SEC-031 (modelo de la tabla de firma), SEC-032 (eliminar el backdoor), SEC-033 (expiración de token), SEC-034 (unificación de dependencias), SEC-035 (`assert`), SEC-036 (endurecer XML), SEC-038 (log injection), SEC-039 (GSI y paginación), SEC-040 (semántica de `result`).
+
+### P3 — Hardening
+
+SEC-052 (alinear contratos), SEC-025 (Swagger por perfil), SEC-041 (eliminar `UtilsOtp`), SEC-042 (externalizar hostnames), SEC-043 (revisar el SA), SEC-044 (cabeceras de seguridad), SEC-045 (eliminar `jwks.json`), SEC-046 (alinear contratos).
+
+**Transversales:**
+* Incorporar `gitleaks`/`trufflehog` y SCA como *gates* bloqueantes en `security.yml`.
+* Reemplazar los `SecurityConfigTest` actuales por tests de integración que verifiquen el 401.
+* Aplicar `NetworkPolicy` entre los pods del namespace.
+* Definir una configuración de referencia (`SecurityConfig`, `WebClientConfig`, `ControllerAdvice`) y aplicarla a los once proyectos, para evitar que la corrección se aplique de forma desigual.
+
+---
+
+## 17. Quick Wins
+
+Correcciones de bajo esfuerzo y alto beneficio, ordenadas por relación impacto/esfuerzo:
+
+| # | Acción | Esfuerzo | Hallazgo | Beneficio |
+| - | ------ | -------- | -------- | --------- |
+| 1 | Eliminar 6 líneas de log (OTP, password, token, clave AES, JWT, base64) | **15 min** | SEC-005, SEC-007, SEC-011 | Elimina cinco fugas de credenciales y datos |
+| 2 | Sustituir `Constant.CALLBACK` por una propiedad de entorno | **30 min** | SEC-006 | Corta el envío de datos a un tercero público |
+| 3 | Añadir `@ToString.Exclude` a 8 campos sensibles en DTO | **30 min** | SEC-007, SEC-012 | Cierra las fugas por `toString()` |
+| 4 | Eliminar `.wiretap(true)` en 6 ficheros | **20 min** | SEC-013 | Elimina el riesgo latente de volcado completo |
+| 5 | Cambiar `show-details: ALWAYS` por `when-authorized` y fijar `exposure.include` | **30 min** | SEC-022 | Reduce el reconocimiento de infraestructura |
+| 6 | `springdoc.api-docs.enabled: false` en los perfiles pro/pre/cert | **20 min** | SEC-025 | Retira el contrato del plano lateral |
+| 7 | Añadir timeouts a los 4 clientes que no los tienen | **1 h** | SEC-016 | Elimina el DoS por agotamiento de hilos |
+| 8 | Corregir `getDocumentVersion` para consultar por clave | **30 min** | SEC-014 | Cierra la enumeración del repositorio documental |
+| 9 | Sustituir `putIfAbsent` por `updateItem` en `patchConsent` | **20 min** | SEC-030 | Hace funcionar la revocación de consentimientos |
+| 10 | Eliminar la rama `CONTRATO_CLIENTE` y `test.pdf` | **20 min** | SEC-032 | Retira código de pruebas de la ruta productiva |
+| 11 | Sustituir los dos `assert` por comprobaciones explícitas | **15 min** | SEC-035 | Elimina dos NPE en el flujo de OTP |
+| 12 | `ddl-auto: validate` y `sql.init.mode: never` en `beproducoffering` | **10 min** | SEC-029 | Impide cambios de esquema no controlados |
+| 13 | Eliminar `UtilsOtp` (código muerto) | **10 min** | SEC-041 | Reduce superficie y evita su uso futuro |
+| 14 | Añadir `maxItems: 10` al array de documentos de firma | **15 min** | SEC-019, SEC-020 | Corta la amplificación 1→2N |
+| 15 | Devolver `fileName` en vez de `name` en los metadatos | **30 min** | SEC-048 | Deja de publicar el DNI del titular |
+| 16 | Unificar en 404 la respuesta ante documento inexistente | **1 h** | SEC-047 | Cierra el oráculo de enumeración |
+
+**Total estimado: menos de una jornada de trabajo** para cerrar total o parcialmente 14 hallazgos, incluidos tres de severidad Critical.
+
+---
+
+## 18. Limitaciones de la revisión
+
+Esta revisión es **estática y limitada al contenido de `E:\claude\Santander\APIs\codigo`**. Los siguientes elementos condicionan las conclusiones y **no han podido verificarse**:
+
+**Sobre la arquitectura aportada.** El diagrama PRE/PROD se ha utilizado para calibrar severidades, pero **no se ha verificado su implementación real**. En concreto, no se ha comprobado:
+
+* la configuración del **authorizer de Cognito** en el API Gateway: qué rutas cubre, si alguna queda sin él, y qué claims incluye el token emitido;
+* las **reglas de Imperva y del AWS WAF**, sus cuotas y su comportamiento ante evasión;
+* si el **API Gateway publica `/actuator/**`, `/swagger-ui.html` o `download_document_intern`** — se ha asumido que no, y de ahí la rebaja de SEC-025;
+* la existencia de **NetworkPolicy** entre pods; la ausencia de evidencia es la razón por la que el riesgo este-oeste se considera abierto;
+* la configuración de **PrivateLink y del NLB**, y si existe alguna ruta alternativa hacia los pods;
+* la configuración de **Netskope** (inspección TLS, CA desplegada en las imágenes) — la hipótesis sobre la causa raíz de SEC-004 es plausible pero no confirmada.
+
+**Sobre la plataforma AWS.** No se han verificado: políticas IAM de los roles asumidos (`AWS_IRSA_*`), políticas de bucket S3, cifrado en reposo (SSE-KMS) de S3, DynamoDB y RDS, versionado de objetos, TTL de las tablas, Security Groups, ACL de red, ni la configuración real de Secrets Manager.
+
+**Sobre el código y el runtime.** No se han verificado: los valores reales de las variables de entorno en cada perfil, el comportamiento en ejecución (esta revisión no ejecutó ningún código ni invocó ningún endpoint), la retención y control de acceso del agregador de logs, ni el contenido del `santander-spring-boot-starter-*` (código del framework corporativo no incluido en el alcance), del que depende de forma relevante la valoración de SEC-001 y SEC-038.
+
+**Sobre dependencias.** No se ejecutó análisis SCA. **Ningún CVE se afirma en este informe.** La §12 se basa únicamente en las versiones declaradas.
+
+**Sobre los proveedores.** No se ha evaluado la postura de seguridad de FacePhi, Zytrust, Modellica, Gesintel, Celmedia, SKY, Qurable ni Contáctanos, ni se han validado sus contratos de integración.
+
+**Principio aplicado:** no se ha asumido la existencia de ningún control del que no haya evidencia. Los controles que sí constan —el perímetro del diagrama, IRSA, Kubernetes Secrets, el contenedor sin privilegios— se han tenido en cuenta y figuran en la §13.
+
+---
+
+## 19. Verificación de cobertura
+
+| Comprobación | Estado |
+| ------------ | ------ |
+| Se analizaron todos los proyectos en alcance? | Si, 11 de 11 (`beemailsend` excluido: plantilla sin codigo de negocio) |
+| Todos los controllers y delegates? | Si, 19 clases de entrada |
+| Todos los endpoints? | Si, 67 operaciones declaradas en 11 contratos |
+| Spring Security? | Si, 10 `SecurityConfig` + `beemailboxes` sin ella |
+| ¿Autenticación M2M? | Sí — 13 integraciones (§10) |
+| ¿Autorización? | Sí — SEC-002, sin controles en 8 proyectos |
+| ¿JWT / OAuth2 / API Keys? | Sí — SEC-005, SEC-007, SEC-023, SEC-031, SEC-033 |
+| ¿TLS / mTLS? | Sí — SEC-004, SEC-009; sin mTLS en ninguna integración |
+| ¿Todos los clientes HTTP? | Sí — 7 `WebClientConfig`, 1 `RestTemplateConfig`, 8 `AwsHttpClientConfig` |
+| ¿URLs externas? | Sí — inventariadas en §10 |
+| ¿Propagación de cabeceras? | Sí — SEC-021, SEC-026, SEC-027 |
+| ¿Propagación de tokens? | Sí — no se reenvía el `Authorization` del consumidor; cada servicio obtiene el suyo (sin credential forwarding) |
+| ¿Timeouts? | Sí — SEC-016 |
+| ¿Retries? | Sí — SEC-017 |
+| ¿Idempotencia? | Sí — SEC-037 |
+| ¿Replay attacks? | Sí — SEC-006, SEC-037 |
+| ¿SSRF? | Sí — analizado y **descartado** (§14) |
+| ¿SQL Injection? | Sí — analizado y **descartado** (§14) |
+| ¿Deserialización? | Sí — analizado y **descartado** (§14) |
+| ¿XML / XXE? | Sí — SEC-036 (requiere validación) |
+| ¿Criptografía? | Sí — SEC-023, SEC-024, SEC-041 |
+| ¿Secretos? | Sí — SEC-003, 18 credenciales inventariadas |
+| ¿Logs? | Sí — SEC-005, SEC-007, SEC-011, SEC-012, SEC-013, SEC-038 |
+| ¿Excepciones? | Sí — SEC-018, SEC-028 |
+| ¿Dependencias? | Sí — §12, con la limitación declarada sobre CVE |
+| Configuracion? | Si, 51 ficheros `application*.yml` en 5 perfiles, mas los `.gluon/cd` de despliegue |
+| ¿Lógica de negocio? | Sí — SEC-010, SEC-030, SEC-032, SEC-040 |
+| ¿Relaciones entre APIs? | Sí — SEC-021, §8 |
+| ¿Cadenas de ataque? | Sí — 4 cadenas documentadas (§8) |
+| ¿Se eliminaron falsos positivos? | Sí — 10 patrones descartados con justificación (§14) |
+| ¿Cada hallazgo tiene evidencia? | Sí — archivo y línea verificados sobre el código |
+| ¿Cada hallazgo tiene corrección concreta? | Sí — con código recomendado donde aplica |
+| ¿Se re-escaneó con criterio de observabilidad externa? | Sí — v1.4, ver §22 y `EH_PREVIEW.md` |
+
+---
+
+---
+
+## 20. Seguimiento de remediación
+
+Registro de estado de los 46 hallazgos. **Esta es la sección que se actualiza en cada iteración**; el resto del informe solo cambia si aparece evidencia nueva o si un hallazgo se reevalúa.
+
+### Convención de estados
+
+| Estado | Significado |
+| ------ | ----------- |
+| `ABIERTO` | Sin trabajo iniciado |
+| `EN CURSO` | Corrección en desarrollo |
+| `EN REVISIÓN` | Corregido, pendiente de verificación sobre el código |
+| `CERRADO` | Corregido y verificado sobre el código |
+| `ASUMIDO` | Riesgo aceptado formalmente; requiere justificación, responsable y fecha de revisión |
+| `NO APLICA` | Descartado tras aportarse evidencia que invalida el hallazgo |
+
+Para pasar a `CERRADO` se requiere: (a) la corrección visible en el código, (b) una prueba que falle si el defecto reaparece, y (c) la verificación anotada en la columna correspondiente. Un hallazgo corregido sin prueba de regresión se queda en `EN REVISIÓN`.
+
+### Estado actual
+
+**Avance: 0 de 52 cerrados.**
+
+| Estado | Critical | High | Medium | Low | Info | Total |
+| ------ | -------: | ---: | -----: | --: | ---: | ----: |
+| ABIERTO | 9 | 17 | 18 | 6 | 2 | **52** |
+| EN CURSO | 0 | 0 | 0 | 0 | 0 | 0 |
+| EN REVISIÓN | 0 | 0 | 0 | 0 | 0 | 0 |
+| CERRADO | 0 | 0 | 0 | 0 | 0 | 0 |
+| ASUMIDO | 0 | 0 | 0 | 0 | 0 | 0 |
+
+### Registro por hallazgo
+
+| ID | Sev. | Prio. | Proyecto(s) | Hallazgo | Estado | Responsable | PR / commit | Verificado | Notas |
+| -- | ---- | ----- | ----------- | -------- | ------ | ----------- | ----------- | ---------- | ----- |
+| SEC-001 | Critical | P0 | Todos (11) | Autenticación y autorización desactivadas en todas las APIs | `ABIERTO` |  |  |  |  |
+| SEC-002 | Critical | P0 | 8 proyectos | BOLA/IDOR sistémico sobre identificadores de negocio | `ABIERTO` |  |  |  |  |
+| SEC-003 | Critical | P0 | 6 proyectos | Secretos de proveedores y BD versionados en el repositorio | `ABIERTO` |  |  |  |  |
+| SEC-004 | Critical | P0 | 7 proyectos | Validación de certificado TLS deshabilitada (trust-all) | `ABIERTO` |  |  |  |  |
+| SEC-005 | Critical | P0 | beemailboxes | Bypass de OTP: sin vínculo a usuario, sin límite, OTP en pa... | `ABIERTO` |  |  |  |  |
+| SEC-006 | Critical | P0 | bedigitsignature | Callback de firma digital a `webhook.site` y token de callb... | `ABIERTO` |  |  |  |  |
+| SEC-007 | Critical | P0 | 4 proyectos | Credenciales, tokens y clave AES escritos en logs | `ABIERTO` |  |  |  |  |
+| SEC-008 | Critical | P0 | becreditrisk | Datos personales reales (DNI + PLAFT/PEP) en `data.sql` ver... | `ABIERTO` |  |  |  |  |
+| SEC-009 | High | P1 | beclaims | Credenciales enviadas por HTTP en claro a Contáctanos (red... | `ABIERTO` |  |  |  |  |
+| SEC-010 | Critical | P0 | beclaims | Fail-open: se devuelven datos ficticios cuando falla el pro... | `ABIERTO` |  |  |  |  |
+| SEC-011 | High | P1 | bedigitsignature | Documento PDF completo en base64 escrito al log | `ABIERTO` |  |  |  |  |
+| SEC-012 | High | P1 | beidentbiometric | Tokens biométricos y datos de DNI escritos al log | `ABIERTO` |  |  |  |  |
+| SEC-013 | High | P1 | 6 proyectos | `wiretap(true)`: tráfico HTTP completo (incl. `Authorizatio... | `ABIERTO` |  |  |  |  |
+| SEC-014 | High | P1 | bedocmanagement | `GET /documents/{id}/versions` ignora el id y devuelve un s... | `ABIERTO` |  |  |  |  |
+| SEC-015 | High | P1 | bedocmanagement | Clave S3 y `Content-Type` construidos con datos del cliente... | `ABIERTO` |  |  |  |  |
+| SEC-016 | High | P1 | 3 proyectos | Integraciones salientes sin timeout | `ABIERTO` |  |  |  |  |
+| SEC-017 | High | P1 | becustombeprogrm | Reintentos sobre operaciones no idempotentes sin clave de i... | `ABIERTO` |  |  |  |  |
+| SEC-018 | High | P1 | becustombeprogrm, bedigitsignature | Cuerpo de error del proveedor propagado al consumidor | `ABIERTO` |  |  |  |  |
+| SEC-019 | High | P1 | Todos | Sin rate limiting: amplificación de recursos y abuso de env... | `ABIERTO` |  |  |  |  |
+| SEC-020 | High | P1 | 4 proyectos | Payloads base64 sin límite de tamaño ni validación | `ABIERTO` |  |  |  |  |
+| SEC-021 | High | P1 | bedocmanagement ← bedigitsignature | Endpoint `download_document_intern` público y confianza tra... | `ABIERTO` |  |  |  |  |
+| SEC-022 | High | P1 | Todos | Actuator expuesto sin autenticación con `show-details: ALWAYS` | `ABIERTO` |  |  |  |  |
+| SEC-023 | High | P1 | becustombeprogrm, bedigitsignature | JWT M2M sin `iss`/`aud`/`jti`, clave AES reutilizada como c... | `ABIERTO` |  |  |  |  |
+| SEC-024 | Medium | P2 | becustombeprogrm | AES sin cifrado autenticado y transformación tomada de conf... | `ABIERTO` |  |  |  |  |
+| SEC-025 | Low | P3 | Todos | Swagger UI y `/v3/api-docs` habilitados en todos los perfil... | `ABIERTO` |  |  |  |  |
+| SEC-026 | Medium | P2 | becreditrisk | Headers `society`/`channel` del consumidor alimentan el mot... | `ABIERTO` |  |  |  |  |
+| SEC-027 | Medium | P2 | Todos | `forward-headers-strategy: framework` sin proxy de confianz... | `ABIERTO` |  |  |  |  |
+| SEC-028 | Medium | P2 | 5 proyectos | Excepciones no mapeadas producen 500 con posible detalle in... | `ABIERTO` |  |  |  |  |
+| SEC-029 | Medium | P2 | beproducoffering | `ddl-auto: update` y `sql.init.mode: always` en producción | `ABIERTO` |  |  |  |  |
+| SEC-030 | Medium | P2 | bedatacomanagment | `patchConsent` usa `putIfAbsent`: la actualización nunca se... | `ABIERTO` |  |  |  |  |
+| SEC-031 | Medium | P2 | bedigitsignature | JWT almacenado como partition key en DynamoDB | `ABIERTO` |  |  |  |  |
+| SEC-032 | Medium | P2 | bedigitsignature | Backdoor de pruebas `CONTRATO_CLIENTE` devuelve un PDF del... | `ABIERTO` |  |  |  |  |
+| SEC-033 | Medium | P2 | beclaims | Token cacheado sin expiración ni renovación | `ABIERTO` |  |  |  |  |
+| SEC-034 | Medium | P2 | Todos | Deriva de versiones; `bedatacomanagment` mezcla Netty 4.1.x... | `ABIERTO` |  |  |  |  |
+| SEC-035 | Medium | P2 | beemailboxes | `assert` usado para control de flujo (inactivo en runtime) | `ABIERTO` |  |  |  |  |
+| SEC-036 | Medium | P2 | beemailboxes | `XmlMapper` sin endurecimiento explícito frente a DTD/entid... | `ABIERTO` |  |  |  |  |
+| SEC-037 | Medium | P2 | bedigitsignature, becustombeprogrm, beemailboxes | Sin idempotencia ni anti-replay en operaciones sensibles | `ABIERTO` |  |  |  |  |
+| SEC-038 | Medium | P2 | 6 proyectos | Datos externos escritos al log sin neutralizar (log injection) | `ABIERTO` |  |  |  |  |
+| SEC-039 | Medium | P2 | bedocmanagement | `search_documents` ejecuta Scan completo de DynamoDB sin pa... | `ABIERTO` |  |  |  |  |
+| SEC-040 | Medium | P2 | bewatchscreening | `validate_status` devuelve siempre `"Match Found"` | `ABIERTO` |  |  |  |  |
+| SEC-041 | Low | P3 | beemailboxes | Generador de códigos con PRNG no criptográfico y espacio re... | `ABIERTO` |  |  |  |  |
+| SEC-042 | Low | P3 | 3 proyectos | Endpoints internos y hostnames de BD revelados en el reposi... | `ABIERTO` |  |  |  |  |
+| SEC-043 | Low | P3 | Todos | `automountServiceAccountToken: true` en despliegue productivo | `ABIERTO` |  |  |  |  |
+| SEC-044 | Low | P3 | Todos | CSP definida para API JSON; falta política de cabeceras ade... | `ABIERTO` |  |  |  |  |
+| SEC-045 | Info | P3 | beclaims | `jwks.json` con claves públicas presente pero no utilizado | `ABIERTO` |  |  |  |  |
+| SEC-046 | Info | P3 | Todos | 67 operaciones declaradas frente a ~26 implementadas | `ABIERTO` |  |  |  |  |
+| SEC-047 | High | P1 | bedocmanagement | Enumeración diferencial ante recurso inexistente | `ABIERTO` |  |  |  |  |
+| SEC-048 | High | P1 | bedocmanagement | El DNI del titular se devuelve en el campo `name` | `ABIERTO` |  |  |  |  |
+| SEC-049 | High | P1 | bedocmanagement | Borrado sin verificación de titularidad ni existencia | `ABIERTO` |  |  |  |  |
+| SEC-050 | Medium | P2 | becustombeprogrm | El path variable determina el verbo HTTP saliente | `ABIERTO` |  |  |  |  |
+| SEC-051 | Medium | P2 | bedocmanagement | Campos cruzados en `FileEntity` | `ABIERTO` |  |  |  |  |
+| SEC-052 | Low | P3 | beknowyocustomer, bedatacomanagment | Endpoints declarados que responden 501 | `ABIERTO` |  |  |  |  |
+
+### Cómo actualizar este informe
+
+1. **Al corregir un hallazgo:** cambiar su `Estado` en la tabla anterior, anotar responsable, PR y fecha de verificación. Actualizar el contador de avance y la tabla de estado.
+2. **Si la corrección difiere de la recomendada:** anotarlo en `Notas` y, si el enfoque cambia el riesgo residual, ajustar el detalle del hallazgo en §5, §6 o §7.
+3. **Si un hallazgo resulta inválido:** marcar `NO APLICA` con la evidencia en `Notas`, y añadirlo a §14 (Falsos positivos descartados) explicando por qué el análisis estático lo señaló.
+4. **Si se acepta el riesgo:** marcar `ASUMIDO`, y registrar en `Notas` quién lo acepta, con qué justificación y en qué fecha se revisará.
+5. **Al aparecer un hallazgo nuevo:** asignar el siguiente ID libre (SEC-047 en adelante), documentarlo con la misma estructura (ubicación, descripción, evidencia, flujo, source, sink, escenario, impacto, remediación) y añadirlo a §4, §9 y a esta tabla.
+6. **Registrar el cambio** en el historial de versiones de la cabecera.
+
+### Orden de ataque sugerido
+
+Los quick wins de §17 son el mejor punto de partida: **menos de una jornada** para cerrar total o parcialmente 14 hallazgos, tres de ellos Critical. No requieren decisiones de arquitectura ni coordinación con terceros, así que pueden avanzar en paralelo al trabajo de fondo.
+
+Después, por dependencias entre hallazgos:
+
+```text
+SEC-003 (rotar secretos)  ──► independiente, urgente, coordinar con proveedores
+SEC-008 (data.sql)        ──► independiente, urgente, escalar al DPO
+SEC-001 (validar JWT)     ──► habilita técnicamente a ──►  SEC-002 (autorización de objeto)
+                                                            │
+SEC-004 (CA de Netskope)  ──► independiente                 └──► cierra el riesgo #1 del §15
+SEC-005 (rediseño OTP)    ──► independiente, requiere cambio de contrato
+SEC-006 (callback)        ──► requiere definir la ruta de entrada con Arquitectura
+```
+
+`SEC-001` y `SEC-002` deben planificarse juntos: activar la validación del token sin implementar la autorización de objeto cierra el primero y deja el segundo intacto, que es el de mayor riesgo real según §15.
+
+
+---
+
+---
+
+## 21. Línea base para comparativas
+
+Este informe queda congelado como **línea base** en:
+
+```text
+security-baseline-2026-08-20-v1.2.json
+```
+
+Contiene los 46 hallazgos con una **huella estable** por hallazgo, calculada sobre CWE + proyecto + componente (sin números de línea) + términos del título. Esa huella es lo que permite emparejar hallazgos entre auditorías distintas.
+
+**Por qué no se compara por ID.** Los identificadores `SEC-0NN` se asignan por orden de redacción. Si en la próxima auditoría aparece un hallazgo nuevo entre medias, la numeración se desplaza y `SEC-014` deja de referirse a lo mismo: comparar por ID generaría decenas de falsos "nuevos" y "resueltos". La huella sobrevive a la renumeración, a que el código cambie de línea y a reformulaciones del título. No incluye la severidad, porque su cambio es justamente lo que interesa detectar.
+
+### Al ejecutar la próxima auditoría
+
+```bash
+# 1. Congelar la nueva línea base
+python snapshot_baseline.py SECURITY_CODE_REVIEW.md security-baseline-<fecha>.json
+
+# 2. Comparar contra esta
+python compare_scans.py security-baseline-2026-08-20-v1.2.json                         security-baseline-<fecha>.json --md comparativa.md
+```
+
+El resultado clasifica cada hallazgo en `RESUELTO`, `NUEVO`, `PERSISTE`, `AGRAVADO`, `ATENUADO` o `REGRESION`, y produce un anexo listo para incorporar al informe nuevo.
+
+### Qué vigilar
+
+**`REGRESION`** — un hallazgo cerrado que reaparece. Es la razón de ser de este mecanismo: en un informe aislado parecería un hallazgo más, y solo la comparación lo delata. Suele indicar que la corrección no llegó a desplegarse, que se revirtió en un merge, o que se aplicó a un componente y no a los demás que compartían el defecto.
+
+**`RESUELTO`** — conviene confirmar la causa antes de anotarlo como logro: un hallazgo también desaparece si el componente salió del alcance o si el código se movió.
+
+Los scripts están en la skill `security-code-review` (`~/.claude/skills/security-code-review/scripts/`).
+
+
+---
+
+---
+
+## 22. Anexo: vista previa del Ethical Hacking
+
+Documento complementario: **`EH_PREVIEW.md`** (mismo directorio).
+
+Ante la confirmación de que el Ethical Hacking será de **caja negra, sin revisión de código y a través del API Gateway con credenciales entregadas**, se re-escaneó el código con un criterio distinto al de esta auditoría: no *¿qué está mal?* sino **¿qué es observable desde fuera?**.
+
+El anexo contiene:
+
+* El **modelo de atacante** asumido y sus implicaciones.
+* El mapeo de los hallazgos contra **OWASP API Security Top 10 2023**, el marco que previsiblemente usará el proveedor. Nueve de las diez categorías tienen al menos un hallazgo asociado; la única limpia es SSRF, verificada y descartada.
+* **15 casos de prueba** concretos con la petición y el resultado esperado.
+* La lista de **qué no verá** el proveedor y por qué.
+* Priorización previa a la prueba.
+
+### Dos conclusiones que afectan a la lectura de este informe
+
+**1. SEC-001 quedará enmascarado.** Con el API Gateway y Cognito delante, las pruebas de autenticación —sin cabecera, token expirado, firma alterada— se detendrán en el perímetro. El proveedor no detectará que el backend no valida el token, porque nunca le llegará una petición sin token válido.
+
+Esto tiene una consecuencia de gobierno: si el informe del Ethical Hacking concluye *"autenticación correcta"*, estará certificando una capa que no existe. Conviene que el alcance quede documentado explícitamente en su informe.
+
+**2. Un resultado limpio no equivale a código seguro.** De los 52 hallazgos, alrededor de 20 son observables desde fuera. Los 32 restantes —secretos versionados, validación TLS anulada, credenciales en logs, datos personales en `data.sql`, dependencias— solo se detectan con acceso al código, que es justamente el alcance de esta auditoría y no el de la prueba externa.
+
+### Recomendación sobre el alcance
+
+Plantear a Arquitectura la inclusión de un **escenario de red interna o de contenedor comprometido**. Sin él, SEC-001 y SEC-021 no se prueban, y son los dos hallazgos sobre los que se apoya el resto del modelo de confianza. Es práctica habitual en el sector.
+
+
+---
+
+*Informe generado mediante revisión estática del código fuente. Las credenciales identificadas se reportan enmascaradas y no han sido utilizadas. No se modificó ningún archivo del código fuente; el único fichero creado es este informe.*
